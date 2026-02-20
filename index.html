@@ -147,24 +147,17 @@
       background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
     }
     .header-content {
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      position: relative;
-      z-index: 1;
-      flex: 1;
+      display:flex;
+      align-items:center;
+      gap:1.5rem;
+      position:relative;
+      z-index:1;
+      flex:1;
     }
-    .logo-container {
-      flex-shrink: 0;
-    }
-    .logo-container img {
-      height: 60px;
-      width: auto;
-      object-fit: contain;
-    }
+    .logo-container { flex-shrink:0; }
+    .logo-container img { height:60px; width:auto; object-fit:contain; }
     .header-text h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: .5px; margin: 0; }
     .header-text p  { margin: 0.25rem 0 0 0; opacity: .85; font-size: 0.95rem; }
-
 
     /* ── Nav pills ── */
     nav {
@@ -260,42 +253,16 @@
       transition: all .2s;
       display: flex; align-items: center; gap: .4rem;
     }
-    button.btn-primary {
-      background: var(--blue-mid);
-      color: #fff;
-    }
-    button.btn-primary:hover {
-      background: var(--blue-dark);
-      box-shadow: 0 4px 12px rgba(31,56,100,.3);
-    }
-    button.btn-success {
-      background: var(--success);
-      color: #fff;
-    }
-    button.btn-success:hover {
-      background: #1e8449;
-    }
-    button.btn-danger {
-      background: var(--accent);
-      color: #fff;
-    }
-    button.btn-danger:hover {
-      background: #c73535;
-    }
-    button.btn-secondary {
-      background: #95a5a6;
-      color: #fff;
-    }
-    button.btn-secondary:hover {
-      background: #7f8c8d;
-    }
-    button.btn-warning {
-      background: var(--warning);
-      color: #fff;
-    }
-    button.btn-warning:hover {
-      background: #e0941f;
-    }
+    button.btn-primary { background: var(--blue-mid); color: #fff; }
+    button.btn-primary:hover { background: var(--blue-dark); box-shadow: 0 4px 12px rgba(31,56,100,.3); }
+    button.btn-success { background: var(--success); color: #fff; }
+    button.btn-success:hover { background: #1e8449; }
+    button.btn-danger { background: var(--accent); color: #fff; }
+    button.btn-danger:hover { background: #c73535; }
+    button.btn-secondary { background: #95a5a6; color: #fff; }
+    button.btn-secondary:hover { background: #7f8c8d; }
+    button.btn-warning { background: var(--warning); color: #fff; }
+    button.btn-warning:hover { background: #e0941f; }
 
     /* ── Modal ── */
     .modal {
@@ -314,21 +281,9 @@
       width: 90%;
       box-shadow: 0 10px 40px rgba(0,0,0,.3);
     }
-    .modal-content h3 {
-      font-size: 1.3rem;
-      color: var(--blue-dark);
-      margin-bottom: 1.5rem;
-    }
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: .4rem;
-      color: var(--blue-dark);
-      font-size: .9rem;
-    }
+    .modal-content h3 { font-size: 1.3rem; color: var(--blue-dark); margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: .4rem; color: var(--blue-dark); font-size: .9rem; }
     .form-group input, .form-group select {
       width: 100%;
       padding: .6rem .8rem;
@@ -338,14 +293,8 @@
       outline: none;
       transition: border-color .2s;
     }
-    .form-group input:focus, .form-group select:focus {
-      border-color: var(--blue-mid);
-      box-shadow: 0 0 0 3px rgba(46,117,182,.1);
-    }
-    .modal-buttons {
-      display: flex; gap: .75rem; justify-content: flex-end;
-      margin-top: 1.75rem;
-    }
+    .form-group input:focus, .form-group select:focus { border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(46,117,182,.1); }
+    .modal-buttons { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.75rem; }
 
     /* ── Table ── */
     .table-wrap { overflow-x: auto; }
@@ -355,35 +304,14 @@
     tbody tr { border-bottom: 1px solid #e8edf5; transition: background .15s; }
     tbody tr:hover { background: var(--blue-light); }
     tbody td { padding: .75rem 1rem; }
-    .badge {
-      display: inline-block;
-      padding: .3rem .75rem;
-      border-radius: 50px;
-      font-size: .78rem; font-weight: 700;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .badge-aberto {
-      background: #ffeaea; color: var(--accent);
-    }
-    .badge-aberto:hover {
-      background: #ffcccc;
-    }
-    .badge-parcial {
-      background: #fff3cd; color: #856404;
-    }
-    .badge-parcial:hover {
-      background: #ffe69c;
-    }
-    .badge-concluido {
-      background: #d4edda; color: #155724;
-    }
-    .badge-concluido:hover {
-      background: #c3e6cb;
-    }
-    .action-btns {
-      display: flex; gap: .5rem;
-    }
+    .badge { display: inline-block; padding: .3rem .75rem; border-radius: 50px; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+    .badge-aberto { background: #ffeaea; color: var(--accent); }
+    .badge-aberto:hover { background: #ffcccc; }
+    .badge-parcial { background: #fff3cd; color: #856404; }
+    .badge-parcial:hover { background: #ffe69c; }
+    .badge-concluido { background: #d4edda; color: #155724; }
+    .badge-concluido:hover { background: #c3e6cb; }
+    .action-btns { display: flex; gap: .5rem; }
     .action-btns button {
       padding: .35rem .6rem;
       font-size: .8rem;
@@ -392,26 +320,13 @@
       cursor: pointer;
       transition: all .2s;
     }
-    .action-btns .edit-btn {
-      background: #3498db;
-      color: #fff;
-    }
-    .action-btns .edit-btn:hover {
-      background: #2980b9;
-    }
-    .action-btns .delete-btn {
-      background: var(--accent);
-      color: #fff;
-    }
-    .action-btns .delete-btn:hover {
-      background: #c73535;
-    }
+    .action-btns .edit-btn { background: #3498db; color: #fff; }
+    .action-btns .edit-btn:hover { background: #2980b9; }
+    .action-btns .delete-btn { background: var(--accent); color: #fff; }
+    .action-btns .delete-btn:hover { background: #c73535; }
 
     /* ── Search / Filter ── */
-    .filter-bar {
-      display: flex; gap: 1rem; flex-wrap: wrap;
-      margin-bottom: 1.25rem;
-    }
+    .filter-bar { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
     .filter-bar input, .filter-bar select {
       padding: .55rem 1rem;
       border: 1.5px solid #c8d6ea;
@@ -430,113 +345,31 @@
       font-size: .9rem; font-weight: 600; margin-bottom: .3rem;
       color: var(--blue-dark);
     }
-    .progress-track {
-      background: var(--blue-light);
-      border-radius: 50px; height: 14px; overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%; border-radius: 50px;
-      background: linear-gradient(90deg, var(--blue-mid), #5ba4e0);
-      transition: width 1s ease;
-    }
+    .progress-track { background: var(--blue-light); border-radius: 50px; height: 14px; overflow: hidden; }
+    .progress-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--blue-mid), #5ba4e0); transition: width 1s ease; }
 
     /* ── Alert ── */
-    .alert {
-      padding: 1rem 1.25rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      display: none;
-    }
+    .alert { padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
     .alert.show { display: block; }
-    .alert-success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-    .alert-error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
+    .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
     /* ── PDF Report ── */
-    .pdf-report {
-      background: #fff;
-      padding: 2rem;
-      border-radius: var(--radius);
-      margin-top: 2rem;
-    }
-    .pdf-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 2rem;
-      padding-bottom: 1rem;
-      border-bottom: 3px solid var(--blue-mid);
-    }
-    .pdf-header img {
-      height: 50px;
-      width: auto;
-    }
-    .pdf-header-text {
-      flex: 1;
-      margin-left: 1rem;
-    }
-    .pdf-header-text h2 {
-      margin: 0;
-      color: var(--blue-dark);
-      font-size: 1.5rem;
-    }
-    .pdf-header-text p {
-      margin: 0.25rem 0 0 0;
-      color: var(--muted);
-      font-size: 0.9rem;
-    }
-    .pdf-stats {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .pdf-stat-box {
-      background: var(--blue-light);
-      padding: 1.5rem;
-      border-radius: 12px;
-      border-left: 4px solid var(--blue-mid);
-      text-align: center;
-    }
-    .pdf-stat-box .value {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: var(--blue-dark);
-      display: block;
-      margin-bottom: 0.5rem;
-    }
-    .pdf-stat-box .label {
-      font-size: 0.9rem;
-      color: var(--muted);
-      font-weight: 600;
-    }
-    .pdf-section {
-      margin-bottom: 2rem;
-    }
-    .pdf-section h3 {
-      color: var(--blue-dark);
-      font-size: 1.2rem;
-      margin-bottom: 1rem;
-      padding-bottom: 0.5rem;
-      border-bottom: 2px solid var(--blue-light);
-    }
+    .pdf-report { background: #fff; padding: 2rem; border-radius: var(--radius); margin-top: 2rem; }
+    .pdf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 3px solid var(--blue-mid); }
+    .pdf-header img { height: 50px; width: auto; }
+    .pdf-header-text { flex: 1; margin-left: 1rem; }
+    .pdf-header-text h2 { margin: 0; color: var(--blue-dark); font-size: 1.5rem; }
+    .pdf-header-text p { margin: 0.25rem 0 0 0; color: var(--muted); font-size: 0.9rem; }
+    .pdf-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .pdf-stat-box { background: var(--blue-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--blue-mid); text-align: center; }
+    .pdf-stat-box .value { font-size: 2.5rem; font-weight: 800; color: var(--blue-dark); display: block; margin-bottom: 0.5rem; }
+    .pdf-stat-box .label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
+    .pdf-section { margin-bottom: 2rem; }
+    .pdf-section h3 { color: var(--blue-dark); font-size: 1.2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--blue-light); }
 
     /* ── Footer ── */
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      color: var(--muted);
-      font-size: .82rem;
-      border-top: 1px solid #dde4f0;
-      margin-top: 2rem;
-    }
+    footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: .82rem; border-top: 1px solid #dde4f0; margin-top: 2rem; }
 
     /* ── Print ── */
     @media print {
@@ -546,29 +379,14 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
-      header {
-        flex-direction: column;
-        text-align: center;
-      }
-      .header-content {
-        flex-direction: column;
-        gap: 1rem;
-      }
+      header { flex-direction: column; text-align: center; }
+      .header-content { flex-direction: column; gap: 1rem; }
       .header-text h1 { font-size: 1.4rem; }
       .kpi .value { font-size: 1.7rem; }
       .modal-content { width: 95%; }
-      .pdf-header {
-        flex-direction: column;
-        text-align: center;
-      }
-      .pdf-header-text {
-        margin-left: 0;
-        margin-top: 1rem;
-      }
-      .logout-btn {
-        margin-top: 1rem;
-        width: 100%;
-      }
+      .pdf-header { flex-direction: column; text-align: center; }
+      .pdf-header-text { margin-left: 0; margin-top: 1rem; }
+      .logout-btn { margin-top: 1rem; width: 100%; }
     }
   </style>
 </head>
@@ -803,6 +621,12 @@
   Controle de Materiais de Empréstimo — Plano & Plano &mdash; Dados salvos automaticamente
 </footer>
 
+<!-- Firebase bridge -->
+<script type="module">
+  import { salvarNaNuvem, carregarDaNuvem, escutarMudancas } from "./firebase.js";
+  window.__fb = { salvarNaNuvem, carregarDaNuvem, escutarMudancas };
+</script>
+
 <script>
 // ── AUTENTICAÇÃO ──
 const auth = {
@@ -826,8 +650,6 @@ const auth = {
     const login = document.getElementById('login-input').value.toLowerCase().trim();
     const senha = document.getElementById('password-input').value.trim();
 
-
-
     if (login === this.CREDENCIAIS.login && senha === this.CREDENCIAIS.senha) {
       document.getElementById('login-error').classList.remove('show');
       this.mostrarApp();
@@ -838,15 +660,9 @@ const auth = {
     }
   },
 
-
-
   toggleSenha() {
     const input = document.getElementById('password-input');
-    if (input.type === 'password') {
-      input.type = 'text';
-    } else {
-      input.type = 'password';
-    }
+    input.type = (input.type === 'password') ? 'text' : 'password';
   },
 
   mostrarApp() {
@@ -866,14 +682,37 @@ const app = {
   dados: [],
   editandoId: null,
   charts: {},
+  _unsub: null,
+  _isApplyingRemote: false,
 
   // ── Inicialização ──
   init() {
     console.log('Inicializando aplicação...');
-    this.carregarDados();
-    this.atualizarUI();
-    this.setupEventListeners();
-    console.log('Aplicação inicializada com sucesso!');
+    this.carregarDados().then(() => {
+      this.atualizarUI();
+      this.setupEventListeners();
+      this.iniciarSyncAoVivo();
+      console.log('Aplicação inicializada com sucesso!');
+    });
+  },
+
+  iniciarSyncAoVivo() {
+    try {
+      if (!window.__fb || !window.__fb.escutarMudancas) return;
+      if (this._unsub) this._unsub();
+      this._unsub = window.__fb.escutarMudancas((registros) => {
+        // evita loop quando a própria tela salva
+        if (this._isApplyingRemote) return;
+        this._isApplyingRemote = true;
+        this.dados = Array.isArray(registros) ? registros : [];
+        // mantém um cache local também
+        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados)); } catch(e) {}
+        this.atualizarUI();
+        this._isApplyingRemote = false;
+      });
+    } catch (e) {
+      console.warn('Sync ao vivo indisponível:', e);
+    }
   },
 
   // ── Setup de eventos ──
@@ -884,39 +723,70 @@ const app = {
     });
   },
 
-  // ── Carregar dados ──
-  carregarDados() {
+  // ── Carregar dados (Firebase → fallback localStorage → default) ──
+  async carregarDados() {
     try {
+      // 1) tenta nuvem
+      if (window.__fb && window.__fb.carregarDaNuvem) {
+        const cloud = await window.__fb.carregarDaNuvem();
+        if (cloud && Array.isArray(cloud) && cloud.length) {
+          this.dados = cloud;
+          console.log('Dados carregados do Firebase:', this.dados.length, 'registros');
+          // cache local
+          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados)); } catch(e) {}
+          return;
+        }
+      }
+
+      // 2) fallback localStorage
       const salvos = localStorage.getItem(this.STORAGE_KEY);
       if (salvos) {
         this.dados = JSON.parse(salvos);
         console.log('Dados carregados do localStorage:', this.dados.length, 'registros');
-      } else {
-        this.dados = [
-          { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
-          { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
-          { id:3, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-02-12", quantidade:150, status:"Em Aberto" },
-          { id:4, empresa:"Felipe Agosti", material:"Tábua 30cm",             data:"2026-02-12", quantidade:50,  status:"Em Aberto" },
-          { id:5, empresa:"Murilo",        material:"Pontalete",              data:"2026-02-04", quantidade:220, status:"Em Aberto" },
-          { id:6, empresa:"Spera Urban",   material:"Pontalete",              data:"2025-02-03", quantidade:100, status:"Em Aberto" },
-          { id:7, empresa:"Plano Purus",   material:"Tábua de 30cm",          data:"2026-02-06", quantidade:100, status:"Em Aberto" },
-        ];
+        // sobe para nuvem na primeira vez (se nuvem estiver vazia)
         this.salvarDados();
+        return;
       }
+
+      // 3) default
+      this.dados = [
+        { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
+        { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
+        { id:3, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-02-12", quantidade:150, status:"Em Aberto" },
+        { id:4, empresa:"Felipe Agosti", material:"Tábua 30cm",             data:"2026-02-12", quantidade:50,  status:"Em Aberto" },
+        { id:5, empresa:"Murilo",        material:"Pontalete",              data:"2026-02-04", quantidade:220, status:"Em Aberto" },
+        { id:6, empresa:"Spera Urban",   material:"Pontalete",              data:"2025-02-03", quantidade:100, status:"Em Aberto" },
+        { id:7, empresa:"Plano Purus",   material:"Tábua de 30cm",          data:"2026-02-06", quantidade:100, status:"Em Aberto" },
+      ];
+      this.salvarDados();
     } catch (e) {
       console.error('Erro ao carregar dados:', e);
       this.mostrarAlerta('Erro ao carregar dados. Usando dados padrão.', 'error');
     }
   },
 
-  // ── Salvar dados ──
+  // ── Salvar dados (Firebase + cache local) ──
   salvarDados() {
+    // cache local sempre
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
-      console.log('Dados salvos com sucesso!');
+    } catch (e) {
+      console.warn('Falha ao salvar cache local:', e);
+    }
+
+    // salva na nuvem (fire-and-forget)
+    try {
+      if (this._isApplyingRemote) return;
+      if (window.__fb && window.__fb.salvarNaNuvem) {
+        window.__fb.salvarNaNuvem(this.dados).then(() => {
+          console.log('Dados salvos no Firebase!');
+        }).catch((e) => {
+          console.error('Erro ao salvar no Firebase:', e);
+          this.mostrarAlerta('Sem conexão com a nuvem. Salvando localmente.', 'error');
+        });
+      }
     } catch (e) {
       console.error('Erro ao salvar dados:', e);
-      this.mostrarAlerta('Erro ao salvar dados. Tente novamente.', 'error');
     }
   },
 
@@ -934,7 +804,7 @@ const app = {
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
-    
+
     if (id === 'relatorio') {
       this.gerarRelatorioPDF();
     }
@@ -1005,11 +875,11 @@ const app = {
   alterarStatus(id) {
     const reg = this.dados.find(d => d.id === id);
     if (!reg) return;
-    
+
     const statusOpcoes = ["Em Aberto", "Parcial", "Concluído"];
     const indiceAtual = statusOpcoes.indexOf(reg.status);
     reg.status = statusOpcoes[(indiceAtual + 1) % statusOpcoes.length];
-    
+
     this.salvarDados();
     this.atualizarUI();
     this.mostrarAlerta(`Status alterado para: ${reg.status}`, 'success');
@@ -1043,14 +913,10 @@ const app = {
     const materiaisAtuais = new Set(this.dados.map(d => d.material));
 
     filterEmp.innerHTML = '<option value="">Todas as empresas</option>';
-    [...empresasAtuais].sort().forEach(e => {
-      filterEmp.innerHTML += `<option>${e}</option>`;
-    });
+    [...empresasAtuais].sort().forEach(e => { filterEmp.innerHTML += `<option>${e}</option>`; });
 
     filterMat.innerHTML = '<option value="">Todos os materiais</option>';
-    [...materiaisAtuais].sort().forEach(m => {
-      filterMat.innerHTML += `<option>${m}</option>`;
-    });
+    [...materiaisAtuais].sort().forEach(m => { filterMat.innerHTML += `<option>${m}</option>`; });
 
     // Tabela
     this.renderTabela(this.dados);
@@ -1100,17 +966,12 @@ const app = {
 
   // ── Gráficos ──
   atualizarGraficos(porEmpresa, porMaterial, total) {
-    // Destruir gráficos antigos
-    Object.values(this.charts).forEach(chart => {
-      try { chart.destroy(); } catch(e) {}
-    });
+    Object.values(this.charts).forEach(chart => { try { chart.destroy(); } catch(e) {} });
     this.charts = {};
 
-    // Gráfico: Empresa (doughnut)
     this.charts.empresa = new Chart(document.getElementById('chartEmpresa'), {
       type: 'doughnut',
-      data: {
-        labels: Object.keys(porEmpresa),
+      data: { labels: Object.keys(porEmpresa),
         datasets: [{ data: Object.values(porEmpresa), backgroundColor: this.CORES, borderWidth: 2, borderColor: '#fff' }]
       },
       options: {
@@ -1123,11 +984,9 @@ const app = {
       }
     });
 
-    // Gráfico: Material (pie)
     this.charts.material = new Chart(document.getElementById('chartMaterial'), {
       type: 'pie',
-      data: {
-        labels: Object.keys(porMaterial),
+      data: { labels: Object.keys(porMaterial),
         datasets: [{ data: Object.values(porMaterial), backgroundColor: this.CORES, borderWidth: 2, borderColor: '#fff' }]
       },
       options: {
@@ -1139,7 +998,6 @@ const app = {
       }
     });
 
-    // Gráfico: Por data
     const porData = this.dados.reduce((acc, d) => {
       const key = `${d.data} – ${d.empresa}`;
       acc[key] = (acc[key] || 0) + d.quantidade;
@@ -1147,15 +1005,8 @@ const app = {
     }, {});
     this.charts.data = new Chart(document.getElementById('chartData'), {
       type: 'bar',
-      data: {
-        labels: Object.keys(porData),
-        datasets: [{
-          label: 'Quantidade',
-          data: Object.values(porData),
-          backgroundColor: this.CORES,
-          borderRadius: 8,
-          borderSkipped: false
-        }]
+      data: { labels: Object.keys(porData),
+        datasets: [{ label: 'Quantidade', data: Object.values(porData), backgroundColor: this.CORES, borderRadius: 8, borderSkipped: false }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -1167,55 +1018,30 @@ const app = {
       }
     });
 
-    // Gráfico: Empresa bar
     this.charts.empresaBar = new Chart(document.getElementById('chartEmpresaBar'), {
       type: 'bar',
-      data: {
-        labels: Object.keys(porEmpresa),
-        datasets: [{
-          label: 'Total de Itens',
-          data: Object.values(porEmpresa),
-          backgroundColor: this.CORES,
-          borderRadius: 10,
-          borderSkipped: false
-        }]
+      data: { labels: Object.keys(porEmpresa),
+        datasets: [{ label: 'Total de Itens', data: Object.values(porEmpresa), backgroundColor: this.CORES, borderRadius: 10, borderSkipped: false }]
       },
       options: {
-        indexAxis: 'y',
-        responsive: true, maintainAspectRatio: false,
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
-        scales: {
-          x: { beginAtZero: true, grid: { color: '#e8edf5' } },
-          y: { grid: { display: false } }
-        }
+        scales: { x: { beginAtZero: true, grid: { color: '#e8edf5' } }, y: { grid: { display: false } } }
       }
     });
 
-    // Gráfico: Material bar
     this.charts.materialBar = new Chart(document.getElementById('chartMaterialBar'), {
       type: 'bar',
-      data: {
-        labels: Object.keys(porMaterial),
-        datasets: [{
-          label: 'Total de Itens',
-          data: Object.values(porMaterial),
-          backgroundColor: this.CORES,
-          borderRadius: 10,
-          borderSkipped: false
-        }]
+      data: { labels: Object.keys(porMaterial),
+        datasets: [{ label: 'Total de Itens', data: Object.values(porMaterial), backgroundColor: this.CORES, borderRadius: 10, borderSkipped: false }]
       },
       options: {
-        indexAxis: 'y',
-        responsive: true, maintainAspectRatio: false,
+        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
         plugins: { legend: { display: false } },
-        scales: {
-          x: { beginAtZero: true, grid: { color: '#e8edf5' } },
-          y: { grid: { display: false } }
-        }
+        scales: { x: { beginAtZero: true, grid: { color: '#e8edf5' } }, y: { grid: { display: false } } }
       }
     });
 
-    // Progress bars: Empresas
     const peDiv = document.getElementById('progressEmpresas');
     peDiv.innerHTML = '';
     Object.entries(porEmpresa).sort((a,b) => b[1]-a[1]).forEach(([emp, qtd], i) => {
@@ -1229,7 +1055,6 @@ const app = {
         </div>`;
     });
 
-    // Progress bars: Materiais
     const pmDiv = document.getElementById('progressMateriais');
     pmDiv.innerHTML = '';
     Object.entries(porMaterial).sort((a,b) => b[1]-a[1]).forEach(([mat, qtd], i) => {
@@ -1263,22 +1088,10 @@ const app = {
       </div>
 
       <div class="pdf-stats">
-        <div class="pdf-stat-box">
-          <span class="value">${total}</span>
-          <span class="label">Total de Itens</span>
-        </div>
-        <div class="pdf-stat-box">
-          <span class="value">${abertos}</span>
-          <span class="label">Em Aberto</span>
-        </div>
-        <div class="pdf-stat-box">
-          <span class="value">${parciais}</span>
-          <span class="label">Parcial</span>
-        </div>
-        <div class="pdf-stat-box">
-          <span class="value">${concluidos}</span>
-          <span class="label">Concluído</span>
-        </div>
+        <div class="pdf-stat-box"><span class="value">${total}</span><span class="label">Total de Itens</span></div>
+        <div class="pdf-stat-box"><span class="value">${abertos}</span><span class="label">Em Aberto</span></div>
+        <div class="pdf-stat-box"><span class="value">${parciais}</span><span class="label">Parcial</span></div>
+        <div class="pdf-stat-box"><span class="value">${concluidos}</span><span class="label">Concluído</span></div>
       </div>
 
       <div class="pdf-section">
@@ -1358,7 +1171,6 @@ const app = {
     document.getElementById('pdf-container').innerHTML = html;
   },
 
-  // ── Exportar PDF ──
   exportarPDF() {
     const elemento = document.getElementById('pdf-container');
     const opt = {
@@ -1372,11 +1184,10 @@ const app = {
     this.mostrarAlerta('PDF gerado com sucesso!', 'success');
   },
 
-  // ── Exportar CSV ──
   exportarCSV() {
-    let csv = 'ID,Empresa,Material,Data do Empréstimo,Quantidade,Status\n';
+    let csv = 'ID,Empresa,Material,Data do Empréstimo,Quantidade,Status\\n';
     this.dados.forEach(d => {
-      csv += `${d.id},"${d.empresa}","${d.material}","${d.data}",${d.quantidade},"${d.status}"\n`;
+      csv += `${d.id},"${d.empresa}","${d.material}","${d.data}",${d.quantidade},"${d.status}"\\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -1386,11 +1197,20 @@ const app = {
     this.mostrarAlerta('Arquivo CSV exportado com sucesso!', 'success');
   },
 
-  // ── Resetar ──
   resetarDados() {
     if (confirm('Tem certeza que deseja resetar TODOS os dados para o padrão inicial? Esta ação não pode ser desfeita!')) {
-      localStorage.removeItem(this.STORAGE_KEY);
-      this.carregarDados();
+      try { localStorage.removeItem(this.STORAGE_KEY); } catch(e) {}
+      // volta para o padrão
+      this.dados = [
+        { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
+        { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
+        { id:3, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-02-12", quantidade:150, status:"Em Aberto" },
+        { id:4, empresa:"Felipe Agosti", material:"Tábua 30cm",             data:"2026-02-12", quantidade:50,  status:"Em Aberto" },
+        { id:5, empresa:"Murilo",        material:"Pontalete",              data:"2026-02-04", quantidade:220, status:"Em Aberto" },
+        { id:6, empresa:"Spera Urban",   material:"Pontalete",              data:"2025-02-03", quantidade:100, status:"Em Aberto" },
+        { id:7, empresa:"Plano Purus",   material:"Tábua de 30cm",          data:"2026-02-06", quantidade:100, status:"Em Aberto" },
+      ];
+      this.salvarDados();
       this.atualizarUI();
       this.mostrarAlerta('Dados resetados para o padrão inicial!', 'success');
     }
