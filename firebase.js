@@ -1,9 +1,14 @@
-
+/**
+ * Firebase Firestore (sem build / sem npm)
+ * - Funciona em site estático (GitHub Pages / Vercel)
+ * - Salva/Carrega em 1 documento: controle/dados
+ */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import {
   getFirestore, doc, setDoc, getDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 
+// ✅ Config do seu app (você enviou no chat)
 const firebaseConfig = {
   apiKey: "AIzaSyBNeTqTWbvakrz2KiVABPWezxoqZePuBms",
   authDomain: "planoeplano.firebaseapp.com",
@@ -16,6 +21,7 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
+// Documento único com todos os registros (simples)
 const REF = doc(db, "controle", "dados");
 
 export async function salvarNaNuvem(registros) {
