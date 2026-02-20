@@ -578,14 +578,14 @@
 <div id="login-screen">
   <div class="login-container">
     <div class="login-logo">
-      <img src="logo.jpg" alt="Plano & Plano" />
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
     </div>
     <h1>Acesso Restrito</h1>
     <p>Faça login para acessar o controle de materiais</p>
     <form class="login-form" onsubmit="auth.login(event)">
       <div class="form-group">
         <label for="login-input">Login</label>
-        <input type="text" id="login-input" placeholder="Ex: planonana" required autocomplete="off" />
+        <input type="text" id="login-input" required autocomplete="off" />
       </div>
       <div class="form-group">
         <label for="password-input">Senha</label>
@@ -596,11 +596,6 @@
       </div>
       <button type="submit">Acessar Sistema</button>
       <div id="login-error" class="login-error">❌ Login ou senha incorretos! Tente novamente.</div>
-      <div style="margin-top: 1rem; padding: 0.75rem; background: #f0f4fa; border-radius: 8px; font-size: 0.85rem; color: #6b7a99;">
-        <strong>Credenciais padrão:</strong><br>
-        Login: <code style="background: #fff; padding: 0.2rem 0.4rem; border-radius: 4px;">planonana</code><br>
-        Senha: <code style="background: #fff; padding: 0.2rem 0.4rem; border-radius: 4px;">@plano123</code>
-      </div>
     </form>
   </div>
 </div>
@@ -609,7 +604,7 @@
 <header>
   <div class="header-content">
     <div class="logo-container">
-      <img src="logo.jpg" alt="Plano & Plano" />
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
     </div>
     <div class="header-text">
       <h1>Controle de Materiais</h1>
@@ -831,15 +826,12 @@ const auth = {
     const login = document.getElementById('login-input').value.toLowerCase().trim();
     const senha = document.getElementById('password-input').value.trim();
 
-    console.log('Tentativa de login:', { login, senha });
-    console.log('Credenciais esperadas:', this.CREDENCIAIS);
+
 
     if (login === this.CREDENCIAIS.login && senha === this.CREDENCIAIS.senha) {
-      console.log('Login bem-sucedido!');
       document.getElementById('login-error').classList.remove('show');
       this.mostrarApp();
     } else {
-      console.log('Login falhou!');
       document.getElementById('login-error').classList.add('show');
       document.getElementById('password-input').value = '';
       document.getElementById('login-input').focus();
@@ -1263,7 +1255,7 @@ const app = {
 
     let html = `
       <div class="pdf-header">
-        <img src="logo.jpg" alt="Plano & Plano" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
         <div class="pdf-header-text">
           <h2>Relatório de Materiais em Empréstimo</h2>
           <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
