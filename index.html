@@ -3,894 +3,533 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Controle de Materiais de Empréstimo - Editável</title>
+  <title>Controle de Materiais v4.0 - Oficial</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     /* ── Reset & Base ── */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     :root {
-      --blue-dark:  #1F3864;
-      --blue-mid:   #2E75B6;
-      --blue-light: #DDEEFF;
-      --accent:     #E84545;
-      --success:    #27AE60;
-      --bg:         #F0F4FA;
-      --card:       #FFFFFF;
-      --text:       #1a2340;
-      --muted:      #6b7a99;
-      --radius:     14px;
-      --shadow:     0 4px 24px rgba(31,56,100,.10);
+      --blue-dark:  #0f172a;
+      --blue-mid:   #2563eb;
+      --blue-light: #dbeafe;
+      --accent:     #ef4444;
+      --success:    #22c55e;
+      --warning:    #f59e0b;
+      --bg:         #f8fafc;
+      --card:       #ffffff;
+      --text:       #1e293b;
+      --muted:      #64748b;
+      --radius:     12px;
+      --shadow:     0 10px 15px -3px rgba(0,0,0,0.1);
     }
-    html { scroll-behavior: smooth; }
     body {
-      font-family: 'Segoe UI', Arial, sans-serif;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      line-height: 1.5;
     }
 
     /* ── Header ── */
     header {
-      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      background: var(--blue-dark);
       color: #fff;
-      padding: 2.5rem 2rem 2rem;
+      padding: 3rem 1rem;
       text-align: center;
-      position: relative;
-      overflow: hidden;
+      border-bottom: 4px solid var(--blue-mid);
     }
-    header::before {
-      content: '';
-      position: absolute; inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    header h1 { font-size: 2.25rem; font-weight: 800; margin-bottom: 0.5rem; }
+    header .version-tag { 
+      background: var(--blue-mid); 
+      font-size: 0.75rem; 
+      padding: 0.2rem 0.6rem; 
+      border-radius: 4px; 
+      vertical-align: middle;
+      margin-left: 10px;
     }
-    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: .5px; position: relative; }
-    header p  { margin-top: .5rem; opacity: .85; font-size: 1rem; position: relative; }
 
-    /* ── Nav pills ── */
+    /* ── Navigation ── */
     nav {
-      display: flex; justify-content: center; gap: .75rem;
-      padding: 1.25rem 1rem;
-      background: var(--card);
-      box-shadow: 0 2px 8px rgba(31,56,100,.08);
+      display: flex; justify-content: center; gap: 0.5rem;
+      padding: 1rem;
+      background: #fff;
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
       flex-wrap: wrap;
     }
     nav button {
-      background: var(--blue-light);
-      color: var(--blue-dark);
-      border: none; border-radius: 50px;
-      padding: .5rem 1.4rem;
-      font-size: .92rem; font-weight: 600;
-      cursor: pointer; transition: all .2s;
+      background: transparent;
+      color: var(--muted);
+      border: none; border-radius: 8px;
+      padding: 0.6rem 1.2rem;
+      font-size: 0.95rem; font-weight: 600;
+      cursor: pointer; transition: 0.2s;
     }
-    nav button:hover, nav button.active {
-      background: var(--blue-mid);
-      color: #fff;
-      box-shadow: 0 4px 12px rgba(46,117,182,.35);
-    }
+    nav button:hover { background: var(--blue-light); color: var(--blue-mid); }
+    nav button.active { background: var(--blue-mid); color: #fff; }
 
-    /* ── Main layout ── */
-    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+    /* ── Main ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1rem; }
 
-    /* ── KPI Cards ── */
+    /* ── KPIs ── */
     .kpi-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 1.25rem;
-      margin-bottom: 2.5rem;
+      gap: 1.5rem;
+      margin-bottom: 3rem;
     }
     .kpi {
       background: var(--card);
       border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
       box-shadow: var(--shadow);
-      padding: 1.5rem 1.25rem;
-      display: flex; flex-direction: column; align-items: center;
-      border-top: 4px solid var(--blue-mid);
-      transition: transform .2s;
+      border-bottom: 4px solid #e2e8f0;
     }
-    .kpi:hover { transform: translateY(-4px); }
-    .kpi .icon { font-size: 2rem; margin-bottom: .5rem; }
-    .kpi .value { font-size: 2.2rem; font-weight: 800; color: var(--blue-dark); }
-    .kpi .label { font-size: .82rem; color: var(--muted); text-align: center; margin-top: .25rem; text-transform: uppercase; letter-spacing: .5px; }
+    .kpi.alert { border-bottom-color: var(--accent); }
+    .kpi .value { font-size: 2.5rem; font-weight: 800; color: var(--blue-dark); display: block; }
+    .kpi .label { font-size: 0.875rem; color: var(--muted); font-weight: 600; text-transform: uppercase; }
 
-    /* ── Section ── */
-    section { display: none; }
+    /* ── Sections ── */
+    section { display: none; animation: fadeIn 0.3s ease; }
     section.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
     /* ── Cards ── */
     .card {
       background: var(--card);
       border-radius: var(--radius);
+      padding: 2rem;
+      margin-bottom: 2rem;
       box-shadow: var(--shadow);
-      padding: 1.75rem;
-      margin-bottom: 2rem;
     }
-    .card h2 {
-      font-size: 1.15rem; font-weight: 700;
-      color: var(--blue-dark);
-      margin-bottom: 1.25rem;
-      padding-bottom: .6rem;
-      border-bottom: 2px solid var(--blue-light);
-      display: flex; align-items: center; gap: .5rem;
-    }
-
-    /* ── Chart grid ── */
-    .chart-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
-      gap: 1.5rem;
-      margin-bottom: 2rem;
-    }
-    .chart-wrap { position: relative; height: 300px; }
+    .card h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 0.5rem; }
 
     /* ── Buttons ── */
-    .btn-group {
-      display: flex; gap: .75rem; flex-wrap: wrap;
-      margin-bottom: 1.5rem;
-    }
-    button.btn {
-      padding: .6rem 1.2rem;
-      border: none;
+    .btn-group { display: flex; gap: 0.75rem; flex-wrap: wrap; margin-bottom: 2rem; }
+    .btn {
+      padding: 0.75rem 1.5rem;
       border-radius: 8px;
-      font-size: .92rem;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
-      transition: all .2s;
-      display: flex; align-items: center; gap: .4rem;
+      border: none;
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      transition: 0.2s;
     }
-    button.btn-primary {
-      background: var(--blue-mid);
-      color: #fff;
+    .btn-primary { background: var(--blue-mid); color: #fff; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    .btn-danger { background: var(--accent); color: #fff; }
+    .btn-secondary { background: #64748b; color: #fff; }
+    .btn:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid #e2e8f0; }
+    table { width: 100%; border-collapse: collapse; background: #fff; }
+    th { background: #f1f5f9; padding: 1rem; text-align: left; font-weight: 700; font-size: 0.875rem; color: var(--muted); }
+    td { padding: 1rem; border-top: 1px solid #e2e8f0; font-size: 0.95rem; }
+    
+    /* ── Badges (Status) ── */
+    .badge {
+      padding: 0.4rem 0.8rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: inline-block;
+      text-align: center;
+      min-width: 100px;
     }
-    button.btn-primary:hover {
-      background: var(--blue-dark);
-      box-shadow: 0 4px 12px rgba(31,56,100,.3);
-    }
-    button.btn-success {
-      background: var(--success);
-      color: #fff;
-    }
-    button.btn-success:hover {
-      background: #1e8449;
-    }
-    button.btn-danger {
-      background: var(--accent);
-      color: #fff;
-    }
-    button.btn-danger:hover {
-      background: #c73535;
-    }
-    button.btn-secondary {
-      background: #95a5a6;
-      color: #fff;
-    }
-    button.btn-secondary:hover {
-      background: #7f8c8d;
+    .status-aberto { background: #fee2e2; color: #991b1b; }
+    .status-parcial { background: #fef3c7; color: #92400e; }
+    .status-concluido { background: #dcfce7; color: #166534; }
+
+    /* ── Forms ── */
+    .form-group { margin-bottom: 1.5rem; }
+    label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.9rem; }
+    input, select {
+      width: 100%; padding: 0.75rem;
+      border: 1px solid #cbd5e1; border-radius: 8px;
+      font-size: 1rem;
     }
 
     /* ── Modal ── */
     .modal {
-      display: none;
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.5);
-      z-index: 1000;
-      align-items: center; justify-content: center;
+      display: none; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.75);
+      z-index: 1000; align-items: center; justify-content: center; padding: 1rem;
     }
     .modal.active { display: flex; }
-    .modal-content {
-      background: var(--card);
-      border-radius: var(--radius);
-      padding: 2rem;
-      max-width: 500px;
-      width: 90%;
-      box-shadow: 0 10px 40px rgba(0,0,0,.3);
-    }
-    .modal-content h3 {
-      font-size: 1.3rem;
-      color: var(--blue-dark);
-      margin-bottom: 1.5rem;
-    }
-    .form-group {
-      margin-bottom: 1.25rem;
-    }
-    .form-group label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: .4rem;
-      color: var(--blue-dark);
-      font-size: .9rem;
-    }
-    .form-group input, .form-group select {
-      width: 100%;
-      padding: .6rem .8rem;
-      border: 1.5px solid #c8d6ea;
-      border-radius: 8px;
-      font-size: .92rem;
-      outline: none;
-      transition: border-color .2s;
-    }
-    .form-group input:focus, .form-group select:focus {
-      border-color: var(--blue-mid);
-      box-shadow: 0 0 0 3px rgba(46,117,182,.1);
-    }
-    .modal-buttons {
-      display: flex; gap: .75rem; justify-content: flex-end;
-      margin-top: 1.75rem;
-    }
+    .modal-content { background: #fff; border-radius: var(--radius); padding: 2rem; width: 100%; max-width: 500px; }
 
-    /* ── Table ── */
-    .table-wrap { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; font-size: .93rem; }
-    thead tr { background: var(--blue-dark); color: #fff; }
-    thead th { padding: .85rem 1rem; text-align: left; font-weight: 600; white-space: nowrap; }
-    tbody tr { border-bottom: 1px solid #e8edf5; transition: background .15s; }
-    tbody tr:hover { background: var(--blue-light); }
-    tbody td { padding: .75rem 1rem; }
-    .badge {
-      display: inline-block;
-      padding: .2rem .75rem;
-      border-radius: 50px;
-      font-size: .78rem; font-weight: 700;
-      background: #ffeaea; color: var(--accent);
+    /* ── Relatório / Slides ── */
+    #report-container { background: #fff; }
+    .slide {
+      background: #fff; border: 1px solid #e2e8f0; border-radius: 12px;
+      padding: 3rem; margin-bottom: 2rem; min-height: 500px;
+      display: flex; flex-direction: column;
     }
-    .action-btns {
-      display: flex; gap: .5rem;
-    }
-    .action-btns button {
-      padding: .35rem .6rem;
-      font-size: .8rem;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      transition: all .2s;
-    }
-    .action-btns .edit-btn {
-      background: #3498db;
-      color: #fff;
-    }
-    .action-btns .edit-btn:hover {
-      background: #2980b9;
-    }
-    .action-btns .delete-btn {
-      background: var(--accent);
-      color: #fff;
-    }
-    .action-btns .delete-btn:hover {
-      background: #c73535;
-    }
+    .slide-header { border-bottom: 4px solid var(--blue-mid); padding-bottom: 1rem; margin-bottom: 2rem; }
+    .slide-header h2 { font-size: 2.5rem; color: var(--blue-dark); margin: 0; }
+    .slide-body { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; flex-grow: 1; }
+    .stat-card { background: #f1f5f9; padding: 1.5rem; border-radius: 12px; }
+    .stat-card h3 { margin: 0 0 0.5rem 0; font-size: 1rem; color: var(--muted); }
+    .stat-card .val { font-size: 2.5rem; font-weight: 800; color: var(--blue-mid); }
 
-    /* ── Search / Filter ── */
-    .filter-bar {
-      display: flex; gap: 1rem; flex-wrap: wrap;
-      margin-bottom: 1.25rem;
-    }
-    .filter-bar input, .filter-bar select {
-      padding: .55rem 1rem;
-      border: 1.5px solid #c8d6ea;
-      border-radius: 8px;
-      font-size: .92rem;
-      outline: none;
-      transition: border-color .2s;
-      flex: 1; min-width: 160px;
-    }
-    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--blue-mid); }
+    /* ── Charts ── */
+    .chart-container { height: 300px; position: relative; }
 
-    /* ── Progress bars ── */
-    .progress-list { display: flex; flex-direction: column; gap: 1rem; }
-    .progress-item label {
-      display: flex; justify-content: space-between;
-      font-size: .9rem; font-weight: 600; margin-bottom: .3rem;
-      color: var(--blue-dark);
-    }
-    .progress-track {
-      background: var(--blue-light);
-      border-radius: 50px; height: 14px; overflow: hidden;
-    }
-    .progress-fill {
-      height: 100%; border-radius: 50px;
-      background: linear-gradient(90deg, var(--blue-mid), #5ba4e0);
-      transition: width 1s ease;
-    }
-
-    /* ── Alert ── */
-    .alert {
-      padding: 1rem 1.25rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      display: none;
-    }
-    .alert.show { display: block; }
-    .alert-success {
-      background: #d4edda;
-      color: #155724;
-      border: 1px solid #c3e6cb;
-    }
-    .alert-error {
-      background: #f8d7da;
-      color: #721c24;
-      border: 1px solid #f5c6cb;
-    }
-
-    /* ── Footer ── */
-    footer {
-      text-align: center;
-      padding: 1.5rem;
-      color: var(--muted);
-      font-size: .82rem;
-      border-top: 1px solid #dde4f0;
-      margin-top: 2rem;
-    }
-
-    /* ── Responsive ── */
-    @media (max-width: 600px) {
-      header h1 { font-size: 1.4rem; }
-      .kpi .value { font-size: 1.7rem; }
-      .modal-content { width: 95%; }
+    @media print {
+      nav, header, .btn-group, .filter-bar { display: none; }
+      .slide { border: none; margin: 0; page-break-after: always; }
     }
   </style>
 </head>
 <body>
 
 <header>
-  <h1>📋 Controle de Materiais de Empréstimo</h1>
-  <p>Painel interativo e editável de débitos em aberto</p>
+  <h1>Controle de Materiais <span class="version-tag">v4.0 NOVO</span></h1>
+  <p>Gestão profissional de empréstimos com status e relatórios</p>
 </header>
 
-<nav>
-  <button class="active" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
-  <button onclick="app.showSection('por-empresa', this)">Por Empresa</button>
-  <button onclick="app.showSection('por-material', this)">Por Material</button>
-  <button onclick="app.showSection('registros', this)">Gerenciar Registros</button>
+<nav id="main-nav">
+  <button class="active" onclick="app.nav('dashboard', this)">🏠 Painel</button>
+  <button onclick="app.nav('gerenciar', this)">📝 Gerenciar Dados</button>
+  <button onclick="app.nav('relatorio', this)">📊 Gerar Slides</button>
 </nav>
 
 <main>
-
-  <!-- Alert ── -->
-  <div id="alert" class="alert"></div>
-
-  <!-- KPIs sempre visíveis -->
+  <!-- KPIs -->
   <div class="kpi-grid">
     <div class="kpi">
-      <div class="icon">📋</div>
-      <div class="value" id="kpiTotal">660</div>
-      <div class="label">Total de Itens em Débito</div>
+      <span class="label">Total de Itens</span>
+      <span class="value" id="kpi-total">0</span>
+    </div>
+    <div class="kpi alert">
+      <span class="label">Em Aberto</span>
+      <span class="value" id="kpi-aberto">0</span>
     </div>
     <div class="kpi">
-      <div class="icon">🏢</div>
-      <div class="value" id="kpiEmpresas">4</div>
-      <div class="label">Empresas Credoras</div>
-    </div>
-    <div class="kpi">
-      <div class="icon">🔨</div>
-      <div class="value" id="kpiMateriais">4</div>
-      <div class="label">Tipos de Material</div>
-    </div>
-    <div class="kpi">
-      <div class="icon">📅</div>
-      <div class="value" id="kpiRegistros">7</div>
-      <div class="label">Registros de Empréstimo</div>
-    </div>
-    <div class="kpi" style="border-top-color: var(--accent);">
-      <div class="icon">⚠️</div>
-      <div class="value" id="kpiAbertos" style="color:var(--accent);">7</div>
-      <div class="label">Itens Em Aberto</div>
+      <span class="label">Empresas</span>
+      <span class="value" id="kpi-empresas">0</span>
     </div>
   </div>
 
-  <!-- ── VISÃO GERAL ── -->
-  <section id="visao-geral" class="active">
+  <!-- DASHBOARD -->
+  <section id="dashboard" class="active">
     <div class="chart-grid">
       <div class="card">
-        <h2>📊 Quantidade por Empresa</h2>
-        <div class="chart-wrap"><canvas id="chartEmpresa"></canvas></div>
+        <h2>📊 Distribuição por Empresa</h2>
+        <div class="chart-container"><canvas id="chart-empresa"></canvas></div>
       </div>
       <div class="card">
-        <h2>🏗️ Distribuição por Material</h2>
-        <div class="chart-wrap"><canvas id="chartMaterial"></canvas></div>
+        <h2>🏗️ Tipos de Materiais</h2>
+        <div class="chart-container"><canvas id="chart-material"></canvas></div>
       </div>
     </div>
-    <div class="card">
-      <h2>📈 Empréstimos por Data</h2>
-      <div class="chart-wrap" style="height:260px"><canvas id="chartData"></canvas></div>
-    </div>
   </section>
 
-  <!-- ── POR EMPRESA ── -->
-  <section id="por-empresa">
+  <!-- GERENCIAR -->
+  <section id="gerenciar">
     <div class="card">
-      <h2>🏢 Participação por Empresa</h2>
-      <div class="progress-list" id="progressEmpresas"></div>
-    </div>
-    <div class="card">
-      <h2>📈 Comparativo de Empresas</h2>
-      <div class="chart-wrap" style="height:320px"><canvas id="chartEmpresaBar"></canvas></div>
-    </div>
-  </section>
-
-  <!-- ── POR MATERIAL ── -->
-  <section id="por-material">
-    <div class="card">
-      <h2>🔨 Participação por Material</h2>
-      <div class="progress-list" id="progressMateriais"></div>
-    </div>
-    <div class="card">
-      <h2>📈 Comparativo de Materiais</h2>
-      <div class="chart-wrap" style="height:300px"><canvas id="chartMaterialBar"></canvas></div>
-    </div>
-  </section>
-
-  <!-- ── REGISTROS ── -->
-  <section id="registros">
-    <div class="card">
-      <h2>📝 Gerenciar Registros</h2>
+      <h2>📝 Controle de Registros</h2>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="app.abrirModalNovo()">
-          ➕ Novo Registro
-        </button>
-        <button class="btn btn-success" onclick="app.exportarCSV()">
-          💾 Exportar CSV
-        </button>
-        <button class="btn btn-secondary" onclick="app.resetarDados()">
-          🔄 Resetar Dados
-        </button>
+        <button class="btn btn-primary" onclick="app.modalNovo()">➕ Novo Item</button>
+        <button class="btn btn-success" onclick="app.exportarCSV()">💾 Salvar Excel (CSV)</button>
+        <button class="btn btn-danger" onclick="app.resetar()">🔄 Resetar Tudo</button>
       </div>
-      <div class="filter-bar">
-        <input type="text" id="searchInput" placeholder="🔍 Buscar por empresa ou material..." oninput="app.filtrarTabela()" />
-        <select id="filterEmpresa" onchange="app.filtrarTabela()">
-          <option value="">Todas as empresas</option>
-        </select>
-        <select id="filterMaterial" onchange="app.filtrarTabela()">
-          <option value="">Todos os materiais</option>
-        </select>
-      </div>
+      
       <div class="table-wrap">
         <table>
           <thead>
             <tr>
-              <th>#</th>
               <th>Empresa</th>
               <th>Material</th>
-              <th>Data do Empréstimo</th>
-              <th>Quantidade</th>
-              <th>Status</th>
+              <th>Data</th>
+              <th>Qtd</th>
+              <th>Status (Clique para mudar)</th>
               <th>Ações</th>
             </tr>
           </thead>
-          <tbody id="tabelaRegistros"></tbody>
+          <tbody id="tabela-corpo"></tbody>
         </table>
       </div>
     </div>
   </section>
 
+  <!-- RELATORIO -->
+  <section id="relatorio">
+    <div class="card">
+      <h2>📊 Visualização para Apresentação (Slides)</h2>
+      <p>Este formato é ideal para tirar print ou salvar como PDF para reuniões.</p>
+      <div class="btn-group">
+        <button class="btn btn-warning" onclick="app.exportarPDF()">📥 Baixar Relatório PDF</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
+      </div>
+      
+      <div id="report-container">
+        <!-- Slide 1 -->
+        <div class="slide">
+          <div class="slide-header">
+            <h2>Resumo Geral de Empréstimos</h2>
+            <p id="slide-data"></p>
+          </div>
+          <div class="slide-body">
+            <div style="display: flex; flex-direction: column; gap: 1rem;">
+              <div class="stat-card">
+                <h3>Total de Materiais</h3>
+                <div class="val" id="slide-total">0</div>
+              </div>
+              <div class="stat-card">
+                <h3>Pendências Críticas</h3>
+                <div class="val" id="slide-pendente" style="color: var(--accent);">0</div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <h3>Top Empresas Credoras</h3>
+              <ul id="slide-list" style="list-style: none; padding: 0; margin-top: 1rem; font-size: 1.2rem;"></ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 </main>
 
-<!-- ── MODAL ── -->
+<!-- MODAL -->
 <div id="modal" class="modal">
   <div class="modal-content">
-    <h3 id="modalTitle">Novo Registro</h3>
-    <form id="formRegistro" onsubmit="app.salvarRegistro(event)">
-      <div class="form-group">
-        <label for="empresa">Empresa *</label>
-        <input type="text" id="empresa" required placeholder="Ex: Felipe Agosti" />
-      </div>
-      <div class="form-group">
-        <label for="material">Material *</label>
-        <input type="text" id="material" required placeholder="Ex: Pontalete" />
-      </div>
-      <div class="form-group">
-        <label for="data">Data do Empréstimo *</label>
-        <input type="date" id="data" required />
-      </div>
-      <div class="form-group">
-        <label for="quantidade">Quantidade *</label>
-        <input type="number" id="quantidade" required min="1" placeholder="Ex: 20" />
-      </div>
-      <div class="modal-buttons">
+    <h3 id="modal-titulo">Novo Registro</h3>
+    <form onsubmit="app.salvar(event)">
+      <div class="form-group"><label>Empresa</label><input id="f-empresa" required></div>
+      <div class="form-group"><label>Material</label><input id="f-material" required></div>
+      <div class="form-group"><label>Data</label><input type="date" id="f-data" required></div>
+      <div class="form-group"><label>Quantidade</label><input type="number" id="f-qtd" required></div>
+      <div style="display: flex; gap: 1rem; justify-content: flex-end;">
         <button type="button" class="btn btn-secondary" onclick="app.fecharModal()">Cancelar</button>
-        <button type="submit" class="btn btn-success">Salvar</button>
+        <button type="submit" class="btn btn-primary">Salvar</button>
       </div>
     </form>
   </div>
 </div>
 
-<footer>
-  Controle de Materiais de Empréstimo — Editável &mdash; Dados salvos automaticamente no navegador
-</footer>
-
 <script>
-// ── Aplicação Principal ──
 const app = {
-  STORAGE_KEY: 'controle_emprestimos_dados_v2',
-  CORES: ["#2E75B6","#1F3864","#5BA4E0","#E84545","#F5A623","#27AE60","#8E44AD"],
+  KEY: 'materiais_v4_data',
   dados: [],
-  editandoId: null,
+  editId: null,
   charts: {},
 
-  // ── Inicialização ──
   init() {
-    console.log('Inicializando aplicação...');
-    this.carregarDados();
-    this.atualizarUI();
-    this.setupEventListeners();
-    console.log('Aplicação inicializada com sucesso!');
+    this.carregar();
+    this.render();
+    console.log("App v4 Iniciado");
   },
 
-  // ── Setup de eventos ──
-  setupEventListeners() {
-    const modal = document.getElementById('modal');
-    modal.addEventListener('click', (e) => {
-      if (e.target.id === 'modal') this.fecharModal();
-    });
-  },
-
-  // ── Carregar dados ──
-  carregarDados() {
-    try {
-      const salvos = localStorage.getItem(this.STORAGE_KEY);
-      if (salvos) {
-        this.dados = JSON.parse(salvos);
-        console.log('Dados carregados do localStorage:', this.dados.length, 'registros');
-      } else {
-        this.dados = [
-          { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20  },
-          { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20  },
-          { id:3, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-02-12", quantidade:150 },
-          { id:4, empresa:"Felipe Agosti", material:"Tábua 30cm",             data:"2026-02-12", quantidade:50  },
-          { id:5, empresa:"Murilo",        material:"Pontalete",              data:"2026-02-04", quantidade:220 },
-          { id:6, empresa:"Spera Urban",   material:"Pontalete",              data:"2025-02-03", quantidade:100 },
-          { id:7, empresa:"Plano Purus",   material:"Tábua de 30cm",          data:"2026-02-06", quantidade:100 },
-        ];
-        this.salvarDados();
-      }
-    } catch (e) {
-      console.error('Erro ao carregar dados:', e);
-      this.mostrarAlerta('Erro ao carregar dados. Usando dados padrão.', 'error');
+  carregar() {
+    const raw = localStorage.getItem(this.KEY);
+    if (raw) {
+      this.dados = JSON.parse(raw);
+    } else {
+      // Dados iniciais caso esteja vazio
+      this.dados = [
+        { id: 1, empresa: "Felipe Agosti", material: "Pontalete", data: "2026-01-28", qtd: 20, status: "Em Aberto" },
+        { id: 2, empresa: "Felipe Agosti", material: "Chapa Madeirite", data: "2026-01-28", qtd: 20, status: "Em Aberto" },
+        { id: 3, empresa: "Murilo", material: "Pontalete", data: "2026-02-04", qtd: 220, status: "Em Aberto" },
+        { id: 4, empresa: "Spera Urban", material: "Pontalete", data: "2025-02-03", qtd: 100, status: "Em Aberto" }
+      ];
+      this.salvarLocal();
     }
   },
 
-  // ── Salvar dados ──
-  salvarDados() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
-      console.log('Dados salvos com sucesso!');
-    } catch (e) {
-      console.error('Erro ao salvar dados:', e);
-      this.mostrarAlerta('Erro ao salvar dados. Tente novamente.', 'error');
-    }
+  salvarLocal() {
+    localStorage.setItem(this.KEY, JSON.stringify(this.dados));
   },
 
-  // ── Alert ──
-  mostrarAlerta(msg, tipo) {
-    const alert = document.getElementById('alert');
-    alert.textContent = msg;
-    alert.className = `alert show alert-${tipo}`;
-    setTimeout(() => alert.classList.remove('show'), 3000);
-  },
-
-  // ── Navegação ──
-  showSection(id, btn) {
+  nav(id, btn) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
+    if(id === 'relatorio') this.updateSlide();
   },
 
-  // ── Modal ──
-  abrirModalNovo() {
-    this.editandoId = null;
-    document.getElementById('modalTitle').textContent = 'Novo Registro';
-    document.getElementById('formRegistro').reset();
-    document.getElementById('modal').classList.add('active');
+  render() {
+    this.updateKPIs();
+    this.updateTable();
+    this.updateCharts();
   },
 
-  abrirModalEditar(id) {
-    const reg = this.dados.find(d => d.id === id);
-    if (!reg) return;
-    this.editandoId = id;
-    document.getElementById('modalTitle').textContent = 'Editar Registro';
-    document.getElementById('empresa').value = reg.empresa;
-    document.getElementById('material').value = reg.material;
-    document.getElementById('data').value = reg.data;
-    document.getElementById('quantidade').value = reg.quantidade;
-    document.getElementById('modal').classList.add('active');
+  updateKPIs() {
+    const total = this.dados.reduce((acc, d) => acc + Number(d.qtd), 0);
+    const abertos = this.dados.filter(d => d.status === "Em Aberto").length;
+    const empresas = new Set(this.dados.map(d => d.empresa)).size;
+
+    document.getElementById('kpi-total').innerText = total;
+    document.getElementById('kpi-aberto').innerText = abertos;
+    document.getElementById('kpi-empresas').innerText = empresas;
   },
 
-  fecharModal() {
-    document.getElementById('modal').classList.remove('active');
-    this.editandoId = null;
+  updateTable() {
+    const corpo = document.getElementById('tabela-corpo');
+    corpo.innerHTML = this.dados.map(d => `
+      <tr>
+        <td><strong>${d.empresa}</strong></td>
+        <td>${d.material}</td>
+        <td>${new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR')}</td>
+        <td>${d.qtd}</td>
+        <td>
+          <span class="badge status-${d.status.toLowerCase().replace(' ', '-')}" onclick="app.toggleStatus(${d.id})">
+            ${d.status}
+          </span>
+        </td>
+        <td>
+          <button onclick="app.modalEditar(${d.id})" style="border:none; background:none; cursor:pointer;">✏️</button>
+          <button onclick="app.deletar(${d.id})" style="border:none; background:none; cursor:pointer;">🗑️</button>
+        </td>
+      </tr>
+    `).join('');
   },
 
-  salvarRegistro(e) {
-    e.preventDefault();
-    const empresa = document.getElementById('empresa').value.trim();
-    const material = document.getElementById('material').value.trim();
-    const data = document.getElementById('data').value;
-    const quantidade = parseInt(document.getElementById('quantidade').value);
-
-    if (!empresa || !material || !data || !quantidade) {
-      this.mostrarAlerta('Preencha todos os campos!', 'error');
-      return;
-    }
-
-    if (this.editandoId) {
-      const idx = this.dados.findIndex(d => d.id === this.editandoId);
-      if (idx !== -1) {
-        this.dados[idx] = { id: this.editandoId, empresa, material, data, quantidade };
-      }
-    } else {
-      const novoId = Math.max(...this.dados.map(d => d.id), 0) + 1;
-      this.dados.push({ id: novoId, empresa, material, data, quantidade });
-    }
-
-    this.fecharModal();
-    this.salvarDados();
-    this.atualizarUI();
-    this.mostrarAlerta('Registro salvo com sucesso!', 'success');
+  toggleStatus(id) {
+    const item = this.dados.find(x => x.id === id);
+    const estados = ["Em Aberto", "Parcial", "Concluído"];
+    let idx = estados.indexOf(item.status);
+    item.status = estados[(idx + 1) % 3];
+    this.salvarLocal();
+    this.render();
   },
 
-  deletarRegistro(id) {
-    if (confirm('Tem certeza que deseja deletar este registro?')) {
-      this.dados = this.dados.filter(d => d.id !== id);
-      this.salvarDados();
-      this.atualizarUI();
-      this.mostrarAlerta('Registro deletado com sucesso!', 'success');
-    }
-  },
+  updateCharts() {
+    const ctxEmp = document.getElementById('chart-empresa').getContext('2d');
+    const ctxMat = document.getElementById('chart-material').getContext('2d');
 
-  // ── Agregar ──
-  agrupar(campo) {
-    return this.dados.reduce((acc, d) => {
-      acc[d[campo]] = (acc[d[campo]] || 0) + d.quantidade;
-      return acc;
-    }, {});
-  },
+    // Agrupar dados
+    const empData = {};
+    const matData = {};
+    this.charts.colors = ["#2563eb", "#3b82f6", "#60a5fa", "#93c5fd", "#bfdbfe"];
 
-  // ── Atualizar UI ──
-  atualizarUI() {
-    const porEmpresa  = this.agrupar('empresa');
-    const porMaterial = this.agrupar('material');
-    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
-
-    // KPIs
-    document.getElementById('kpiTotal').textContent = total;
-    document.getElementById('kpiEmpresas').textContent = Object.keys(porEmpresa).length;
-    document.getElementById('kpiMateriais').textContent = Object.keys(porMaterial).length;
-    document.getElementById('kpiRegistros').textContent = this.dados.length;
-    document.getElementById('kpiAbertos').textContent = this.dados.length;
-
-    // Filtros
-    const filterEmp = document.getElementById('filterEmpresa');
-    const filterMat = document.getElementById('filterMaterial');
-    const empresasAtuais = new Set(this.dados.map(d => d.empresa));
-    const materiaisAtuais = new Set(this.dados.map(d => d.material));
-
-    filterEmp.innerHTML = '<option value="">Todas as empresas</option>';
-    [...empresasAtuais].sort().forEach(e => {
-      filterEmp.innerHTML += `<option>${e}</option>`;
+    this.dados.forEach(d => {
+      empData[d.empresa] = (empData[d.empresa] || 0) + Number(d.qtd);
+      matData[d.material] = (matData[d.material] || 0) + Number(d.qtd);
     });
 
-    filterMat.innerHTML = '<option value="">Todos os materiais</option>';
-    [...materiaisAtuais].sort().forEach(m => {
-      filterMat.innerHTML += `<option>${m}</option>`;
-    });
+    if(this.charts.emp) this.charts.emp.destroy();
+    if(this.charts.mat) this.charts.mat.destroy();
 
-    // Tabela
-    this.renderTabela(this.dados);
-
-    // Gráficos
-    this.atualizarGraficos(porEmpresa, porMaterial, total);
-  },
-
-  // ── Tabela ──
-  renderTabela(lista) {
-    const tbody = document.getElementById('tabelaRegistros');
-    tbody.innerHTML = lista.map(d => {
-      const dataFormatada = new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR');
-      return `
-        <tr>
-          <td>${d.id}</td>
-          <td><strong>${d.empresa}</strong></td>
-          <td>${d.material}</td>
-          <td>${dataFormatada}</td>
-          <td><strong>${d.quantidade}</strong></td>
-          <td><span class="badge">Em aberto</span></td>
-          <td>
-            <div class="action-btns">
-              <button class="edit-btn" onclick="app.abrirModalEditar(${d.id})">✏️ Editar</button>
-              <button class="delete-btn" onclick="app.deletarRegistro(${d.id})">🗑️ Deletar</button>
-            </div>
-          </td>
-        </tr>`;
-    }).join('');
-  },
-
-  filtrarTabela() {
-    const busca    = document.getElementById('searchInput').value.toLowerCase();
-    const empresa  = document.getElementById('filterEmpresa').value;
-    const material = document.getElementById('filterMaterial').value;
-    const filtrado = this.dados.filter(d => {
-      const matchBusca   = !busca   || d.empresa.toLowerCase().includes(busca) || d.material.toLowerCase().includes(busca);
-      const matchEmpresa = !empresa || d.empresa === empresa;
-      const matchMat     = !material|| d.material.toLowerCase().includes(material.toLowerCase());
-      return matchBusca && matchEmpresa && matchMat;
-    });
-    this.renderTabela(filtrado);
-  },
-
-  // ── Gráficos ──
-  atualizarGraficos(porEmpresa, porMaterial, total) {
-    // Destruir gráficos antigos
-    Object.values(this.charts).forEach(chart => {
-      try { chart.destroy(); } catch(e) {}
-    });
-    this.charts = {};
-
-    // Gráfico: Empresa (doughnut)
-    this.charts.empresa = new Chart(document.getElementById('chartEmpresa'), {
+    this.charts.emp = new Chart(ctxEmp, {
       type: 'doughnut',
       data: {
-        labels: Object.keys(porEmpresa),
-        datasets: [{ data: Object.values(porEmpresa), backgroundColor: this.CORES, borderWidth: 2, borderColor: '#fff' }]
+        labels: Object.keys(empData),
+        datasets: [{ data: Object.values(empData), backgroundColor: this.charts.colors }]
       },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} itens (${(ctx.raw/total*100).toFixed(1)}%)` } }
-        },
-        cutout: '60%'
-      }
+      options: { responsive: true, maintainAspectRatio: false }
     });
 
-    // Gráfico: Material (pie)
-    this.charts.material = new Chart(document.getElementById('chartMaterial'), {
-      type: 'pie',
-      data: {
-        labels: Object.keys(porMaterial),
-        datasets: [{ data: Object.values(porMaterial), backgroundColor: this.CORES, borderWidth: 2, borderColor: '#fff' }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: {
-          legend: { position: 'bottom', labels: { padding: 14, font: { size: 12 } } },
-          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} itens (${(ctx.raw/total*100).toFixed(1)}%)` } }
-        }
-      }
-    });
-
-    // Gráfico: Por data
-    const porData = this.dados.reduce((acc, d) => {
-      const key = `${d.data} – ${d.empresa}`;
-      acc[key] = (acc[key] || 0) + d.quantidade;
-      return acc;
-    }, {});
-    this.charts.data = new Chart(document.getElementById('chartData'), {
+    this.charts.mat = new Chart(ctxMat, {
       type: 'bar',
       data: {
-        labels: Object.keys(porData),
-        datasets: [{
-          label: 'Quantidade',
-          data: Object.values(porData),
-          backgroundColor: this.CORES,
-          borderRadius: 8,
-          borderSkipped: false
-        }]
+        labels: Object.keys(matData),
+        datasets: [{ label: 'Quantidade', data: Object.values(matData), backgroundColor: '#2563eb' }]
       },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } },
-          y: { beginAtZero: true, grid: { color: '#e8edf5' } }
-        }
-      }
-    });
-
-    // Gráfico: Empresa bar
-    this.charts.empresaBar = new Chart(document.getElementById('chartEmpresaBar'), {
-      type: 'bar',
-      data: {
-        labels: Object.keys(porEmpresa),
-        datasets: [{
-          label: 'Total de Itens',
-          data: Object.values(porEmpresa),
-          backgroundColor: this.CORES,
-          borderRadius: 10,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { beginAtZero: true, grid: { color: '#e8edf5' } },
-          y: { grid: { display: false } }
-        }
-      }
-    });
-
-    // Gráfico: Material bar
-    this.charts.materialBar = new Chart(document.getElementById('chartMaterialBar'), {
-      type: 'bar',
-      data: {
-        labels: Object.keys(porMaterial),
-        datasets: [{
-          label: 'Total de Itens',
-          data: Object.values(porMaterial),
-          backgroundColor: this.CORES,
-          borderRadius: 10,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        indexAxis: 'y',
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { beginAtZero: true, grid: { color: '#e8edf5' } },
-          y: { grid: { display: false } }
-        }
-      }
-    });
-
-    // Progress bars: Empresas
-    const peDiv = document.getElementById('progressEmpresas');
-    peDiv.innerHTML = '';
-    Object.entries(porEmpresa).sort((a,b) => b[1]-a[1]).forEach(([emp, qtd], i) => {
-      const pct = (qtd/total*100).toFixed(1);
-      peDiv.innerHTML += `
-        <div class="progress-item">
-          <label><span>${emp}</span><span>${qtd} itens (${pct}%)</span></label>
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${pct}%; background: linear-gradient(90deg, ${this.CORES[i]}, ${this.CORES[(i+1)%this.CORES.length]})"></div>
-          </div>
-        </div>`;
-    });
-
-    // Progress bars: Materiais
-    const pmDiv = document.getElementById('progressMateriais');
-    pmDiv.innerHTML = '';
-    Object.entries(porMaterial).sort((a,b) => b[1]-a[1]).forEach(([mat, qtd], i) => {
-      const pct = (qtd/total*100).toFixed(1);
-      pmDiv.innerHTML += `
-        <div class="progress-item">
-          <label><span>${mat}</span><span>${qtd} itens (${pct}%)</span></label>
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${pct}%; background: linear-gradient(90deg, ${this.CORES[i]}, ${this.CORES[(i+1)%this.CORES.length]})"></div>
-          </div>
-        </div>`;
+      options: { responsive: true, maintainAspectRatio: false }
     });
   },
 
-  // ── Exportar CSV ──
-  exportarCSV() {
-    let csv = 'ID,Empresa,Material,Data do Empréstimo,Quantidade,Status\n';
-    this.dados.forEach(d => {
-      csv += `${d.id},"${d.empresa}","${d.material}","${d.data}",${d.quantidade},"Em aberto"\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `controle_emprestimos_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    this.mostrarAlerta('Arquivo CSV exportado com sucesso!', 'success');
+  updateSlide() {
+    document.getElementById('slide-data').innerText = "Relatório Gerado em: " + new Date().toLocaleDateString('pt-BR');
+    document.getElementById('slide-total').innerText = document.getElementById('kpi-total').innerText;
+    document.getElementById('slide-pendente').innerText = document.getElementById('kpi-aberto').innerText;
+    
+    const empData = {};
+    this.dados.forEach(d => empData[d.empresa] = (empData[d.empresa] || 0) + Number(d.qtd));
+    
+    const sorted = Object.entries(empData).sort((a,b) => b[1] - a[1]);
+    document.getElementById('slide-list').innerHTML = sorted.map(([name, val]) => `
+      <li style="margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;">
+        <strong>${name}</strong>: ${val} itens
+      </li>
+    `).join('');
   },
 
-  // ── Resetar ──
-  resetarDados() {
-    if (confirm('Tem certeza que deseja resetar TODOS os dados para o padrão inicial? Esta ação não pode ser desfeita!')) {
-      localStorage.removeItem(this.STORAGE_KEY);
-      this.carregarDados();
-      this.atualizarUI();
-      this.mostrarAlerta('Dados resetados para o padrão inicial!', 'success');
+  modalNovo() {
+    this.editId = null;
+    document.getElementById('modal-titulo').innerText = "Novo Registro";
+    document.getElementById('modal').classList.add('active');
+  },
+
+  modalEditar(id) {
+    const item = this.dados.find(x => x.id === id);
+    this.editId = id;
+    document.getElementById('f-empresa').value = item.empresa;
+    document.getElementById('f-material').value = item.material;
+    document.getElementById('f-data').value = item.data;
+    document.getElementById('f-qtd').value = item.qtd;
+    document.getElementById('modal-titulo').innerText = "Editar Registro";
+    document.getElementById('modal').classList.add('active');
+  },
+
+  fecharModal() { document.getElementById('modal').classList.remove('active'); },
+
+  salvar(e) {
+    e.preventDefault();
+    const obj = {
+      empresa: document.getElementById('f-empresa').value,
+      material: document.getElementById('f-material').value,
+      data: document.getElementById('f-data').value,
+      qtd: document.getElementById('f-qtd').value,
+      status: "Em Aberto"
+    };
+
+    if(this.editId) {
+      const idx = this.dados.findIndex(x => x.id === this.editId);
+      obj.id = this.editId;
+      obj.status = this.dados[idx].status;
+      this.dados[idx] = obj;
+    } else {
+      obj.id = Date.now();
+      this.dados.push(obj);
     }
+
+    this.salvarLocal();
+    this.render();
+    this.fecharModal();
+  },
+
+  deletar(id) {
+    if(confirm("Deseja excluir este item?")) {
+      this.dados = this.dados.filter(x => x.id !== id);
+      this.salvarLocal();
+      this.render();
+    }
+  },
+
+  resetar() {
+    if(confirm("Isso apagará todas as suas edições. Continuar?")) {
+      localStorage.removeItem(this.KEY);
+      location.reload();
+    }
+  },
+
+  exportarCSV() {
+    let csv = "Empresa,Material,Data,Quantidade,Status\n";
+    this.dados.forEach(d => {
+      csv += `${d.empresa},${d.material},${d.data},${d.qtd},${d.status}\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'controle_materiais.csv';
+    a.click();
+  },
+
+  exportarPDF() {
+    const element = document.getElementById('report-container');
+    html2pdf().from(element).save('relatorio_slides.pdf');
   }
 };
 
-// ── Inicializar ao carregar a página ──
-document.addEventListener('DOMContentLoaded', () => {
-  app.init();
-});
+window.onload = () => app.init();
 </script>
 </body>
 </html>
