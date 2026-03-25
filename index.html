@@ -1,95 +1,395 @@
-    .badge-parcial:hover { background: #ffe69c; }
-    .badge-concluido { background: #d4edda; color: #155724; }
-    .badge-concluido:hover { background: #c3e6cb; }
-    .action-btns { display: flex; gap: .5rem; }
-    .action-btns button {
-      padding: .35rem .6rem;
-      font-size: .8rem;
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Materiais - Plano & Plano</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark:  #1F3864;
+      --blue-mid:   #2E75B6;
+      --blue-light: #DDEEFF;
+      --accent:     #E84545;
+      --success:    #27AE60;
+      --warning:    #F5A623;
+      --bg:         #F0F4FA;
+      --card:       #FFFFFF;
+      --text:       #1a2340;
+      --muted:      #6b7a99;
+      --radius:     14px;
+      --shadow:     0 4px 24px rgba(31,56,100,.10);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* LOGIN */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+    }
+    #login-screen.hidden { display: none; }
+    .login-container {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 3rem 2rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    .login-container h1 {
+      font-size: 1.8rem;
+      color: var(--blue-dark);
+      margin-bottom: 0.5rem;
+      font-weight: 800;
+    }
+    .login-container p { color: var(--muted); margin-bottom: 2rem; font-size: 0.95rem; }
+    .login-form { display: flex; flex-direction: column; gap: 1.25rem; }
+    .login-form .form-group { text-align: left; }
+    .login-form label { display: block; font-weight: 600; margin-bottom: 0.5rem; color: var(--blue-dark); font-size: 0.9rem; }
+    .login-form input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #c8d6ea;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .login-form input:focus { border-color: var(--blue-mid); box-shadow: 0 0 0 4px rgba(46,117,182,0.1); }
+    .login-form button {
+      padding: 0.85rem 1.5rem;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
       border: none;
-      border-radius: 5px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .login-form button:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(31,56,100,0.3); }
+    .login-error { color: var(--accent); font-size: 0.85rem; margin-top: 1rem; display: none; }
+    .login-error.show { display: block; }
+    .version-badge {
+      background: #fff3cd;
+      color: #856404;
+      padding: 0.75rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+      font-size: 0.85rem;
+      border: 1px solid #ffeeba;
+      font-weight: 600;
+    }
+
+    /* HEADER */
+    header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .header-content { display: flex; align-items: center; gap: 1.5rem; position: relative; z-index: 1; flex: 1; }
+    .logo-container { flex-shrink: 0; }
+    .logo-container img { height: 60px; width: auto; object-fit: contain; }
+    .header-text h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: .5px; margin: 0; }
+    .header-text p { margin: 0.25rem 0 0 0; opacity: .85; font-size: 0.95rem; }
+
+    /* NAV */
+    nav {
+      display: flex; justify-content: center; gap: .75rem;
+      padding: 1.25rem 1rem;
+      background: var(--card);
+      box-shadow: 0 2px 8px rgba(31,56,100,.08);
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    nav button {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border: none; border-radius: 50px;
+      padding: .5rem 1.4rem;
+      font-size: .92rem; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    nav button:hover, nav button.active {
+      background: var(--blue-mid);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(46,117,182,.35);
+    }
+    nav button.new-tab {
+      background: #fff3cd;
+      border: 2px solid var(--warning);
+      color: #856404;
+      font-weight: 700;
+    }
+    nav button.new-tab:hover, nav button.new-tab.active {
+      background: var(--warning);
+      color: #fff;
+      border-color: var(--warning);
+    }
+
+    /* MAIN */
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* CARD */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    .card h2 {
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 1.25rem;
+      padding-bottom: .6rem;
+      border-bottom: 2px solid var(--blue-light);
+      display: flex; align-items: center; gap: .5rem;
+    }
+
+    /* BUTTONS */
+    .btn-group { display: flex; gap: .75rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+    button.btn {
+      padding: .6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: .92rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all .2s;
+      display: flex; align-items: center; gap: .4rem;
     }
-    .action-btns .edit-btn { background: #3498db; color: #fff; }
-    .action-btns .edit-btn:hover { background: #2980b9; }
-    .action-btns .delete-btn { background: var(--accent); color: #fff; }
-    .action-btns .delete-btn:hover { background: #c73535; }
+    button.btn-primary { background: var(--blue-mid); color: #fff; }
+    button.btn-primary:hover { background: var(--blue-dark); box-shadow: 0 4px 12px rgba(31,56,100,.3); }
+    button.btn-success { background: var(--success); color: #fff; }
+    button.btn-success:hover { background: #1e8449; }
+    button.btn-danger { background: var(--accent); color: #fff; }
+    button.btn-danger:hover { background: #c73535; }
+    button.btn-secondary { background: #95a5a6; color: #fff; }
+    button.btn-secondary:hover { background: #7f8c8d; }
 
-    /* ── Search / Filter ── */
-    .filter-bar { display: flex; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.25rem; }
-    .filter-bar input, .filter-bar select {
-      padding: .55rem 1rem;
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center; justify-content: center;
+      overflow-y: auto;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 600px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0,0,0,.3);
+      margin: auto;
+    }
+    .modal-content h3 { font-size: 1.3rem; color: var(--blue-dark); margin-bottom: 1.5rem; }
+    .form-group { margin-bottom: 1.25rem; }
+    .form-group label { display: block; font-weight: 600; margin-bottom: .4rem; color: var(--blue-dark); font-size: .9rem; }
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: .6rem .8rem;
       border: 1.5px solid #c8d6ea;
       border-radius: 8px;
       font-size: .92rem;
       outline: none;
       transition: border-color .2s;
-      flex: 1; min-width: 160px;
+      font-family: inherit;
     }
-    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--blue-mid); }
+    .form-group input:focus, .form-group textarea:focus { border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(46,117,182,.1); }
+    .modal-buttons { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.75rem; }
 
-    /* ── Progress bars ── */
-    .progress-list { display: flex; flex-direction: column; gap: 1rem; }
-    .progress-item label {
-      display: flex; justify-content: space-between;
-      font-size: .9rem; font-weight: 600; margin-bottom: .3rem;
+    /* SECTION */
+    section { display: none; }
+    section.active { display: block; }
+
+    /* MATERIAIS GRID */
+    .materiais-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
+    .material-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      transition: transform 0.2s, box-shadow 0.2s;
+      border: 2px solid transparent;
+    }
+    .material-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(31,56,100,.15);
+      border-color: var(--blue-mid);
+    }
+    .material-card-image {
+      width: 100%;
+      height: 200px;
+      background: var(--blue-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      overflow: hidden;
+    }
+    .material-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .material-card-content {
+      padding: 1.25rem;
+    }
+    .material-card-content h3 {
+      font-size: 1.1rem;
       color: var(--blue-dark);
+      margin-bottom: 0.5rem;
+      font-weight: 700;
     }
-    .progress-track { background: var(--blue-light); border-radius: 50px; height: 14px; overflow: hidden; }
-    .progress-fill { height: 100%; border-radius: 50px; background: linear-gradient(90deg, var(--blue-mid), #5ba4e0); transition: width 1s ease; }
+    .material-card-content p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      margin-bottom: 0.75rem;
+    }
+    .material-qty {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 1px solid var(--blue-light);
+    }
+    .material-qty-value {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--blue-mid);
+    }
+    .material-qty-label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+    .material-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .material-actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+    .material-actions button {
+      flex: 1;
+      padding: 0.5rem;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .material-actions .edit-btn {
+      background: #3498db;
+      color: #fff;
+    }
+    .material-actions .edit-btn:hover {
+      background: #2980b9;
+    }
+    .material-actions .delete-btn {
+      background: var(--accent);
+      color: #fff;
+    }
+    .material-actions .delete-btn:hover {
+      background: #c73535;
+    }
 
-    /* ── Alert ── */
+    /* IMAGE PREVIEW */
+    .image-preview {
+      width: 100%;
+      height: 150px;
+      background: var(--blue-light);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 0.5rem;
+      overflow: hidden;
+    }
+    .image-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    /* ALERT */
     .alert { padding: 1rem 1.25rem; border-radius: 8px; margin-bottom: 1rem; display: none; }
     .alert.show { display: block; }
     .alert-success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .alert-error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
 
-    /* ── PDF Report ── */
-    .pdf-report { background: #fff; padding: 2rem; border-radius: var(--radius); margin-top: 2rem; }
-    .pdf-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 3px solid var(--blue-mid); }
-    .pdf-header img { height: 50px; width: auto; }
-    .pdf-header-text { flex: 1; margin-left: 1rem; }
-    .pdf-header-text h2 { margin: 0; color: var(--blue-dark); font-size: 1.5rem; }
-    .pdf-header-text p { margin: 0.25rem 0 0 0; color: var(--muted); font-size: 0.9rem; }
-    .pdf-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
-    .pdf-stat-box { background: var(--blue-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--blue-mid); text-align: center; }
-    .pdf-stat-box .value { font-size: 2.5rem; font-weight: 800; color: var(--blue-dark); display: block; margin-bottom: 0.5rem; }
-    .pdf-stat-box .label { font-size: 0.9rem; color: var(--muted); font-weight: 600; }
-    .pdf-section { margin-bottom: 2rem; }
-    .pdf-section h3 { color: var(--blue-dark); font-size: 1.2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--blue-light); }
-
-    /* ── Footer ── */
+    /* FOOTER */
     footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: .82rem; border-top: 1px solid #dde4f0; margin-top: 2rem; }
 
-    /* ── Print ── */
+    /* PRINT */
     @media print {
-      nav, .btn-group, .filter-bar, .logout-btn { display: none !important; }
-      .pdf-report { box-shadow: none; border: none; }
+      nav, .btn-group, .material-actions { display: none !important; }
+      .materiais-grid { grid-template-columns: repeat(2, 1fr); }
+      .material-card { page-break-inside: avoid; }
     }
 
-    /* ── Responsive ── */
+    /* RESPONSIVE */
     @media (max-width: 768px) {
       header { flex-direction: column; text-align: center; }
       .header-content { flex-direction: column; gap: 1rem; }
       .header-text h1 { font-size: 1.4rem; }
-      .kpi .value { font-size: 1.7rem; }
       .modal-content { width: 95%; }
-      .pdf-header { flex-direction: column; text-align: center; }
-      .pdf-header-text { margin-left: 0; margin-top: 1rem; }
-      .logout-btn { margin-top: 1rem; width: 100%; }
+      .materiais-grid { grid-template-columns: 1fr; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── LOGIN SCREEN ── -->
+<!-- LOGIN -->
 <div id="login-screen">
   <div class="login-container">
-    <div class="login-logo">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
-    </div>
     <h1>Acesso Restrito</h1>
     <p>Faça login para acessar o controle de materiais</p>
+    <div class="version-badge">
+      ✅ VERSÃO 3.0 - CONTROLE DE MATERIAIS COM FIREBASE
+    </div>
     <form class="login-form" onsubmit="auth.login(event)">
       <div class="form-group">
         <label for="login-input">Login</label>
@@ -97,44 +397,289 @@
       </div>
       <div class="form-group">
         <label for="password-input">Senha</label>
-        <div style="display: flex; gap: 0.5rem; align-items: center;">
-          <input type="password" id="password-input" placeholder="Digite sua senha" required autocomplete="off" style="flex: 1;" />
-          <button type="button" onclick="auth.toggleSenha()" style="padding: 0.6rem 0.8rem; background: #ddeeff; border: 1px solid #c8d6ea; border-radius: 8px; cursor: pointer; font-size: 1rem;">👁️</button>
-        </div>
+        <input type="password" id="password-input" required autocomplete="off" />
       </div>
       <button type="submit">Acessar Sistema</button>
-      <div id="login-error" class="login-error">❌ Login ou senha incorretos! Tente novamente.</div>
+      <div id="login-error" class="login-error">❌ Login ou senha incorretos!</div>
     </form>
   </div>
 </div>
 
-<!-- ── MAIN APP ── -->
+<!-- APP -->
 <header>
   <div class="header-content">
     <div class="logo-container">
-      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4SpS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
     </div>
     <div class="header-text">
       <h1>Controle de Materiais</h1>
-      <p>Gestão profissional de empréstimos - Plano & Plano</p>
+      <p>Gestão profissional - Plano & Plano</p>
     </div>
   </div>
-
 </header>
 
 <nav>
-  <button class="active" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
-  <button onclick="app.showSection('por-empresa', this)">Por Empresa</button>
-  <button onclick="app.showSection('por-material', this)">Por Material</button>
-  <button onclick="app.showSection('registros', this)">Gerenciar Registros</button>
-  <button onclick="app.showSection('relatorio', this)">Relatório Visual</button>
+  <button class="active" onclick="app.showSection('materiais-obra', this)">🏗️ Controle de Materiais</button>
 </nav>
 
 <main>
-
-  <!-- Alert ── -->
   <div id="alert" class="alert"></div>
 
-  <!-- KPIs sempre visíveis -->
-  <div class="kpi-grid">
-    <div class="kpi">
+  <section id="materiais-obra" class="active">
+    <div class="card">
+      <h2>🏗️ Controle de Materiais da Obra</h2>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="appMateriais.abrirModalNovo()">➕ Novo Material</button>
+        <button class="btn btn-success" onclick="appMateriais.abrirRelatorio()">📋 Relatório do Dia</button>
+        <button class="btn btn-secondary" onclick="appMateriais.carregarMateriais()">🔄 Atualizar</button>
+      </div>
+      <div id="materiaisContainer" class="materiais-grid"></div>
+    </div>
+  </section>
+</main>
+
+<!-- MODAL -->
+<div id="modalMateriais" class="modal">
+  <div class="modal-content">
+    <h3 id="modalMateriaisTitle">Novo Material</h3>
+    <form id="formMateriais" onsubmit="appMateriais.salvarMaterial(event)">
+      <div class="form-group">
+        <label for="nomeMaterial">Nome do Material *</label>
+        <input type="text" id="nomeMaterial" required />
+      </div>
+      <div class="form-group">
+        <label for="quantidadeMaterial">Quantidade *</label>
+        <input type="number" id="quantidadeMaterial" required min="1" />
+      </div>
+      <div class="form-group">
+        <label for="especificacoes">Especificações</label>
+        <textarea id="especificacoes" rows="3"></textarea>
+      </div>
+      <div class="form-group">
+        <label for="fotoMaterial">Foto do Material</label>
+        <input type="file" id="fotoMaterial" accept="image/*" />
+        <div id="imagemPreview" class="image-preview" style="display: none;">
+          <img id="imagemPreviewImg" src="" />
+        </div>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button>
+        <button type="submit" class="btn btn-success">Salvar Material</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer>Controle de Materiais — Plano & Plano — Versão 3.0</footer>
+
+<script type="module">
+  import { salvarMaterialNaNuvem, carregarMateriaisDaNuvem, escutarMudancasMateriais, deletarMaterialDaNuvem } from "./firebase.js";
+  window.__fb = { salvarMaterialNaNuvem, carregarMateriaisDaNuvem, escutarMudancasMateriais, deletarMaterialDaNuvem };
+</script>
+
+<script>
+const auth = {
+  CREDENCIAIS: { login: 'planonana', senha: '@plano123' },
+  verificarSessao() {
+    document.getElementById('login-screen').classList.remove('hidden');
+    document.querySelector('header').style.display = 'none';
+    document.querySelector('nav').style.display = 'none';
+    document.querySelector('main').style.display = 'none';
+    document.querySelector('footer').style.display = 'none';
+  },
+  login(e) {
+    e.preventDefault();
+    const login = document.getElementById('login-input').value.toLowerCase().trim();
+    const senha = document.getElementById('password-input').value.trim();
+    if (login === this.CREDENCIAIS.login && senha === this.CREDENCIAIS.senha) {
+      this.mostrarApp();
+    } else {
+      document.getElementById('login-error').classList.add('show');
+    }
+  },
+  mostrarApp() {
+    document.getElementById('login-screen').classList.add('hidden');
+    document.querySelector('header').style.display = 'flex';
+    document.querySelector('nav').style.display = 'flex';
+    document.querySelector('main').style.display = 'block';
+    document.querySelector('footer').style.display = 'block';
+    appMateriais.init();
+  }
+};
+
+const app = {
+  showSection(id, btn) {
+    document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+  }
+};
+
+const appMateriais = {
+  materiais: [],
+  editandoId: null,
+
+  async init() {
+    console.log("Inicializando app de materiais...");
+    this.setupEventListeners();
+    await this.carregarMateriais();
+    this.iniciarSyncAoVivo();
+  },
+
+  setupEventListeners() {
+    document.getElementById('modalMateriais').addEventListener('click', (e) => {
+      if (e.target.id === 'modalMateriais') this.fecharModal();
+    });
+    document.getElementById('fotoMaterial').addEventListener('change', (e) => {
+      const file = e.target.files && e.target.files[0];
+      if (!file) {
+        document.getElementById('imagemPreviewImg').src = '';
+        document.getElementById('imagemPreview').style.display = 'none';
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('imagemPreviewImg').src = ev.target.result;
+        document.getElementById('imagemPreview').style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    });
+  },
+
+  async carregarMateriais() {
+    console.log("Carregando materiais do Firebase...");
+    if (window.__fb?.carregarMateriaisDaNuvem) {
+      this.materiais = await window.__fb.carregarMateriaisDaNuvem();
+      console.log("Materiais carregados:", this.materiais);
+    }
+    this.renderizarMateriais();
+  },
+
+  iniciarSyncAoVivo() {
+    if (window.__fb?.escutarMudancasMateriais) {
+      console.log("Iniciando sincronização em tempo real...");
+      window.__fb.escutarMudancasMateriais((mats) => {
+        this.materiais = mats;
+        console.log("Materiais atualizados:", mats);
+        this.renderizarMateriais();
+      });
+    }
+  },
+
+  abrirModalNovo() {
+    this.editandoId = null;
+    document.getElementById('formMateriais').reset();
+    document.getElementById('imagemPreview').style.display = 'none';
+    document.getElementById('modalMateriaisTitle').textContent = 'Novo Material';
+    document.getElementById('modalMateriais').classList.add('active');
+  },
+
+  abrirModalEditar(id) {
+    const mat = this.materiais.find(m => m.id === id);
+    if (!mat) return;
+    this.editandoId = id;
+    document.getElementById('nomeMaterial').value = mat.nome;
+    document.getElementById('quantidadeMaterial').value = mat.quantidade;
+    document.getElementById('especificacoes').value = mat.especificacoes || '';
+    if (mat.foto) {
+      document.getElementById('imagemPreviewImg').src = mat.foto;
+      document.getElementById('imagemPreview').style.display = 'block';
+    }
+    document.getElementById('modalMateriaisTitle').textContent = 'Editar Material';
+    document.getElementById('modalMateriais').classList.add('active');
+  },
+
+  fecharModal() {
+    document.getElementById('modalMateriais').classList.remove('active');
+  },
+
+  async salvarMaterial(e) {
+    e.preventDefault();
+    const nome = document.getElementById('nomeMaterial').value;
+    const quantidade = parseInt(document.getElementById('quantidadeMaterial').value);
+    const especificacoes = document.getElementById('especificacoes').value;
+    const foto = document.getElementById('imagemPreviewImg').src || '';
+
+    const material = {
+      id: this.editandoId || Date.now(),
+      nome,
+      quantidade,
+      especificacoes,
+      foto,
+      dataAtualizacao: new Date().toISOString()
+    };
+
+    if (window.__fb?.salvarMaterialNaNuvem) {
+      const sucesso = await window.__fb.salvarMaterialNaNuvem(material);
+      if (sucesso) {
+        this.mostrarAlerta('Material salvo com sucesso!', 'success');
+        this.fecharModal();
+        await this.carregarMateriais();
+      } else {
+        this.mostrarAlerta('Erro ao salvar material!', 'error');
+      }
+    }
+  },
+
+  async deletarMaterial(id) {
+    if (!confirm('Tem certeza que deseja deletar este material?')) return;
+    if (window.__fb?.deletarMaterialDaNuvem) {
+      const sucesso = await window.__fb.deletarMaterialDaNuvem(id);
+      if (sucesso) {
+        this.mostrarAlerta('Material deletado!', 'success');
+        await this.carregarMateriais();
+      } else {
+        this.mostrarAlerta('Erro ao deletar material!', 'error');
+      }
+    }
+  },
+
+  renderizarMateriais() {
+    const container = document.getElementById('materiaisContainer');
+    if (!this.materiais || this.materiais.length === 0) {
+      container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 2rem;">Nenhum material cadastrado ainda. Clique em "Novo Material" para começar.</p>';
+      return;
+    }
+    container.innerHTML = this.materiais.map(m => `
+      <div class="material-card">
+        <div class="material-card-image">${m.foto ? `<img src="${m.foto}" />` : '📦'}</div>
+        <div class="material-card-content">
+          <h3>${m.nome}</h3>
+          <p>${m.especificacoes || 'Sem especificações'}</p>
+          <div class="material-qty">
+            <span class="material-qty-value">${m.quantidade}</span>
+            <span class="material-qty-label">Unidades</span>
+          </div>
+          <div class="material-date">📅 ${this.formatarData(m.dataAtualizacao)}</div>
+          <div class="material-actions">
+            <button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">✏️ Editar</button>
+            <button class="delete-btn" onclick="appMateriais.deletarMaterial(${m.id})">🗑️ Deletar</button>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  },
+
+  formatarData(dataISO) {
+    if (!dataISO) return '-';
+    const data = new Date(dataISO);
+    return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  },
+
+  abrirRelatorio() {
+    window.open('relatorio-materiais.html', '_blank');
+  },
+
+  mostrarAlerta(msg, tipo) {
+    const alert = document.getElementById('alert');
+    alert.textContent = msg;
+    alert.className = `alert show alert-${tipo}`;
+    setTimeout(() => alert.classList.remove('show'), 3000);
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => auth.verificarSessao());
+</script>
+</body>
+</html>
