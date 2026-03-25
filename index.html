@@ -513,6 +513,59 @@
       .logout-btn { margin-top: 1rem; width: 100%; }
       .materiais-grid { grid-template-columns: 1fr; }
     }
+  
+    .camera-helper {
+      display:block;
+      color: var(--muted);
+      margin-top: .35rem;
+      margin-bottom: .85rem;
+      line-height: 1.45;
+      font-size: .86rem;
+    }
+    .camera-actions {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: .85rem;
+      margin-top: .35rem;
+    }
+    .camera-actions .btn {
+      min-height: 62px;
+      border-radius: 16px;
+      justify-content: center;
+      flex-direction: column;
+      gap: .25rem;
+      box-shadow: 0 8px 24px rgba(31,56,100,.12);
+      font-size: .92rem;
+      font-weight: 700;
+      width: 100%;
+    }
+    .camera-btn-icon { font-size: 1.35rem; line-height: 1; }
+    .gallery-btn {
+      background: #eef5ff;
+      color: var(--blue-dark);
+      border: 1px solid #cfe0fb;
+    }
+    .gallery-btn:hover { background: #e3efff; }
+    .capture-btn {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      border: none;
+    }
+    .capture-btn:hover { filter: brightness(1.03); }
+    .image-preview-app {
+      margin-top: 1rem;
+      border: 2px dashed #c8d6ea;
+      border-radius: 16px;
+      height: 220px;
+      background: linear-gradient(180deg, #f8fbff 0%, #edf4ff 100%);
+    }
+    .image-preview-app img { border-radius: 12px; }
+    @media (max-width: 768px) {
+      .camera-actions { grid-template-columns: 1fr; }
+      .camera-actions .btn { min-height: 58px; flex-direction: row; }
+      .image-preview-app { height: 200px; }
+    }
+
   </style>
 </head>
 <body>
@@ -771,14 +824,30 @@
         <label for="especificacoes">Especificações / Descrição</label>
         <textarea id="especificacoes" placeholder="Ex: Cimento Portland 50kg, Areia média, etc..." rows="3"></textarea>
       </div>
-      <div class="form-group">
-        <label for="fotoMaterial">Foto do Material</label>
-        <small style="display:block;color:#6b7a99;margin-top:4px;margin-bottom:8px;">No celular, você pode escolher uma imagem ou abrir a câmera para tirar a foto do material na hora.</small>
-        <input type="file" id="fotoMaterial"  / accept="image/*" capture="environment">
-        <div id="imagemPreview" class="image-preview" style="display: none;">
-          <img id="imagemPreviewImg" src="" alt="Preview" />
-        </div>
-      </div>
+      
+<div class="form-group">
+  <label for="fotoMaterial">Foto do Material</label>
+  <small class="camera-helper">A imagem será comprimida automaticamente. No celular, use <strong>Galeria</strong> para escolher uma imagem salva ou <strong>Câmera</strong> para tirar a foto na hora.</small>
+
+  <input type="file" id="fotoMaterial" accept="image/*" style="display:none;" />
+  <input type="file" id="fotoMaterialCamera" accept="image/*" capture="environment" style="display:none;" />
+
+  <div class="camera-actions">
+    <button type="button" class="btn gallery-btn" onclick="document.getElementById('fotoMaterial').click()">
+      <span class="camera-btn-icon">🖼️</span>
+      <span>Escolher da Galeria</span>
+    </button>
+    <button type="button" class="btn capture-btn" onclick="document.getElementById('fotoMaterialCamera').click()">
+      <span class="camera-btn-icon">📷</span>
+      <span>Tirar Foto</span>
+    </button>
+  </div>
+
+  <div id="imagemPreview" class="image-preview image-preview-app" style="display: none;">
+    <img id="imagemPreviewImg" src="" alt="Preview" />
+  </div>
+</div>
+
       <div class="modal-buttons">
         <button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button>
         <button type="submit" class="btn btn-success">Salvar Material</button>
@@ -1423,7 +1492,9 @@ const appMateriais = {
     });
 
     const fotoInput = document.getElementById('fotoMaterial');
-    fotoInput.addEventListener('change', (e) => this.previewImagem(e));
+    const fotoInputCamera = document.getElementById('fotoMaterialCamera');
+    if (fotoInput) fotoInput.addEventListener('change', (e) => this.previewImagem(e));
+    if (fotoInputCamera) fotoInputCamera.addEventListener('change', (e) => this.previewImagem(e));
   },
 
   async carregarMateriais() {
@@ -1483,18 +1554,15 @@ const appMateriais = {
             const canvas = document.createElement('canvas');
             canvas.width = width;
             canvas.height = height;
-
             const ctx = canvas.getContext('2d');
             ctx.drawImage(img, 0, 0, width, height);
 
             let quality = 0.72;
             let output = canvas.toDataURL('image/jpeg', quality);
-
             while (output.length > 350000 && quality > 0.45) {
               quality -= 0.07;
               output = canvas.toDataURL('image/jpeg', quality);
             }
-
             resolve(output);
           };
           img.onerror = reject;
@@ -1512,6 +1580,7 @@ const appMateriais = {
     const file = e.target.files && e.target.files[0];
     const preview = document.getElementById('imagemPreview');
     const previewImg = document.getElementById('imagemPreviewImg');
+
     if (!file) {
       previewImg.src = '';
       preview.style.display = 'none';
@@ -1530,6 +1599,11 @@ const appMateriais = {
     this.editandoId = null;
     document.getElementById('modalMateriaisTitle').textContent = 'Novo Material';
     document.getElementById('formMateriais').reset();
+    const fotoInput = document.getElementById('fotoMaterial');
+    const fotoInputCamera = document.getElementById('fotoMaterialCamera');
+    if (fotoInput) fotoInput.value = '';
+    if (fotoInputCamera) fotoInputCamera.value = '';
+    document.getElementById('imagemPreviewImg').src = '';
     document.getElementById('imagemPreview').style.display = 'none';
     document.getElementById('modalMateriais').classList.add('active');
   },
@@ -1555,6 +1629,10 @@ const appMateriais = {
 
   fecharModal() {
     document.getElementById('modalMateriais').classList.remove('active');
+    const fotoInput = document.getElementById('fotoMaterial');
+    const fotoInputCamera = document.getElementById('fotoMaterialCamera');
+    if (fotoInput) fotoInput.value = '';
+    if (fotoInputCamera) fotoInputCamera.value = '';
     this.editandoId = null;
   },
 
@@ -1564,16 +1642,21 @@ const appMateriais = {
     const quantidade = parseInt(document.getElementById('quantidadeMaterial').value);
     const especificacoes = document.getElementById('especificacoes').value.trim();
     const fotoInput = document.getElementById('fotoMaterial');
+    const fotoInputCamera = document.getElementById('fotoMaterialCamera');
 
     if (!nome || !quantidade) {
       app.mostrarAlerta('Preencha os campos obrigatórios!', 'error');
       return;
     }
 
+    const arquivoSelecionado =
+      (fotoInput && fotoInput.files && fotoInput.files[0]) ||
+      (fotoInputCamera && fotoInputCamera.files && fotoInputCamera.files[0]);
+
     let foto = null;
-    if (fotoInput.files.length > 0) {
+    if (arquivoSelecionado) {
       try {
-        foto = await this.comprimirImagem(fotoInput.files[0]);
+        foto = await this.comprimirImagem(arquivoSelecionado);
         this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
       } catch (error) {
         console.error('Erro ao comprimir imagem:', error);
@@ -1617,7 +1700,7 @@ const appMateriais = {
     this.fecharModal();
     this.salvarMateriais().then(() => {
       this.buscarMateriais();
-      app.mostrarAlerta(foto ? 'Material salvo com imagem comprimida com sucesso!' : 'Material salvo com sucesso!', 'success');
+      app.mostrarAlerta('Material salvo com sucesso!', 'success');
     });
   },
 
@@ -1743,6 +1826,59 @@ const appMateriais = {
       .stats, .cards { grid-template-columns: 1fr; }
       .header { flex-direction:column; align-items:flex-start; }
     }
+  
+    .camera-helper {
+      display:block;
+      color: var(--muted);
+      margin-top: .35rem;
+      margin-bottom: .85rem;
+      line-height: 1.45;
+      font-size: .86rem;
+    }
+    .camera-actions {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: .85rem;
+      margin-top: .35rem;
+    }
+    .camera-actions .btn {
+      min-height: 62px;
+      border-radius: 16px;
+      justify-content: center;
+      flex-direction: column;
+      gap: .25rem;
+      box-shadow: 0 8px 24px rgba(31,56,100,.12);
+      font-size: .92rem;
+      font-weight: 700;
+      width: 100%;
+    }
+    .camera-btn-icon { font-size: 1.35rem; line-height: 1; }
+    .gallery-btn {
+      background: #eef5ff;
+      color: var(--blue-dark);
+      border: 1px solid #cfe0fb;
+    }
+    .gallery-btn:hover { background: #e3efff; }
+    .capture-btn {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      border: none;
+    }
+    .capture-btn:hover { filter: brightness(1.03); }
+    .image-preview-app {
+      margin-top: 1rem;
+      border: 2px dashed #c8d6ea;
+      border-radius: 16px;
+      height: 220px;
+      background: linear-gradient(180deg, #f8fbff 0%, #edf4ff 100%);
+    }
+    .image-preview-app img { border-radius: 12px; }
+    @media (max-width: 768px) {
+      .camera-actions { grid-template-columns: 1fr; }
+      .camera-actions .btn { min-height: 58px; flex-direction: row; }
+      .image-preview-app { height: 200px; }
+    }
+
   </style>
 </head>
 <body>
