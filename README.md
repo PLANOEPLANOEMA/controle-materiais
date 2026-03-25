@@ -44,10 +44,3 @@ http://localhost:5500
 - `firebase.js` → conexão com Firestore
 - `vercel.json` → (opcional) config de deploy
 
-
-
-## Atualização adicionada
-- Formulário do Controle de Materiais em estilo app
-- Botão separado para Galeria
-- Botão separado para Câmera
-- Melhor visual no celular
