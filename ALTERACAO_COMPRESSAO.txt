@@ -1,0 +1,1 @@
+Foi adicionada compressão automática da imagem antes de salvar o material. Isso reduz o tamanho da foto tirada no celular e evita falha ao salvar no Firestore.
