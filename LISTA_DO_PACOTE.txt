@@ -1,1 +1,1 @@
-Este pacote força o botão de relatório do Controle de Materiais a abrir uma página dedicada, separada da tela principal.
+Relatório de Materiais agora abre sozinho em página separada, com tabela + lista visual.
