@@ -61,8 +61,6 @@
       height: 80px;
       width: auto;
       object-fit: contain;
-      display:block;
-      margin:0 auto;
     }
     .login-container h1 {
       font-size: 1.8rem;
@@ -157,7 +155,7 @@
       flex:1;
     }
     .logo-container { flex-shrink:0; }
-    .logo-container img { height:60px; width:auto; object-fit:contain; display:block; }
+    .logo-container img { height:60px; width:auto; object-fit:contain; }
     .header-text h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: .5px; margin: 0; }
     .header-text p  { margin: 0.25rem 0 0 0; opacity: .85; font-size: 0.95rem; }
 
@@ -273,22 +271,20 @@
       background: rgba(0,0,0,.5);
       z-index: 1000;
       align-items: center; justify-content: center;
-      overflow-y: auto;
     }
     .modal.active { display: flex; }
     .modal-content {
       background: var(--card);
       border-radius: var(--radius);
       padding: 2rem;
-      max-width: 600px;
+      max-width: 500px;
       width: 90%;
       box-shadow: 0 10px 40px rgba(0,0,0,.3);
-      margin: auto;
     }
     .modal-content h3 { font-size: 1.3rem; color: var(--blue-dark); margin-bottom: 1.5rem; }
     .form-group { margin-bottom: 1.25rem; }
     .form-group label { display: block; font-weight: 600; margin-bottom: .4rem; color: var(--blue-dark); font-size: .9rem; }
-    .form-group input, .form-group select, .form-group textarea {
+    .form-group input, .form-group select {
       width: 100%;
       padding: .6rem .8rem;
       border: 1.5px solid #c8d6ea;
@@ -296,9 +292,8 @@
       font-size: .92rem;
       outline: none;
       transition: border-color .2s;
-      font-family: inherit;
     }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(46,117,182,.1); }
+    .form-group input:focus, .form-group select:focus { border-color: var(--blue-mid); box-shadow: 0 0 0 3px rgba(46,117,182,.1); }
     .modal-buttons { display: flex; gap: .75rem; justify-content: flex-end; margin-top: 1.75rem; }
 
     /* ── Table ── */
@@ -373,132 +368,13 @@
     .pdf-section { margin-bottom: 2rem; }
     .pdf-section h3 { color: var(--blue-dark); font-size: 1.2rem; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--blue-light); }
 
-    /* ── Materiais Grid ── */
-    .materiais-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-      gap: 1.5rem;
-      margin-top: 2rem;
-    }
-    .material-card {
-      background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      transition: transform 0.2s, box-shadow 0.2s;
-    }
-    .material-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 8px 32px rgba(31,56,100,.15);
-    }
-    .material-card-image {
-      width: 100%;
-      height: 200px;
-      background: var(--blue-light);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 3rem;
-      overflow: hidden;
-    }
-    .material-card-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    .material-card-content {
-      padding: 1.25rem;
-    }
-    .material-card-content h3 {
-      font-size: 1.1rem;
-      color: var(--blue-dark);
-      margin-bottom: 0.5rem;
-      font-weight: 700;
-    }
-    .material-card-content p {
-      font-size: 0.85rem;
-      color: var(--muted);
-      margin-bottom: 0.75rem;
-    }
-    .material-qty {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 1rem;
-      padding-bottom: 1rem;
-      border-bottom: 1px solid var(--blue-light);
-    }
-    .material-qty-value {
-      font-size: 1.5rem;
-      font-weight: 800;
-      color: var(--blue-mid);
-    }
-    .material-qty-label {
-      font-size: 0.8rem;
-      color: var(--muted);
-      text-transform: uppercase;
-    }
-    .material-date {
-      font-size: 0.8rem;
-      color: var(--muted);
-      margin-bottom: 1rem;
-    }
-    .material-actions {
-      display: flex;
-      gap: 0.5rem;
-    }
-    .material-actions button {
-      flex: 1;
-      padding: 0.5rem;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-    .material-actions .edit-btn {
-      background: #3498db;
-      color: #fff;
-    }
-    .material-actions .edit-btn:hover {
-      background: #2980b9;
-    }
-    .material-actions .delete-btn {
-      background: var(--accent);
-      color: #fff;
-    }
-    .material-actions .delete-btn:hover {
-      background: #c73535;
-    }
-
-    /* ── Image Preview ── */
-    .image-preview {
-      width: 100%;
-      height: 150px;
-      background: var(--blue-light);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin-top: 0.5rem;
-      overflow: hidden;
-    }
-    .image-preview img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-
     /* ── Footer ── */
     footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: .82rem; border-top: 1px solid #dde4f0; margin-top: 2rem; }
 
     /* ── Print ── */
     @media print {
-      nav, .btn-group, .filter-bar, .logout-btn, .material-actions { display: none !important; }
+      nav, .btn-group, .filter-bar, .logout-btn { display: none !important; }
       .pdf-report { box-shadow: none; border: none; }
-      .materiais-grid { grid-template-columns: repeat(2, 1fr); }
-      .material-card { page-break-inside: avoid; }
     }
 
     /* ── Responsive ── */
@@ -511,8 +387,141 @@
       .pdf-header { flex-direction: column; text-align: center; }
       .pdf-header-text { margin-left: 0; margin-top: 1rem; }
       .logout-btn { margin-top: 1rem; width: 100%; }
-      .materiais-grid { grid-template-columns: 1fr; }
     }
+  
+    /* ── App Style Upgrade ── */
+    body {
+      -webkit-tap-highlight-color: transparent;
+    }
+    nav {
+      border-bottom-left-radius: 18px;
+      border-bottom-right-radius: 18px;
+    }
+    nav button {
+      min-height: 44px;
+    }
+    .card {
+      border: 1px solid rgba(31,56,100,.06);
+    }
+    .modal-content {
+      border: 1px solid rgba(31,56,100,.08);
+    }
+    .camera-helper {
+      display:block;
+      color: var(--muted);
+      margin-top: .35rem;
+      margin-bottom: .85rem;
+      line-height: 1.4;
+      font-size: .85rem;
+    }
+    .camera-actions {
+      display:grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: .85rem;
+      margin-top: .4rem;
+    }
+    .camera-btn {
+      min-height: 64px;
+      border-radius: 16px !important;
+      justify-content: center;
+      flex-direction: column;
+      gap: .2rem !important;
+      box-shadow: 0 8px 24px rgba(31,56,100,.12);
+      font-size: .92rem !important;
+    }
+    .camera-btn-icon {
+      font-size: 1.3rem;
+      line-height: 1;
+    }
+    .gallery-btn {
+      background: #eef5ff !important;
+      color: var(--blue-dark) !important;
+      border: 1px solid #cfe0fb !important;
+    }
+    .gallery-btn:hover {
+      background: #e3efff !important;
+    }
+    .capture-btn {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%) !important;
+      color: #fff !important;
+    }
+    .image-preview-app {
+      margin-top: 1rem !important;
+      border: 2px dashed #c8d6ea;
+      border-radius: 16px;
+      height: 220px;
+      background: linear-gradient(180deg, #f8fbff 0%, #edf4ff 100%);
+    }
+    .image-preview-app img {
+      border-radius: 12px;
+    }
+    .materiais-grid {
+      align-items: start;
+    }
+    .material-card {
+      border: 1px solid rgba(31,56,100,.08);
+    }
+    .material-card-content h3 {
+      line-height: 1.3;
+    }
+    .btn {
+      min-height: 42px;
+    }
+    @media (max-width: 768px) {
+      main {
+        padding: 1.25rem .9rem 5rem;
+      }
+      .kpi-grid {
+        gap: .9rem;
+      }
+      .kpi {
+        padding: 1rem .8rem;
+        border-radius: 18px;
+      }
+      .card {
+        padding: 1.1rem;
+        border-radius: 18px;
+      }
+      .modal-content {
+        width: calc(100% - 18px);
+        padding: 1.15rem;
+        border-radius: 22px;
+      }
+      .camera-actions {
+        grid-template-columns: 1fr;
+      }
+      .camera-btn {
+        min-height: 58px;
+        flex-direction: row;
+      }
+      .image-preview-app {
+        height: 200px;
+      }
+      nav {
+        position: sticky;
+        top: 0;
+        padding: .75rem;
+        gap: .55rem;
+      }
+      nav button {
+        padding: .65rem 1rem;
+        border-radius: 999px;
+      }
+      .materiais-grid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+      .material-card-image {
+        height: 180px;
+      }
+      .material-actions button {
+        min-height: 40px;
+      }
+      footer {
+        padding-bottom: 2rem;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -521,7 +530,7 @@
 <div id="login-screen">
   <div class="login-container">
     <div class="login-logo">
-      <img src="./logo.png" alt="Plano & Plano" />
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
     </div>
     <h1>Acesso Restrito</h1>
     <p>Faça login para acessar o controle de materiais</p>
@@ -547,11 +556,11 @@
 <header>
   <div class="header-content">
     <div class="logo-container">
-      <img src="./logo.png" alt="Plano & Plano" />
+      <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
     </div>
     <div class="header-text">
       <h1>Controle de Materiais</h1>
-      <p>Gestão profissional de empréstimos e estoque - Plano & Plano</p>
+      <p>Gestão profissional de empréstimos - Plano & Plano</p>
     </div>
   </div>
 
@@ -562,7 +571,6 @@
   <button onclick="app.showSection('por-empresa', this)">Por Empresa</button>
   <button onclick="app.showSection('por-material', this)">Por Material</button>
   <button onclick="app.showSection('registros', this)">Gerenciar Registros</button>
-  <button onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
   <button onclick="app.showSection('relatorio', this)">Relatório Visual</button>
 </nav>
 
@@ -574,35 +582,47 @@
   <!-- KPIs sempre visíveis -->
   <div class="kpi-grid">
     <div class="kpi">
-      <div class="icon">📦</div>
-      <div class="value" id="kpiTotal">0</div>
-      <div class="label">Total de Itens</div>
+      <div class="icon">📋</div>
+      <div class="value" id="kpiTotal">660</div>
+      <div class="label">Total de Itens em Débito</div>
     </div>
     <div class="kpi">
       <div class="icon">🏢</div>
-      <div class="value" id="kpiEmpresas">0</div>
-      <div class="label">Empresas</div>
+      <div class="value" id="kpiEmpresas">4</div>
+      <div class="label">Empresas Credoras</div>
     </div>
     <div class="kpi">
       <div class="icon">🔨</div>
-      <div class="value" id="kpiMateriais">0</div>
+      <div class="value" id="kpiMateriais">4</div>
       <div class="label">Tipos de Material</div>
     </div>
     <div class="kpi">
-      <div class="icon">✅</div>
-      <div class="value" id="kpiConcluidos">0</div>
-      <div class="label">Concluídos</div>
+      <div class="icon">📅</div>
+      <div class="value" id="kpiRegistros">7</div>
+      <div class="label">Registros de Empréstimo</div>
+    </div>
+    <div class="kpi" style="border-top-color: var(--accent);">
+      <div class="icon">⚠️</div>
+      <div class="value" id="kpiAbertos" style="color:var(--accent);">7</div>
+      <div class="label">Itens Em Aberto</div>
     </div>
   </div>
 
   <!-- ── VISÃO GERAL ── -->
   <section id="visao-geral" class="active">
-    <div class="card">
-      <h2>📊 Resumo Geral</h2>
-      <div class="chart-grid">
-        <div class="chart-wrap"><canvas id="chartData"></canvas></div>
-        <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+    <div class="chart-grid">
+      <div class="card">
+        <h2>📊 Quantidade por Empresa</h2>
+        <div class="chart-wrap"><canvas id="chartEmpresa"></canvas></div>
       </div>
+      <div class="card">
+        <h2>🏗️ Distribuição por Material</h2>
+        <div class="chart-wrap"><canvas id="chartMaterial"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📈 Empréstimos por Data</h2>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartData"></canvas></div>
     </div>
   </section>
 
@@ -641,7 +661,7 @@
         <button class="btn btn-success" onclick="app.exportarCSV()">
           💾 Exportar CSV
         </button>
-        <button class="btn btn-warning" onclick="app.showSection('relatorio', document.querySelectorAll('nav button')[5])">
+        <button class="btn btn-warning" onclick="app.showSection('relatorio', document.querySelectorAll('nav button')[4])">
           📊 Gerar Relatório
         </button>
         <button class="btn btn-secondary" onclick="app.resetarDados()">
@@ -682,29 +702,6 @@
     </div>
   </section>
 
-  <!-- ── CONTROLE DE MATERIAIS DA OBRA ── -->
-  <section id="materiais-obra">
-    <div class="card">
-      <h2>🏗️ Controle de Materiais da Obra</h2>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="appMateriais.abrirModalNovo()">
-          ➕ Novo Material
-        </button>
-        <button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">
-          📋 Relatório do Dia
-        </button>
-        <button class="btn btn-secondary" onclick="appMateriais.buscarMateriais()">
-          🔄 Atualizar
-        </button>
-      </div>
-      <div class="filter-bar">
-        <input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" />
-        <input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" />
-      </div>
-      <div id="materiaisContainer" class="materiais-grid"></div>
-    </div>
-  </section>
-
   <!-- ── RELATÓRIO VISUAL ── -->
   <section id="relatorio">
     <div class="card">
@@ -725,7 +722,7 @@
 
 </main>
 
-<!-- ── MODAL EMPRÉSTIMOS ── -->
+<!-- ── MODAL ── -->
 <div id="modal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle">Novo Registro</h3>
@@ -754,62 +751,14 @@
   </div>
 </div>
 
-<!-- ── MODAL MATERIAIS DA OBRA ── -->
-<div id="modalMateriais" class="modal">
-  <div class="modal-content">
-    <h3 id="modalMateriaisTitle">Novo Material</h3>
-    <form id="formMateriais" onsubmit="appMateriais.salvarMaterial(event)">
-      <div class="form-group">
-        <label for="nomeMaterial">Nome do Material *</label>
-        <input type="text" id="nomeMaterial" required placeholder="Ex: Cimento, Areia, Tijolos..." />
-      </div>
-      <div class="form-group">
-        <label for="quantidadeMaterial">Quantidade *</label>
-        <input type="number" id="quantidadeMaterial" required min="1" placeholder="Ex: 50" />
-      </div>
-      <div class="form-group">
-        <label for="especificacoes">Especificações / Descrição</label>
-        <textarea id="especificacoes" placeholder="Ex: Cimento Portland 50kg, Areia média, etc..." rows="3"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="fotoMaterial">Foto do Material</label>
-        <small style="display:block;color:#6b7a99;margin-top:4px;margin-bottom:8px;">No celular, você pode escolher uma imagem ou abrir a câmera para tirar a foto do material na hora.</small>
-        <input type="file" id="fotoMaterial"  / accept="image/*" capture="environment">
-        <div id="imagemPreview" class="image-preview" style="display: none;">
-          <img id="imagemPreviewImg" src="" alt="Preview" />
-        </div>
-      </div>
-      <div class="modal-buttons">
-        <button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button>
-        <button type="submit" class="btn btn-success">Salvar Material</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <footer>
-  Controle de Materiais de Empréstimo e Estoque — Plano & Plano &mdash; Dados salvos automaticamente
+  Controle de Materiais de Empréstimo — Plano & Plano &mdash; Dados salvos automaticamente
 </footer>
 
 <!-- Firebase bridge -->
 <script type="module">
-  import {
-    salvarNaNuvem,
-    carregarDaNuvem,
-    escutarMudancas,
-    salvarMateriaisNaNuvem,
-    carregarMateriaisDaNuvem,
-    escutarMudancasMateriais
-  } from "./firebase.js";
-
-  window.__fb = {
-    salvarNaNuvem,
-    carregarDaNuvem,
-    escutarMudancas,
-    salvarMateriaisNaNuvem,
-    carregarMateriaisDaNuvem,
-    escutarMudancasMateriais
-  };
+  import { salvarNaNuvem, carregarDaNuvem, escutarMudancas } from "./firebase.js";
+  window.__fb = { salvarNaNuvem, carregarDaNuvem, escutarMudancas };
 </script>
 
 <script>
@@ -822,6 +771,7 @@ const auth = {
   SESSION_KEY: 'plano_session_auth',
 
   verificarSessao() {
+    // Sempre mostrar a tela de login ao carregar
     document.getElementById('login-screen').classList.remove('hidden');
     document.querySelector('header').style.display = 'none';
     document.querySelector('nav').style.display = 'none';
@@ -856,14 +806,12 @@ const auth = {
     document.querySelector('main').style.display = 'block';
     document.querySelector('footer').style.display = 'block';
     app.init();
-    appMateriais.init();
   }
 };
 
-// ── Aplicação Principal (Empréstimos) ──
+// ── Aplicação Principal ──
 const app = {
   STORAGE_KEY: 'controle_emprestimos_dados_final',
-  STORAGE_KEY_MATERIAIS: 'controle_materiais_obra_dados',
   CORES: ["#2E75B6","#1F3864","#5BA4E0","#E84545","#F5A623","#27AE60","#8E44AD"],
   dados: [],
   editandoId: null,
@@ -871,13 +819,14 @@ const app = {
   _unsub: null,
   _isApplyingRemote: false,
 
+  // ── Inicialização ──
   init() {
-    console.log('Inicializando aplicação de empréstimos...');
+    console.log('Inicializando aplicação...');
     this.carregarDados().then(() => {
       this.atualizarUI();
       this.setupEventListeners();
       this.iniciarSyncAoVivo();
-      console.log('Aplicação de empréstimos inicializada!');
+      console.log('Aplicação inicializada com sucesso!');
     });
   },
 
@@ -886,9 +835,11 @@ const app = {
       if (!window.__fb || !window.__fb.escutarMudancas) return;
       if (this._unsub) this._unsub();
       this._unsub = window.__fb.escutarMudancas((registros) => {
+        // evita loop quando a própria tela salva
         if (this._isApplyingRemote) return;
         this._isApplyingRemote = true;
         this.dados = Array.isArray(registros) ? registros : [];
+        // mantém um cache local também
         try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados)); } catch(e) {}
         this.atualizarUI();
         this._isApplyingRemote = false;
@@ -898,6 +849,7 @@ const app = {
     }
   },
 
+  // ── Setup de eventos ──
   setupEventListeners() {
     const modal = document.getElementById('modal');
     modal.addEventListener('click', (e) => {
@@ -905,26 +857,32 @@ const app = {
     });
   },
 
+  // ── Carregar dados (Firebase → fallback localStorage → default) ──
   async carregarDados() {
     try {
+      // 1) tenta nuvem
       if (window.__fb && window.__fb.carregarDaNuvem) {
         const cloud = await window.__fb.carregarDaNuvem();
         if (cloud && Array.isArray(cloud) && cloud.length) {
           this.dados = cloud;
-          console.log('Dados de empréstimos carregados do Firebase:', this.dados.length);
+          console.log('Dados carregados do Firebase:', this.dados.length, 'registros');
+          // cache local
           try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados)); } catch(e) {}
           return;
         }
       }
 
+      // 2) fallback localStorage
       const salvos = localStorage.getItem(this.STORAGE_KEY);
       if (salvos) {
         this.dados = JSON.parse(salvos);
-        console.log('Dados de empréstimos carregados do localStorage:', this.dados.length);
+        console.log('Dados carregados do localStorage:', this.dados.length, 'registros');
+        // sobe para nuvem na primeira vez (se nuvem estiver vazia)
         this.salvarDados();
         return;
       }
 
+      // 3) default
       this.dados = [
         { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
         { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
@@ -941,13 +899,16 @@ const app = {
     }
   },
 
+  // ── Salvar dados (Firebase + cache local) ──
   salvarDados() {
+    // cache local sempre
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
     } catch (e) {
       console.warn('Falha ao salvar cache local:', e);
     }
 
+    // salva na nuvem (fire-and-forget)
     try {
       if (this._isApplyingRemote) return;
       if (window.__fb && window.__fb.salvarNaNuvem) {
@@ -955,13 +916,15 @@ const app = {
           console.log('Dados salvos no Firebase!');
         }).catch((e) => {
           console.error('Erro ao salvar no Firebase:', e);
+          this.mostrarAlerta('Sem conexão com a nuvem. Salvando localmente.', 'error');
         });
       }
     } catch (e) {
-      console.warn('Falha ao salvar na nuvem:', e);
+      console.error('Erro ao salvar dados:', e);
     }
   },
 
+  // ── Alert ──
   mostrarAlerta(msg, tipo) {
     const alert = document.getElementById('alert');
     alert.textContent = msg;
@@ -969,17 +932,19 @@ const app = {
     setTimeout(() => alert.classList.remove('show'), 3000);
   },
 
+  // ── Navegação ──
   showSection(id, btn) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
-    
+
     if (id === 'relatorio') {
       this.gerarRelatorioPDF();
     }
   },
 
+  // ── Modal ──
   abrirModalNovo() {
     this.editandoId = null;
     document.getElementById('modalTitle').textContent = 'Novo Registro';
@@ -1019,7 +984,7 @@ const app = {
     if (this.editandoId) {
       const idx = this.dados.findIndex(d => d.id === this.editandoId);
       if (idx !== -1) {
-        this.dados[idx] = { ...this.dados[idx], empresa, material, data, quantidade };
+        this.dados[idx] = { id: this.editandoId, empresa, material, data, quantidade, status: this.dados[idx].status };
       }
     } else {
       const novoId = Math.max(...this.dados.map(d => d.id), 0) + 1;
@@ -1044,16 +1009,17 @@ const app = {
   alterarStatus(id) {
     const reg = this.dados.find(d => d.id === id);
     if (!reg) return;
-    
+
     const statusOpcoes = ["Em Aberto", "Parcial", "Concluído"];
     const indiceAtual = statusOpcoes.indexOf(reg.status);
     reg.status = statusOpcoes[(indiceAtual + 1) % statusOpcoes.length];
-    
+
     this.salvarDados();
     this.atualizarUI();
     this.mostrarAlerta(`Status alterado para: ${reg.status}`, 'success');
   },
 
+  // ── Agregar ──
   agrupar(campo) {
     return this.dados.reduce((acc, d) => {
       acc[d[campo]] = (acc[d[campo]] || 0) + d.quantidade;
@@ -1061,101 +1027,116 @@ const app = {
     }, {});
   },
 
-  filtrarTabela() {
-    const search = document.getElementById('searchInput').value.toLowerCase();
-    const filterEmpresa = document.getElementById('filterEmpresa').value;
-    const filterMaterial = document.getElementById('filterMaterial').value;
-    const filterStatus = document.getElementById('filterStatus').value;
+  // ── Atualizar UI ──
+  atualizarUI() {
+    const porEmpresa  = this.agrupar('empresa');
+    const porMaterial = this.agrupar('material');
+    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
 
-    const filtrados = this.dados.filter(d => {
-      const matchSearch = d.empresa.toLowerCase().includes(search) || d.material.toLowerCase().includes(search);
-      const matchEmpresa = !filterEmpresa || d.empresa === filterEmpresa;
-      const matchMaterial = !filterMaterial || d.material === filterMaterial;
-      const matchStatus = !filterStatus || d.status === filterStatus;
-      return matchSearch && matchEmpresa && matchMaterial && matchStatus;
-    });
+    // KPIs
+    document.getElementById('kpiTotal').textContent = total;
+    document.getElementById('kpiEmpresas').textContent = Object.keys(porEmpresa).length;
+    document.getElementById('kpiMateriais').textContent = Object.keys(porMaterial).length;
+    document.getElementById('kpiRegistros').textContent = this.dados.length;
+    document.getElementById('kpiAbertos').textContent = this.dados.filter(d => d.status === "Em Aberto").length;
 
-    this.renderizarTabela(filtrados);
+    // Filtros
+    const filterEmp = document.getElementById('filterEmpresa');
+    const filterMat = document.getElementById('filterMaterial');
+    const empresasAtuais = new Set(this.dados.map(d => d.empresa));
+    const materiaisAtuais = new Set(this.dados.map(d => d.material));
+
+    filterEmp.innerHTML = '<option value="">Todas as empresas</option>';
+    [...empresasAtuais].sort().forEach(e => { filterEmp.innerHTML += `<option>${e}</option>`; });
+
+    filterMat.innerHTML = '<option value="">Todos os materiais</option>';
+    [...materiaisAtuais].sort().forEach(m => { filterMat.innerHTML += `<option>${m}</option>`; });
+
+    // Tabela
+    this.renderTabela(this.dados);
+
+    // Gráficos
+    this.atualizarGraficos(porEmpresa, porMaterial, total);
   },
 
-  renderizarTabela(dados = this.dados) {
+  // ── Tabela ──
+  renderTabela(lista) {
     const tbody = document.getElementById('tabelaRegistros');
-    tbody.innerHTML = '';
-
-    dados.forEach((d, i) => {
+    tbody.innerHTML = lista.map(d => {
       const dataFormatada = new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR');
       const statusClass = `badge-${d.status.toLowerCase().replace('á', 'a').replace('í', 'i')}`;
-      
-      tbody.innerHTML += `
+      return `
         <tr>
-          <td>${i + 1}</td>
-          <td>${d.empresa}</td>
+          <td>${d.id}</td>
+          <td><strong>${d.empresa}</strong></td>
           <td>${d.material}</td>
           <td>${dataFormatada}</td>
-          <td>${d.quantidade}</td>
-          <td><span class="badge ${statusClass}" onclick="app.alterarStatus(${d.id})">${d.status}</span></td>
+          <td><strong>${d.quantidade}</strong></td>
+          <td><span class="badge ${statusClass}" onclick="app.alterarStatus(${d.id})" title="Clique para mudar status">${d.status}</span></td>
           <td>
             <div class="action-btns">
               <button class="edit-btn" onclick="app.abrirModalEditar(${d.id})">✏️ Editar</button>
               <button class="delete-btn" onclick="app.deletarRegistro(${d.id})">🗑️ Deletar</button>
             </div>
           </td>
-        </tr>
-      `;
-    });
+        </tr>`;
+    }).join('');
   },
 
-  atualizarUI() {
-    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
-    const empresas = new Set(this.dados.map(d => d.empresa)).size;
-    const materiais = new Set(this.dados.map(d => d.material)).size;
-    const concluidos = this.dados.filter(d => d.status === "Concluído").length;
-
-    document.getElementById('kpiTotal').textContent = total;
-    document.getElementById('kpiEmpresas').textContent = empresas;
-    document.getElementById('kpiMateriais').textContent = materiais;
-    document.getElementById('kpiConcluidos').textContent = concluidos;
-
-    this.renderizarTabela();
-    this.atualizarFiltros();
-    this.atualizarGraficos();
+  filtrarTabela() {
+    const busca    = document.getElementById('searchInput').value.toLowerCase();
+    const empresa  = document.getElementById('filterEmpresa').value;
+    const material = document.getElementById('filterMaterial').value;
+    const status   = document.getElementById('filterStatus').value;
+    const filtrado = this.dados.filter(d => {
+      const matchBusca   = !busca   || d.empresa.toLowerCase().includes(busca) || d.material.toLowerCase().includes(busca);
+      const matchEmpresa = !empresa || d.empresa === empresa;
+      const matchMat     = !material|| d.material.toLowerCase().includes(material.toLowerCase());
+      const matchStatus  = !status  || d.status === status;
+      return matchBusca && matchEmpresa && matchMat && matchStatus;
+    });
+    this.renderTabela(filtrado);
   },
 
-  atualizarFiltros() {
-    const empresas = [...new Set(this.dados.map(d => d.empresa))].sort();
-    const materiais = [...new Set(this.dados.map(d => d.material))].sort();
-
-    const filterEmpresa = document.getElementById('filterEmpresa');
-    const filterMaterial = document.getElementById('filterMaterial');
-
-    filterEmpresa.innerHTML = '<option value="">Todas as empresas</option>';
-    filterMaterial.innerHTML = '<option value="">Todos os materiais</option>';
-
-    empresas.forEach(e => {
-      filterEmpresa.innerHTML += `<option value="${e}">${e}</option>`;
-    });
-
-    materiais.forEach(m => {
-      filterMaterial.innerHTML += `<option value="${m}">${m}</option>`;
-    });
-  },
-
-  atualizarGraficos() {
-    if (!document.getElementById('chartData')) return;
-
-    const porEmpresa  = this.agrupar('empresa');
-    const porMaterial = this.agrupar('material');
-    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
-
-    Object.values(this.charts).forEach(c => c?.destroy?.());
+  // ── Gráficos ──
+  atualizarGraficos(porEmpresa, porMaterial, total) {
+    Object.values(this.charts).forEach(chart => { try { chart.destroy(); } catch(e) {} });
     this.charts = {};
+
+    this.charts.empresa = new Chart(document.getElementById('chartEmpresa'), {
+      type: 'doughnut',
+      data: { labels: Object.keys(porEmpresa),
+        datasets: [{ data: Object.values(porEmpresa), backgroundColor: this.CORES, borderWidth: 2, borderColor: '#fff' }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 16, font: { size: 12 } } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} itens (${(ctx.raw/total*100).toFixed(1)}%)` } }
+        },
+        cutout: '60%'
+      }
+    });
+
+    this.charts.material = new Chart(document.getElementById('chartMaterial'), {
+      type: 'pie',
+      data: { labels: Object.keys(porMaterial),
+        datasets: [{ data: Object.values(porMaterial), backgroundColor: this.CORES, borderWidth: 2, borderColor: '#fff' }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        plugins: {
+          legend: { position: 'bottom', labels: { padding: 14, font: { size: 12 } } },
+          tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.raw} itens (${(ctx.raw/total*100).toFixed(1)}%)` } }
+        }
+      }
+    });
 
     const porData = this.dados.reduce((acc, d) => {
       const key = `${d.data} – ${d.empresa}`;
       acc[key] = (acc[key] || 0) + d.quantidade;
       return acc;
     }, {});
-
     this.charts.data = new Chart(document.getElementById('chartData'), {
       type: 'bar',
       data: { labels: Object.keys(porData),
@@ -1169,25 +1150,6 @@ const app = {
           y: { beginAtZero: true, grid: { color: '#e8edf5' } }
         }
       }
-    });
-
-    const statusCounts = {
-      'Em Aberto': this.dados.filter(d => d.status === 'Em Aberto').length,
-      'Parcial': this.dados.filter(d => d.status === 'Parcial').length,
-      'Concluído': this.dados.filter(d => d.status === 'Concluído').length
-    };
-
-    this.charts.status = new Chart(document.getElementById('chartStatus'), {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(statusCounts),
-        datasets: [{
-          data: Object.values(statusCounts),
-          backgroundColor: ['#E84545', '#F5A623', '#27AE60'],
-          borderRadius: 8
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
     });
 
     this.charts.empresaBar = new Chart(document.getElementById('chartEmpresaBar'), {
@@ -1241,6 +1203,7 @@ const app = {
     });
   },
 
+  // ── Gerar Relatório PDF ──
   gerarRelatorioPDF() {
     const porEmpresa  = this.agrupar('empresa');
     const porMaterial = this.agrupar('material');
@@ -1251,7 +1214,7 @@ const app = {
 
     let html = `
       <div class="pdf-header">
-        <img src="./logo.png" alt="Plano & Plano" />
+        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAFAAAABQCAMAAAC5zwKfAAABF1BMVEUAFlD/JzIAFk//JzMAFlKiJkUAEEsADUPPMUQAF1H/KDAAF04AFVIAFFH/JzUAGFAZC0MAEEgADEAAFlXkM0SWJEbGMEgAGE32L0BJGD7/KC0AEkrUMUSzK0AADEXPMUX8LDpyHECGIj0AEE4ADj78Lj0AE1UAGElmHUKxLEPzMUF4IDwmEUAvEjuEJkUACD1wHkNUFz6qM1YTDT/mLjyUJEgvD0HgMEZlHDyrKUgfDj1AF0MVDkeFIkE5F0HHMEyXJj9dJErCIzf3L0ejKj48EzhIGTqEKDxrHDxsI0lcHj3hN1ESDjodGk23KDtSF0SEJk++Lk4gCzFpJFOoO1s5H07WLz1QGjakOmMAAC99I0sVDjiSKDlKEzS5AAAD20lEQVR4nO2Xa4/aRhSG53Iw8Yw9bjGLHezFTmK2C9kgUDbrLBKBNtsWNVWlSlVT7f//IZ2LbYyCytDNp5b3i0HAM+d+BoTOOuuss/67AqmvCvQyJvqL5OtRw0wIjHHpPA1DgHOunAXyDBuNE/cpRIDk5vmHEXJr4FBM/63XBCB6QSu7po2FmI2/4+Yw3z8JyJNZjdsDYvxR2xgWH08DLsUOwWID/EGIHGOxIDKqr4RY89AaFzwK+iXwIdGniIBAIRgVS/t4hl1xwMIO+oWp5wjcXEeCWwMTGLFDQP6jevZDA2Q9a6DMci8W8WS1nU9ihhsgBExaPux5mQaWxLMnyoJ2iX7hvvlUAyOUSsvpCq7Ve8pIYM3jHnHfbtIynY0QJ5AZIEKvVbIGcGeC0SX2QOjdYoqFTM6fXbQPZBlaGuCNbS1y3q5DPEYVEKJ79WISVRZubQsH7mm7bEQNJChX2f/eW5lPVpZJ8de6rJV3upLzJimO5vikb4Bzu16BbWXfdLK5jNvAb3X9rV0YVjG0Sgq81jj2AERVz9UgFzVwLEFUOPzNkGo5NkAAc3oagv566JaNhbkJAH+8MAptkuLfaN41+KBFAvLZq5KiTGejgHhQKzqODGINfJbW+oNAA5R52oRup9+ovDhuYrsCsWAFJ24TQyrWyP+99Q26Ocrr7gOvuP+wSwqe+d779mjDz48CF20c/ilKZqxJCu4Q7uwdSEdHgZ3WJBT3PgwwboAyGUu8DzzezbN0p1mIOvJHDZCQv7JBLX1wfHxqE7nKvUooHA3bwEUEnKgdJcv1hbZwadUr7qXW5B0huerqXWH3XU0jEOhuFsIGh0jCtPA3kcOG7V7OaepzCfTdtRkbcysgqqYdc71L9RwXQQ2UCcmzySDWiaHi/ZWdhY8GWKJE2+FAG0ixtF2PNzGx3CnknQGuyEJHMNoB28tVXER2DiO0NT+5g0u14ybQAON208metOS5Zt7I8TmgJvA10HfWQ+UyY2kB9jsZzKDHHwINfNwBQ/nZ9W/ZYDVyOVg7LGcq00Gfw89qraReAywXLhCuC9FqtlYiQaaDn0FPxVCAVwOnjOaDi5cbuRXi4pS7bM+EnfBb9fzMoU5KayyIEbdHQqkLOgBNpttDQIoL+zss+VUwJgpCAuW7YE72JZDhrb3LIZkI8UqFf6EuwVTcHgD2wP5KLJFlYSbdFDeXY5mUxt/hPDqhbJTTYaSBPBjjFrDqlHwB4J8GbKGneQME1L25e+t4T/rTFyRjWgPlMJSbndhfMw8LklKlGndO+6vzD8AIkkVfsM5TLTvrrLPO+l/pbxy/TECdRLkeAAAAAElFTkSuQmCC" alt="Plano & Plano" />
         <div class="pdf-header-text">
           <h2>Relatório de Materiais em Empréstimo</h2>
           <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
@@ -1356,9 +1319,9 @@ const app = {
   },
 
   exportarCSV() {
-    let csv = 'ID,Empresa,Material,Data do Empréstimo,Quantidade,Status\n';
+    let csv = 'ID,Empresa,Material,Data do Empréstimo,Quantidade,Status\\n';
     this.dados.forEach(d => {
-      csv += `${d.id},"${d.empresa}","${d.material}","${d.data}",${d.quantidade},"${d.status}"\n`;
+      csv += `${d.id},"${d.empresa}","${d.material}","${d.data}",${d.quantidade},"${d.status}"\\n`;
     });
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -1371,6 +1334,7 @@ const app = {
   resetarDados() {
     if (confirm('Tem certeza que deseja resetar TODOS os dados para o padrão inicial? Esta ação não pode ser desfeita!')) {
       try { localStorage.removeItem(this.STORAGE_KEY); } catch(e) {}
+      // volta para o padrão
       this.dados = [
         { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
         { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
@@ -1384,401 +1348,6 @@ const app = {
       this.atualizarUI();
       this.mostrarAlerta('Dados resetados para o padrão inicial!', 'success');
     }
-  }
-};
-
-// ── Aplicação de Controle de Materiais da Obra ──
-const appMateriais = {
-  STORAGE_KEY: 'controle_materiais_obra_dados',
-  materiais: [],
-  editandoId: null,
-
-  init() {
-    console.log('Inicializando aplicação de materiais da obra...');
-    this.carregarMateriais().then(() => {
-      this.setupEventListeners();
-      this.buscarMateriais();
-      this.iniciarSyncAoVivo();
-    });
-  },
-
-  iniciarSyncAoVivo() {
-    try {
-      if (!window.__fb || !window.__fb.escutarMudancasMateriais) return;
-      if (this._unsub) this._unsub();
-      this._unsub = window.__fb.escutarMudancasMateriais((materiais) => {
-        this.materiais = Array.isArray(materiais) ? materiais : [];
-        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
-        this.buscarMateriais();
-      });
-    } catch (e) {
-      console.warn('Sync ao vivo de materiais indisponível:', e);
-    }
-  },
-
-  setupEventListeners() {
-    const modal = document.getElementById('modalMateriais');
-    modal.addEventListener('click', (e) => {
-      if (e.target.id === 'modalMateriais') this.fecharModal();
-    });
-
-    const fotoInput = document.getElementById('fotoMaterial');
-    fotoInput.addEventListener('change', (e) => this.previewImagem(e));
-  },
-
-  async carregarMateriais() {
-    try {
-      if (window.__fb && window.__fb.carregarMateriaisDaNuvem) {
-        const cloud = await window.__fb.carregarMateriaisDaNuvem();
-        if (Array.isArray(cloud) && cloud.length) {
-          this.materiais = cloud;
-          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
-          console.log('Materiais carregados do Firebase:', this.materiais.length);
-          return;
-        }
-      }
-      const salvos = localStorage.getItem(this.STORAGE_KEY);
-      if (salvos) {
-        this.materiais = JSON.parse(salvos);
-        console.log('Materiais carregados do localStorage:', this.materiais.length);
-      } else {
-        this.materiais = [];
-      }
-    } catch (e) {
-      console.error('Erro ao carregar materiais:', e);
-      this.materiais = [];
-    }
-  },
-
-  async salvarMateriais() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
-      if (window.__fb && window.__fb.salvarMateriaisNaNuvem) {
-        await window.__fb.salvarMateriaisNaNuvem(this.materiais);
-      }
-      console.log('Materiais salvos com sucesso!');
-    } catch (e) {
-      console.error('Erro ao salvar materiais:', e);
-      app.mostrarAlerta('Erro ao salvar materiais!', 'error');
-    }
-  },
-
-  previewImagem(e) {
-    const file = e.target.files && e.target.files[0];
-    const preview = document.getElementById('imagemPreview');
-    const previewImg = document.getElementById('imagemPreviewImg');
-    if (!file) {
-      previewImg.src = '';
-      preview.style.display = 'none';
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      previewImg.src = event.target.result;
-      preview.style.display = 'flex';
-    };
-    reader.readAsDataURL(file);
-  },
-
-  abrirModalNovo() {
-    this.editandoId = null;
-    document.getElementById('modalMateriaisTitle').textContent = 'Novo Material';
-    document.getElementById('formMateriais').reset();
-    document.getElementById('imagemPreview').style.display = 'none';
-    document.getElementById('modalMateriais').classList.add('active');
-  },
-
-  abrirModalEditar(id) {
-    const mat = this.materiais.find(m => m.id === id);
-    if (!mat) return;
-    
-    this.editandoId = id;
-    document.getElementById('modalMateriaisTitle').textContent = 'Editar Material';
-    document.getElementById('nomeMaterial').value = mat.nome;
-    document.getElementById('quantidadeMaterial').value = mat.quantidade;
-    document.getElementById('especificacoes').value = mat.especificacoes || '';
-    
-    if (mat.foto) {
-      const previewImg = document.getElementById('imagemPreviewImg');
-      previewImg.src = mat.foto;
-      document.getElementById('imagemPreview').style.display = 'flex';
-    }
-    
-    document.getElementById('modalMateriais').classList.add('active');
-  },
-
-  fecharModal() {
-    document.getElementById('modalMateriais').classList.remove('active');
-    this.editandoId = null;
-  },
-
-  salvarMaterial(e) {
-    e.preventDefault();
-    const nome = document.getElementById('nomeMaterial').value.trim();
-    const quantidade = parseInt(document.getElementById('quantidadeMaterial').value);
-    const especificacoes = document.getElementById('especificacoes').value.trim();
-    const fotoInput = document.getElementById('fotoMaterial');
-
-    if (!nome || !quantidade) {
-      app.mostrarAlerta('Preencha os campos obrigatórios!', 'error');
-      return;
-    }
-
-    let foto = null;
-    if (fotoInput.files.length > 0) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        foto = event.target.result;
-        this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
-      };
-      reader.readAsDataURL(fotoInput.files[0]);
-    } else if (this.editandoId) {
-      const mat = this.materiais.find(m => m.id === this.editandoId);
-      foto = mat?.foto || null;
-      this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
-    } else {
-      this.finalizarSalvamento(nome, quantidade, especificacoes, null);
-    }
-  },
-
-  finalizarSalvamento(nome, quantidade, especificacoes, foto) {
-    if (this.editandoId) {
-      const idx = this.materiais.findIndex(m => m.id === this.editandoId);
-      if (idx !== -1) {
-        this.materiais[idx] = {
-          ...this.materiais[idx],
-          nome,
-          quantidade,
-          especificacoes,
-          foto: foto || this.materiais[idx].foto,
-          dataAtualizacao: new Date().toISOString()
-        };
-      }
-    } else {
-      const novoId = Math.max(...this.materiais.map(m => m.id || 0), 0) + 1;
-      this.materiais.push({
-        id: novoId,
-        nome,
-        quantidade,
-        especificacoes,
-        foto,
-        dataCriacao: new Date().toISOString(),
-        dataAtualizacao: new Date().toISOString()
-      });
-    }
-
-    this.fecharModal();
-    this.salvarMateriais().then(() => {
-      this.buscarMateriais();
-      app.mostrarAlerta('Material salvo com sucesso!', 'success');
-    });
-  },
-
-  deletarMaterial(id) {
-    if (confirm('Tem certeza que deseja deletar este material?')) {
-      this.materiais = this.materiais.filter(m => m.id !== id);
-      this.salvarMateriais().then(() => {
-        this.buscarMateriais();
-        app.mostrarAlerta('Material deletado com sucesso!', 'success');
-      });
-    }
-  },
-
-  filtrarMateriais() {
-    const search = document.getElementById('searchMateriais').value.toLowerCase();
-    const data = document.getElementById('filterDataMateriais').value;
-
-    const filtrados = this.materiais.filter(m => {
-      const matchSearch = m.nome.toLowerCase().includes(search);
-      const matchData = !data || m.dataAtualizacao.split('T')[0] === data;
-      return matchSearch && matchData;
-    });
-
-    this.renderizarMateriais(filtrados);
-  },
-
-  buscarMateriais() {
-    this.renderizarMateriais(this.materiais);
-  },
-
-  renderizarMateriais(materiais = this.materiais) {
-    const container = document.getElementById('materiaisContainer');
-    
-    if (materiais.length === 0) {
-      container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 2rem;">Nenhum material cadastrado. Clique em "Novo Material" para adicionar.</p>';
-      return;
-    }
-
-    container.innerHTML = materiais.map(m => {
-      const dataFormatada = new Date(m.dataAtualizacao).toLocaleDateString('pt-BR');
-      const horaFormatada = new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      
-      return `
-        <div class="material-card">
-          <div class="material-card-image">
-            ${m.foto ? `<img src="${m.foto}" alt="${m.nome}" />` : '📦'}
-          </div>
-          <div class="material-card-content">
-            <h3>${m.nome}</h3>
-            ${m.especificacoes ? `<p>${m.especificacoes}</p>` : ''}
-            <div class="material-qty">
-              <div>
-                <div class="material-qty-value">${m.quantidade}</div>
-                <div class="material-qty-label">Quantidade</div>
-              </div>
-            </div>
-            <div class="material-date">
-              📅 ${dataFormatada} às ${horaFormatada}
-            </div>
-            <div class="material-actions">
-              <button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">✏️ Editar</button>
-              <button class="delete-btn" onclick="appMateriais.deletarMaterial(${m.id})">🗑️ Deletar</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  },
-
-  gerarRelatorioDia() {
-    const hoje = new Date().toISOString().split('T')[0];
-    const materiaisDia = this.materiais.filter(m => (m.dataAtualizacao || '').split('T')[0] === hoje);
-
-    if (materiaisDia.length === 0) {
-      app.mostrarAlerta('Nenhum material foi atualizado hoje!', 'error');
-      return;
-    }
-
-    const totalItens = materiaisDia.reduce((s, m) => s + Number(m.quantidade || 0), 0);
-    const agora = new Date();
-    const dataFormatada = agora.toLocaleDateString('pt-BR');
-    const horaFormatada = agora.toLocaleTimeString('pt-BR');
-
-    const html = `
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relatório de Materiais da Obra</title>
-  <style>
-    * { box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; margin: 0; color: #1a2340; background: #fff; }
-    .page { max-width: 1100px; margin: 0 auto; padding: 24px; }
-    .header { display:flex; align-items:center; gap:16px; border-bottom:3px solid #1F3864; padding-bottom:16px; margin-bottom:24px; }
-    .header img { height:60px; width:auto; display:block; }
-    .header h1 { margin:0; color:#1F3864; font-size:28px; }
-    .muted { color:#6b7a99; margin-top:6px; }
-    .stats { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; margin: 20px 0 28px; }
-    .stat { background:#DDEEFF; border-left:4px solid #2E75B6; border-radius:10px; padding:16px; }
-    .stat .value { font-size:30px; font-weight:700; color:#1F3864; }
-    .section-title { color:#1F3864; font-size:20px; margin: 0 0 12px 0; }
-    table { width:100%; border-collapse:collapse; margin-bottom:28px; }
-    thead tr { background:#1F3864; color:#fff; }
-    th, td { border:1px solid #d9e3f0; padding:12px; text-align:left; vertical-align:top; }
-    th.center, td.center { text-align:center; }
-    .cards { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; }
-    .card { border:1px solid #d9e3f0; border-radius:12px; overflow:hidden; background:#fff; }
-    .card-media { height:180px; background:#f5f7fb; display:flex; align-items:center; justify-content:center; }
-    .card-media img { max-width:100%; max-height:100%; object-fit:cover; display:block; }
-    .card-body { padding:14px; }
-    .card-title { font-weight:700; color:#1F3864; margin-bottom:6px; font-size:18px; }
-    .qty { color:#2E75B6; font-weight:700; margin-bottom:6px; }
-    .footer { text-align:center; color:#6b7a99; border-top:1px solid #d9e3f0; padding-top:14px; margin-top:28px; font-size:13px; }
-    .actions { margin: 0 0 20px 0; }
-    .btn { background:#1F3864; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:700; }
-    @media print {
-      .actions { display:none; }
-      .page { max-width:none; padding:0; }
-      body { margin: 0; }
-    }
-    @media (max-width: 800px) {
-      .stats, .cards { grid-template-columns: 1fr; }
-      .header { flex-direction:column; align-items:flex-start; }
-    }
-  </style>
-</head>
-<body>
-  <div class="page">
-    <div class="actions">
-      <button class="btn" onclick="window.print()">🖨️ Imprimir Relatório</button>
-    </div>
-
-    <div class="header">
-      <img src="./logo.png" alt="Plano & Plano" />
-      <div>
-        <h1>Relatório de Materiais da Obra</h1>
-        <div class="muted">Data: ${dataFormatada}</div>
-        <div class="muted">Hora: ${horaFormatada}</div>
-      </div>
-    </div>
-
-    <div class="stats">
-      <div class="stat">
-        <div class="value">${materiaisDia.length}</div>
-        <div>Materiais Registrados</div>
-      </div>
-      <div class="stat">
-        <div class="value">${totalItens}</div>
-        <div>Total de Itens</div>
-      </div>
-    </div>
-
-    <h2 class="section-title">Lista de Materiais</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Material</th>
-          <th class="center">Quantidade</th>
-          <th>Especificações</th>
-          <th class="center">Hora</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${materiaisDia.map(m => `
-          <tr>
-            <td><strong>${m.nome}</strong></td>
-            <td class="center">${m.quantidade}</td>
-            <td>${m.especificacoes || '-'}</td>
-            <td class="center">${new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
-
-    <h2 class="section-title">Lista Visual</h2>
-    <div class="cards">
-      ${materiaisDia.map(m => `
-        <div class="card">
-          <div class="card-media">
-            ${m.foto ? `<img src="${m.foto}" alt="${m.nome}">` : `<div style="font-size:56px;">📦</div>`}
-          </div>
-          <div class="card-body">
-            <div class="card-title">${m.nome}</div>
-            <div class="qty">Quantidade: ${m.quantidade}</div>
-            <div style="margin-bottom:6px;">${m.especificacoes || '-'}</div>
-            <div style="color:#6b7a99; font-size:13px;">Atualizado às ${new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
-          </div>
-        </div>
-      `).join('')}
-    </div>
-
-    <div class="footer">
-      Relatório gerado automaticamente pelo sistema de Controle de Materiais - Plano & Plano
-    </div>
-  </div>
-</body>
-</html>`;
-
-    const win = window.open('', '_blank');
-    if (!win) {
-      app.mostrarAlerta('O navegador bloqueou a abertura do relatório. Libere pop-ups e tente novamente.', 'error');
-      return;
-    }
-    win.document.open();
-    win.document.write(html);
-    win.document.close();
   }
 };
 

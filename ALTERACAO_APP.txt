@@ -1,0 +1,1 @@
+Pacote com visual estilo app no formulário de Controle de Materiais e dois botões separados: galeria e câmera.
