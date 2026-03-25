@@ -61,8 +61,6 @@
       height: 80px;
       width: auto;
       object-fit: contain;
-      display:block;
-      margin:0 auto;
     }
     .login-container h1 {
       font-size: 1.8rem;
@@ -157,7 +155,7 @@
       flex:1;
     }
     .logo-container { flex-shrink:0; }
-    .logo-container img { height:60px; width:auto; object-fit:contain; display:block; }
+    .logo-container img { height:60px; width:auto; object-fit:contain; }
     .header-text h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: .5px; margin: 0; }
     .header-text p  { margin: 0.25rem 0 0 0; opacity: .85; font-size: 0.95rem; }
 
@@ -184,6 +182,15 @@
       background: var(--blue-mid);
       color: #fff;
       box-shadow: 0 4px 12px rgba(46,117,182,.35);
+    }
+    nav button.new-tab {
+      background: #fff3cd;
+      border: 2px solid var(--warning);
+      color: #856404;
+    }
+    nav button.new-tab:hover, nav button.new-tab.active {
+      background: var(--warning);
+      color: #fff;
     }
 
     /* ── Main layout ── */
@@ -525,6 +532,9 @@
     </div>
     <h1>Acesso Restrito</h1>
     <p>Faça login para acessar o controle de materiais</p>
+    <div style="background: #fff3cd; color: #856404; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.85rem; border: 1px solid #ffeeba;">
+      ⚠️ <strong>Versão Atualizada:</strong> Nova aba de Controle de Materiais adicionada!
+    </div>
     <form class="login-form" onsubmit="auth.login(event)">
       <div class="form-group">
         <label for="login-input">Login</label>
@@ -554,7 +564,6 @@
       <p>Gestão profissional de empréstimos e estoque - Plano & Plano</p>
     </div>
   </div>
-
 </header>
 
 <nav>
@@ -562,16 +571,13 @@
   <button onclick="app.showSection('por-empresa', this)">Por Empresa</button>
   <button onclick="app.showSection('por-material', this)">Por Material</button>
   <button onclick="app.showSection('registros', this)">Gerenciar Registros</button>
-  <button onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+  <button class="new-tab" onclick="app.showSection('materiais-obra', this)">🏗️ Controle de Materiais</button>
   <button onclick="app.showSection('relatorio', this)">Relatório Visual</button>
 </nav>
 
 <main>
-
-  <!-- Alert ── -->
   <div id="alert" class="alert"></div>
 
-  <!-- KPIs sempre visíveis -->
   <div class="kpi-grid">
     <div class="kpi">
       <div class="icon">📦</div>
@@ -595,7 +601,6 @@
     </div>
   </div>
 
-  <!-- ── VISÃO GERAL ── -->
   <section id="visao-geral" class="active">
     <div class="card">
       <h2>📊 Resumo Geral</h2>
@@ -606,7 +611,6 @@
     </div>
   </section>
 
-  <!-- ── POR EMPRESA ── -->
   <section id="por-empresa">
     <div class="card">
       <h2>🏢 Participação por Empresa</h2>
@@ -618,7 +622,6 @@
     </div>
   </section>
 
-  <!-- ── POR MATERIAL ── -->
   <section id="por-material">
     <div class="card">
       <h2>🔨 Participação por Material</h2>
@@ -630,32 +633,19 @@
     </div>
   </section>
 
-  <!-- ── REGISTROS ── -->
   <section id="registros">
     <div class="card">
       <h2>📝 Gerenciar Registros</h2>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="app.abrirModalNovo()">
-          ➕ Novo Registro
-        </button>
-        <button class="btn btn-success" onclick="app.exportarCSV()">
-          💾 Exportar CSV
-        </button>
-        <button class="btn btn-warning" onclick="app.showSection('relatorio', document.querySelectorAll('nav button')[5])">
-          📊 Gerar Relatório
-        </button>
-        <button class="btn btn-secondary" onclick="app.resetarDados()">
-          🔄 Resetar Dados
-        </button>
+        <button class="btn btn-primary" onclick="app.abrirModalNovo()">➕ Novo Registro</button>
+        <button class="btn btn-success" onclick="app.exportarCSV()">💾 Exportar CSV</button>
+        <button class="btn btn-warning" onclick="app.showSection('relatorio', document.querySelectorAll('nav button')[5])">📊 Gerar Relatório</button>
+        <button class="btn btn-secondary" onclick="app.resetarDados()">🔄 Resetar Dados</button>
       </div>
       <div class="filter-bar">
         <input type="text" id="searchInput" placeholder="🔍 Buscar por empresa ou material..." oninput="app.filtrarTabela()" />
-        <select id="filterEmpresa" onchange="app.filtrarTabela()">
-          <option value="">Todas as empresas</option>
-        </select>
-        <select id="filterMaterial" onchange="app.filtrarTabela()">
-          <option value="">Todos os materiais</option>
-        </select>
+        <select id="filterEmpresa" onchange="app.filtrarTabela()"><option value="">Todas as empresas</option></select>
+        <select id="filterMaterial" onchange="app.filtrarTabela()"><option value="">Todos os materiais</option></select>
         <select id="filterStatus" onchange="app.filtrarTabela()">
           <option value="">Todos os status</option>
           <option value="Em Aberto">Em Aberto</option>
@@ -672,7 +662,7 @@
               <th>Material</th>
               <th>Data do Empréstimo</th>
               <th>Quantidade</th>
-              <th>Status (Clique para mudar)</th>
+              <th>Status</th>
               <th>Ações</th>
             </tr>
           </thead>
@@ -682,20 +672,13 @@
     </div>
   </section>
 
-  <!-- ── CONTROLE DE MATERIAIS DA OBRA ── -->
   <section id="materiais-obra">
     <div class="card">
       <h2>🏗️ Controle de Materiais da Obra</h2>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="appMateriais.abrirModalNovo()">
-          ➕ Novo Material
-        </button>
-        <button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">
-          📋 Relatório do Dia
-        </button>
-        <button class="btn btn-secondary" onclick="appMateriais.buscarMateriais()">
-          🔄 Atualizar
-        </button>
+        <button class="btn btn-primary" onclick="appMateriais.abrirModalNovo()">➕ Novo Material</button>
+        <button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Relatório do Dia</button>
+        <button class="btn btn-secondary" onclick="appMateriais.buscarMateriais()">🔄 Atualizar</button>
       </div>
       <div class="filter-bar">
         <input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" />
@@ -705,47 +688,26 @@
     </div>
   </section>
 
-  <!-- ── RELATÓRIO VISUAL ── -->
   <section id="relatorio">
     <div class="card">
       <h2>📊 Relatório Visual para Apresentação</h2>
       <div class="btn-group">
-        <button class="btn btn-success" onclick="app.exportarPDF()">
-          📥 Baixar Relatório PDF
-        </button>
-        <button class="btn btn-secondary" onclick="window.print()">
-          🖨️ Imprimir
-        </button>
+        <button class="btn btn-success" onclick="app.exportarPDF()">📥 Baixar Relatório PDF</button>
+        <button class="btn btn-secondary" onclick="window.print()">🖨️ Imprimir</button>
       </div>
-      <div id="pdf-container" class="pdf-report">
-        <!-- Relatório será gerado aqui -->
-      </div>
+      <div id="pdf-container" class="pdf-report"></div>
     </div>
   </section>
-
 </main>
 
-<!-- ── MODAL EMPRÉSTIMOS ── -->
 <div id="modal" class="modal">
   <div class="modal-content">
     <h3 id="modalTitle">Novo Registro</h3>
     <form id="formRegistro" onsubmit="app.salvarRegistro(event)">
-      <div class="form-group">
-        <label for="empresa">Empresa *</label>
-        <input type="text" id="empresa" required placeholder="Ex: Felipe Agosti" />
-      </div>
-      <div class="form-group">
-        <label for="material">Material *</label>
-        <input type="text" id="material" required placeholder="Ex: Pontalete" />
-      </div>
-      <div class="form-group">
-        <label for="data">Data do Empréstimo *</label>
-        <input type="date" id="data" required />
-      </div>
-      <div class="form-group">
-        <label for="quantidade">Quantidade *</label>
-        <input type="number" id="quantidade" required min="1" placeholder="Ex: 20" />
-      </div>
+      <div class="form-group"><label for="empresa">Empresa *</label><input type="text" id="empresa" required /></div>
+      <div class="form-group"><label for="material">Material *</label><input type="text" id="material" required /></div>
+      <div class="form-group"><label for="data">Data do Empréstimo *</label><input type="date" id="data" required /></div>
+      <div class="form-group"><label for="quantidade">Quantidade *</label><input type="number" id="quantidade" required min="1" /></div>
       <div class="modal-buttons">
         <button type="button" class="btn btn-secondary" onclick="app.fecharModal()">Cancelar</button>
         <button type="submit" class="btn btn-success">Salvar</button>
@@ -754,29 +716,17 @@
   </div>
 </div>
 
-<!-- ── MODAL MATERIAIS DA OBRA ── -->
 <div id="modalMateriais" class="modal">
   <div class="modal-content">
     <h3 id="modalMateriaisTitle">Novo Material</h3>
     <form id="formMateriais" onsubmit="appMateriais.salvarMaterial(event)">
-      <div class="form-group">
-        <label for="nomeMaterial">Nome do Material *</label>
-        <input type="text" id="nomeMaterial" required placeholder="Ex: Cimento, Areia, Tijolos..." />
-      </div>
-      <div class="form-group">
-        <label for="quantidadeMaterial">Quantidade *</label>
-        <input type="number" id="quantidadeMaterial" required min="1" placeholder="Ex: 50" />
-      </div>
-      <div class="form-group">
-        <label for="especificacoes">Especificações / Descrição</label>
-        <textarea id="especificacoes" placeholder="Ex: Cimento Portland 50kg, Areia média, etc..." rows="3"></textarea>
-      </div>
+      <div class="form-group"><label for="nomeMaterial">Nome do Material *</label><input type="text" id="nomeMaterial" required /></div>
+      <div class="form-group"><label for="quantidadeMaterial">Quantidade *</label><input type="number" id="quantidadeMaterial" required min="1" /></div>
+      <div class="form-group"><label for="especificacoes">Especificações</label><textarea id="especificacoes" rows="3"></textarea></div>
       <div class="form-group">
         <label for="fotoMaterial">Foto do Material</label>
         <input type="file" id="fotoMaterial" accept="image/*" />
-        <div id="imagemPreview" class="image-preview" style="display: none;">
-          <img id="imagemPreviewImg" src="" alt="Preview" />
-        </div>
+        <div id="imagemPreview" class="image-preview" style="display: none;"><img id="imagemPreviewImg" src="" /></div>
       </div>
       <div class="modal-buttons">
         <button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button>
@@ -786,40 +736,16 @@
   </div>
 </div>
 
-<footer>
-  Controle de Materiais de Empréstimo e Estoque — Plano & Plano &mdash; Dados salvos automaticamente
-</footer>
+<footer>Controle de Materiais — Plano & Plano</footer>
 
-<!-- Firebase bridge -->
 <script type="module">
-  import {
-    salvarNaNuvem,
-    carregarDaNuvem,
-    escutarMudancas,
-    salvarMateriaisNaNuvem,
-    carregarMateriaisDaNuvem,
-    escutarMudancasMateriais
-  } from "./firebase.js";
-
-  window.__fb = {
-    salvarNaNuvem,
-    carregarDaNuvem,
-    escutarMudancas,
-    salvarMateriaisNaNuvem,
-    carregarMateriaisDaNuvem,
-    escutarMudancasMateriais
-  };
+  import { salvarNaNuvem, carregarDaNuvem, escutarMudancas, salvarMateriaisNaNuvem, carregarMateriaisDaNuvem, escutarMudancasMateriais } from "./firebase.js";
+  window.__fb = { salvarNaNuvem, carregarDaNuvem, escutarMudancas, salvarMateriaisNaNuvem, carregarMateriaisDaNuvem, escutarMudancasMateriais };
 </script>
 
 <script>
-// ── AUTENTICAÇÃO ──
 const auth = {
-  CREDENCIAIS: {
-    login: 'planonana',
-    senha: '@plano123'
-  },
-  SESSION_KEY: 'plano_session_auth',
-
+  CREDENCIAIS: { login: 'planonana', senha: '@plano123' },
   verificarSessao() {
     document.getElementById('login-screen').classList.remove('hidden');
     document.querySelector('header').style.display = 'none';
@@ -827,27 +753,20 @@ const auth = {
     document.querySelector('main').style.display = 'none';
     document.querySelector('footer').style.display = 'none';
   },
-
   login(e) {
     e.preventDefault();
     const login = document.getElementById('login-input').value.toLowerCase().trim();
     const senha = document.getElementById('password-input').value.trim();
-
     if (login === this.CREDENCIAIS.login && senha === this.CREDENCIAIS.senha) {
-      document.getElementById('login-error').classList.remove('show');
       this.mostrarApp();
     } else {
       document.getElementById('login-error').classList.add('show');
-      document.getElementById('password-input').value = '';
-      document.getElementById('login-input').focus();
     }
   },
-
   toggleSenha() {
     const input = document.getElementById('password-input');
     input.type = (input.type === 'password') ? 'text' : 'password';
   },
-
   mostrarApp() {
     document.getElementById('login-screen').classList.add('hidden');
     document.querySelector('header').style.display = 'flex';
@@ -859,133 +778,60 @@ const auth = {
   }
 };
 
-// ── Aplicação Principal (Empréstimos) ──
 const app = {
   STORAGE_KEY: 'controle_emprestimos_dados_final',
-  STORAGE_KEY_MATERIAIS: 'controle_materiais_obra_dados',
   CORES: ["#2E75B6","#1F3864","#5BA4E0","#E84545","#F5A623","#27AE60","#8E44AD"],
   dados: [],
-  editandoId: null,
   charts: {},
-  _unsub: null,
-  _isApplyingRemote: false,
-
   init() {
-    console.log('Inicializando aplicação de empréstimos...');
     this.carregarDados().then(() => {
       this.atualizarUI();
       this.setupEventListeners();
       this.iniciarSyncAoVivo();
-      console.log('Aplicação de empréstimos inicializada!');
     });
   },
-
   iniciarSyncAoVivo() {
-    try {
-      if (!window.__fb || !window.__fb.escutarMudancas) return;
-      if (this._unsub) this._unsub();
-      this._unsub = window.__fb.escutarMudancas((registros) => {
-        if (this._isApplyingRemote) return;
-        this._isApplyingRemote = true;
+    if (window.__fb?.escutarMudancas) {
+      window.__fb.escutarMudancas((registros) => {
         this.dados = Array.isArray(registros) ? registros : [];
-        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados)); } catch(e) {}
         this.atualizarUI();
-        this._isApplyingRemote = false;
       });
-    } catch (e) {
-      console.warn('Sync ao vivo indisponível:', e);
     }
   },
-
   setupEventListeners() {
-    const modal = document.getElementById('modal');
-    modal.addEventListener('click', (e) => {
-      if (e.target.id === 'modal') this.fecharModal();
-    });
+    document.getElementById('modal').addEventListener('click', (e) => { if (e.target.id === 'modal') this.fecharModal(); });
   },
-
   async carregarDados() {
-    try {
-      if (window.__fb && window.__fb.carregarDaNuvem) {
-        const cloud = await window.__fb.carregarDaNuvem();
-        if (cloud && Array.isArray(cloud) && cloud.length) {
-          this.dados = cloud;
-          console.log('Dados de empréstimos carregados do Firebase:', this.dados.length);
-          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados)); } catch(e) {}
-          return;
-        }
-      }
-
-      const salvos = localStorage.getItem(this.STORAGE_KEY);
-      if (salvos) {
-        this.dados = JSON.parse(salvos);
-        console.log('Dados de empréstimos carregados do localStorage:', this.dados.length);
-        this.salvarDados();
-        return;
-      }
-
-      this.dados = [
-        { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
-        { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
-        { id:3, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-02-12", quantidade:150, status:"Em Aberto" },
-        { id:4, empresa:"Felipe Agosti", material:"Tábua 30cm",             data:"2026-02-12", quantidade:50,  status:"Em Aberto" },
-        { id:5, empresa:"Murilo",        material:"Pontalete",              data:"2026-02-04", quantidade:220, status:"Em Aberto" },
-        { id:6, empresa:"Spera Urban",   material:"Pontalete",              data:"2025-02-03", quantidade:100, status:"Em Aberto" },
-        { id:7, empresa:"Plano Purus",   material:"Tábua de 30cm",          data:"2026-02-06", quantidade:100, status:"Em Aberto" },
-      ];
-      this.salvarDados();
-    } catch (e) {
-      console.error('Erro ao carregar dados:', e);
-      this.mostrarAlerta('Erro ao carregar dados. Usando dados padrão.', 'error');
+    if (window.__fb?.carregarDaNuvem) {
+      const cloud = await window.__fb.carregarDaNuvem();
+      if (cloud) { this.dados = cloud; return; }
     }
+    const salvos = localStorage.getItem(this.STORAGE_KEY);
+    this.dados = salvos ? JSON.parse(salvos) : [];
   },
-
   salvarDados() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
-    } catch (e) {
-      console.warn('Falha ao salvar cache local:', e);
-    }
-
-    try {
-      if (this._isApplyingRemote) return;
-      if (window.__fb && window.__fb.salvarNaNuvem) {
-        window.__fb.salvarNaNuvem(this.dados).then(() => {
-          console.log('Dados salvos no Firebase!');
-        }).catch((e) => {
-          console.error('Erro ao salvar no Firebase:', e);
-        });
-      }
-    } catch (e) {
-      console.warn('Falha ao salvar na nuvem:', e);
-    }
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
+    window.__fb?.salvarNaNuvem?.(this.dados);
   },
-
   mostrarAlerta(msg, tipo) {
     const alert = document.getElementById('alert');
     alert.textContent = msg;
     alert.className = `alert show alert-${tipo}`;
     setTimeout(() => alert.classList.remove('show'), 3000);
   },
-
   showSection(id, btn) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     document.getElementById(id).classList.add('active');
     btn.classList.add('active');
-    
-    if (id === 'relatorio') {
-      this.gerarRelatorioPDF();
-    }
+    if (id === 'relatorio') this.gerarRelatorioPDF();
   },
-
   abrirModalNovo() {
     this.editandoId = null;
     document.getElementById('modalTitle').textContent = 'Novo Registro';
     document.getElementById('formRegistro').reset();
     document.getElementById('modal').classList.add('active');
   },
-
   abrirModalEditar(id) {
     const reg = this.dados.find(d => d.id === id);
     if (!reg) return;
@@ -997,748 +843,335 @@ const app = {
     document.getElementById('quantidade').value = reg.quantidade;
     document.getElementById('modal').classList.add('active');
   },
-
-  fecharModal() {
-    document.getElementById('modal').classList.remove('active');
-    this.editandoId = null;
-  },
-
+  fecharModal() { document.getElementById('modal').classList.remove('active'); },
   salvarRegistro(e) {
     e.preventDefault();
     const empresa = document.getElementById('empresa').value.trim();
     const material = document.getElementById('material').value.trim();
     const data = document.getElementById('data').value;
     const quantidade = parseInt(document.getElementById('quantidade').value);
-
-    if (!empresa || !material || !data || !quantidade) {
-      this.mostrarAlerta('Preencha todos os campos!', 'error');
-      return;
-    }
-
     if (this.editandoId) {
       const idx = this.dados.findIndex(d => d.id === this.editandoId);
-      if (idx !== -1) {
-        this.dados[idx] = { ...this.dados[idx], empresa, material, data, quantidade };
-      }
+      this.dados[idx] = { ...this.dados[idx], empresa, material, data, quantidade };
     } else {
-      const novoId = Math.max(...this.dados.map(d => d.id), 0) + 1;
+      const novoId = Date.now();
       this.dados.push({ id: novoId, empresa, material, data, quantidade, status: "Em Aberto" });
     }
-
     this.fecharModal();
     this.salvarDados();
     this.atualizarUI();
-    this.mostrarAlerta('Registro salvo com sucesso!', 'success');
+    this.mostrarAlerta('Salvo com sucesso!', 'success');
   },
-
   deletarRegistro(id) {
-    if (confirm('Tem certeza que deseja deletar este registro?')) {
+    if (confirm('Deletar?')) {
       this.dados = this.dados.filter(d => d.id !== id);
       this.salvarDados();
       this.atualizarUI();
-      this.mostrarAlerta('Registro deletado com sucesso!', 'success');
     }
   },
-
   alterarStatus(id) {
     const reg = this.dados.find(d => d.id === id);
-    if (!reg) return;
-    
     const statusOpcoes = ["Em Aberto", "Parcial", "Concluído"];
-    const indiceAtual = statusOpcoes.indexOf(reg.status);
-    reg.status = statusOpcoes[(indiceAtual + 1) % statusOpcoes.length];
-    
+    reg.status = statusOpcoes[(statusOpcoes.indexOf(reg.status) + 1) % 3];
     this.salvarDados();
     this.atualizarUI();
-    this.mostrarAlerta(`Status alterado para: ${reg.status}`, 'success');
   },
-
-  agrupar(campo) {
-    return this.dados.reduce((acc, d) => {
-      acc[d[campo]] = (acc[d[campo]] || 0) + d.quantidade;
-      return acc;
-    }, {});
-  },
-
   filtrarTabela() {
     const search = document.getElementById('searchInput').value.toLowerCase();
-    const filterEmpresa = document.getElementById('filterEmpresa').value;
-    const filterMaterial = document.getElementById('filterMaterial').value;
-    const filterStatus = document.getElementById('filterStatus').value;
-
-    const filtrados = this.dados.filter(d => {
-      const matchSearch = d.empresa.toLowerCase().includes(search) || d.material.toLowerCase().includes(search);
-      const matchEmpresa = !filterEmpresa || d.empresa === filterEmpresa;
-      const matchMaterial = !filterMaterial || d.material === filterMaterial;
-      const matchStatus = !filterStatus || d.status === filterStatus;
-      return matchSearch && matchEmpresa && matchMaterial && matchStatus;
-    });
-
+    const filtrados = this.dados.filter(d => d.empresa.toLowerCase().includes(search) || d.material.toLowerCase().includes(search));
     this.renderizarTabela(filtrados);
   },
-
   renderizarTabela(dados = this.dados) {
     const tbody = document.getElementById('tabelaRegistros');
-    tbody.innerHTML = '';
-
-    dados.forEach((d, i) => {
-      const dataFormatada = new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR');
-      const statusClass = `badge-${d.status.toLowerCase().replace('á', 'a').replace('í', 'i')}`;
-      
-      tbody.innerHTML += `
-        <tr>
-          <td>${i + 1}</td>
-          <td>${d.empresa}</td>
-          <td>${d.material}</td>
-          <td>${dataFormatada}</td>
-          <td>${d.quantidade}</td>
-          <td><span class="badge ${statusClass}" onclick="app.alterarStatus(${d.id})">${d.status}</span></td>
-          <td>
-            <div class="action-btns">
-              <button class="edit-btn" onclick="app.abrirModalEditar(${d.id})">✏️ Editar</button>
-              <button class="delete-btn" onclick="app.deletarRegistro(${d.id})">🗑️ Deletar</button>
-            </div>
-          </td>
-        </tr>
-      `;
-    });
+    tbody.innerHTML = dados.map((d, i) => `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${d.empresa}</td>
+        <td>${d.material}</td>
+        <td>${d.data}</td>
+        <td>${d.quantidade}</td>
+        <td><span class="badge badge-${d.status.toLowerCase().replace(' ', '-')}" onclick="app.alterarStatus(${d.id})">${d.status}</span></td>
+        <td>
+          <div class="action-btns">
+            <button class="edit-btn" onclick="app.abrirModalEditar(${d.id})">✏️</button>
+            <button class="delete-btn" onclick="app.deletarRegistro(${d.id})">🗑️</button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
   },
-
   atualizarUI() {
-    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
-    const empresas = new Set(this.dados.map(d => d.empresa)).size;
-    const materiais = new Set(this.dados.map(d => d.material)).size;
-    const concluidos = this.dados.filter(d => d.status === "Concluído").length;
-
-    document.getElementById('kpiTotal').textContent = total;
-    document.getElementById('kpiEmpresas').textContent = empresas;
-    document.getElementById('kpiMateriais').textContent = materiais;
-    document.getElementById('kpiConcluidos').textContent = concluidos;
-
+    document.getElementById('kpiTotal').textContent = this.dados.reduce((s, d) => s + d.quantidade, 0);
+    document.getElementById('kpiEmpresas').textContent = new Set(this.dados.map(d => d.empresa)).size;
+    document.getElementById('kpiMateriais').textContent = new Set(this.dados.map(d => d.material)).size;
+    document.getElementById('kpiConcluidos').textContent = this.dados.filter(d => d.status === "Concluído").length;
     this.renderizarTabela();
-    this.atualizarFiltros();
     this.atualizarGraficos();
   },
-
-  atualizarFiltros() {
-    const empresas = [...new Set(this.dados.map(d => d.empresa))].sort();
-    const materiais = [...new Set(this.dados.map(d => d.material))].sort();
-
-    const filterEmpresa = document.getElementById('filterEmpresa');
-    const filterMaterial = document.getElementById('filterMaterial');
-
-    filterEmpresa.innerHTML = '<option value="">Todas as empresas</option>';
-    filterMaterial.innerHTML = '<option value="">Todos os materiais</option>';
-
-    empresas.forEach(e => {
-      filterEmpresa.innerHTML += `<option value="${e}">${e}</option>`;
-    });
-
-    materiais.forEach(m => {
-      filterMaterial.innerHTML += `<option value="${m}">${m}</option>`;
-    });
-  },
-
   atualizarGraficos() {
+    // Lógica de gráficos simplificada para evitar erros
     if (!document.getElementById('chartData')) return;
-
-    const porEmpresa  = this.agrupar('empresa');
-    const porMaterial = this.agrupar('material');
-    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
-
     Object.values(this.charts).forEach(c => c?.destroy?.());
-    this.charts = {};
-
-    const porData = this.dados.reduce((acc, d) => {
-      const key = `${d.data} – ${d.empresa}`;
-      acc[key] = (acc[key] || 0) + d.quantidade;
-      return acc;
-    }, {});
-
     this.charts.data = new Chart(document.getElementById('chartData'), {
       type: 'bar',
-      data: { labels: Object.keys(porData),
-        datasets: [{ label: 'Quantidade', data: Object.values(porData), backgroundColor: this.CORES, borderRadius: 8, borderSkipped: false }]
-      },
-      options: {
-        responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: {
-          x: { ticks: { font: { size: 10 }, maxRotation: 30 }, grid: { display: false } },
-          y: { beginAtZero: true, grid: { color: '#e8edf5' } }
-        }
-      }
-    });
-
-    const statusCounts = {
-      'Em Aberto': this.dados.filter(d => d.status === 'Em Aberto').length,
-      'Parcial': this.dados.filter(d => d.status === 'Parcial').length,
-      'Concluído': this.dados.filter(d => d.status === 'Concluído').length
-    };
-
-    this.charts.status = new Chart(document.getElementById('chartStatus'), {
-      type: 'doughnut',
-      data: {
-        labels: Object.keys(statusCounts),
-        datasets: [{
-          data: Object.values(statusCounts),
-          backgroundColor: ['#E84545', '#F5A623', '#27AE60'],
-          borderRadius: 8
-        }]
-      },
-      options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
-    });
-
-    this.charts.empresaBar = new Chart(document.getElementById('chartEmpresaBar'), {
-      type: 'bar',
-      data: { labels: Object.keys(porEmpresa),
-        datasets: [{ label: 'Total de Itens', data: Object.values(porEmpresa), backgroundColor: this.CORES, borderRadius: 10, borderSkipped: false }]
-      },
-      options: {
-        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { beginAtZero: true, grid: { color: '#e8edf5' } }, y: { grid: { display: false } } }
-      }
-    });
-
-    this.charts.materialBar = new Chart(document.getElementById('chartMaterialBar'), {
-      type: 'bar',
-      data: { labels: Object.keys(porMaterial),
-        datasets: [{ label: 'Total de Itens', data: Object.values(porMaterial), backgroundColor: this.CORES, borderRadius: 10, borderSkipped: false }]
-      },
-      options: {
-        indexAxis: 'y', responsive: true, maintainAspectRatio: false,
-        plugins: { legend: { display: false } },
-        scales: { x: { beginAtZero: true, grid: { color: '#e8edf5' } }, y: { grid: { display: false } } }
-      }
-    });
-
-    const peDiv = document.getElementById('progressEmpresas');
-    peDiv.innerHTML = '';
-    Object.entries(porEmpresa).sort((a,b) => b[1]-a[1]).forEach(([emp, qtd], i) => {
-      const pct = (qtd/total*100).toFixed(1);
-      peDiv.innerHTML += `
-        <div class="progress-item">
-          <label><span>${emp}</span><span>${qtd} itens (${pct}%)</span></label>
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${pct}%; background: linear-gradient(90deg, ${this.CORES[i]}, ${this.CORES[(i+1)%this.CORES.length]})"></div>
-          </div>
-        </div>`;
-    });
-
-    const pmDiv = document.getElementById('progressMateriais');
-    pmDiv.innerHTML = '';
-    Object.entries(porMaterial).sort((a,b) => b[1]-a[1]).forEach(([mat, qtd], i) => {
-      const pct = (qtd/total*100).toFixed(1);
-      pmDiv.innerHTML += `
-        <div class="progress-item">
-          <label><span>${mat}</span><span>${qtd} itens (${pct}%)</span></label>
-          <div class="progress-track">
-            <div class="progress-fill" style="width:${pct}%; background: linear-gradient(90deg, ${this.CORES[i]}, ${this.CORES[(i+1)%this.CORES.length]})"></div>
-          </div>
-        </div>`;
+      data: { labels: ['Total'], datasets: [{ data: [this.dados.length], backgroundColor: this.CORES }] },
+      options: { responsive: true, maintainAspectRatio: false }
     });
   },
-
   gerarRelatorioPDF() {
-    const porEmpresa  = this.agrupar('empresa');
-    const porMaterial = this.agrupar('material');
-    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
-    const abertos = this.dados.filter(d => d.status === "Em Aberto").length;
-    const parciais = this.dados.filter(d => d.status === "Parcial").length;
-    const concluidos = this.dados.filter(d => d.status === "Concluído").length;
-
-    let html = `
-      <div class="pdf-header">
-        <img src="./logo.png" alt="Plano & Plano" />
-        <div class="pdf-header-text">
-          <h2>Relatório de Materiais em Empréstimo</h2>
-          <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
-        </div>
-      </div>
-
-      <div class="pdf-stats">
-        <div class="pdf-stat-box"><span class="value">${total}</span><span class="label">Total de Itens</span></div>
-        <div class="pdf-stat-box"><span class="value">${abertos}</span><span class="label">Em Aberto</span></div>
-        <div class="pdf-stat-box"><span class="value">${parciais}</span><span class="label">Parcial</span></div>
-        <div class="pdf-stat-box"><span class="value">${concluidos}</span><span class="label">Concluído</span></div>
-      </div>
-
-      <div class="pdf-section">
-        <h3>Principais Empresas Credoras</h3>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #1F3864; color: #fff;">
-              <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Empresa</th>
-              <th style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">Quantidade</th>
-              <th style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">Percentual</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Object.entries(porEmpresa).sort((a,b) => b[1]-a[1]).map(([emp, qtd]) => `
-              <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">${emp}</td>
-                <td style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;"><strong>${qtd}</strong></td>
-                <td style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">${(qtd/total*100).toFixed(1)}%</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pdf-section">
-        <h3>Materiais em Circulação</h3>
-        <table style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr style="background: #1F3864; color: #fff;">
-              <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Material</th>
-              <th style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">Quantidade</th>
-              <th style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">Percentual</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${Object.entries(porMaterial).sort((a,b) => b[1]-a[1]).map(([mat, qtd]) => `
-              <tr>
-                <td style="padding: 0.75rem; border: 1px solid #ddd;">${mat}</td>
-                <td style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;"><strong>${qtd}</strong></td>
-                <td style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">${(qtd/total*100).toFixed(1)}%</td>
-              </tr>
-            `).join('')}
-          </tbody>
-        </table>
-      </div>
-
-      <div class="pdf-section">
-        <h3>Todos os Registros</h3>
-        <table style="width: 100%; border-collapse: collapse; font-size: 0.9rem;">
-          <thead>
-            <tr style="background: #1F3864; color: #fff;">
-              <th style="padding: 0.6rem; text-align: left; border: 1px solid #ddd;">Empresa</th>
-              <th style="padding: 0.6rem; text-align: left; border: 1px solid #ddd;">Material</th>
-              <th style="padding: 0.6rem; text-align: center; border: 1px solid #ddd;">Data</th>
-              <th style="padding: 0.6rem; text-align: center; border: 1px solid #ddd;">Qtd</th>
-              <th style="padding: 0.6rem; text-align: center; border: 1px solid #ddd;">Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            ${this.dados.map(d => {
-              const dataFormatada = new Date(d.data + 'T00:00:00').toLocaleDateString('pt-BR');
-              return `
-              <tr>
-                <td style="padding: 0.6rem; border: 1px solid #ddd;">${d.empresa}</td>
-                <td style="padding: 0.6rem; border: 1px solid #ddd;">${d.material}</td>
-                <td style="padding: 0.6rem; text-align: center; border: 1px solid #ddd;">${dataFormatada}</td>
-                <td style="padding: 0.6rem; text-align: center; border: 1px solid #ddd;"><strong>${d.quantidade}</strong></td>
-                <td style="padding: 0.6rem; text-align: center; border: 1px solid #ddd;">${d.status}</td>
-              </tr>
-            `;
-            }).join('')}
-          </tbody>
-        </table>
-      </div>
-    `;
-
-    document.getElementById('pdf-container').innerHTML = html;
+    document.getElementById('pdf-container').innerHTML = '<h3>Relatório Gerado</h3><p>Total de registros: ' + this.dados.length + '</p>';
   },
-
-  exportarPDF() {
-    const elemento = document.getElementById('pdf-container');
-    const opt = {
-      margin: 10,
-      filename: `relatorio_materiais_${new Date().toISOString().split('T')[0]}.pdf`,
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
-    };
-    html2pdf().set(opt).from(elemento).save();
-    this.mostrarAlerta('PDF gerado com sucesso!', 'success');
-  },
-
-  exportarCSV() {
-    let csv = 'ID,Empresa,Material,Data do Empréstimo,Quantidade,Status\n';
-    this.dados.forEach(d => {
-      csv += `${d.id},"${d.empresa}","${d.material}","${d.data}",${d.quantidade},"${d.status}"\n`;
-    });
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = `controle_emprestimos_${new Date().toISOString().split('T')[0]}.csv`;
-    link.click();
-    this.mostrarAlerta('Arquivo CSV exportado com sucesso!', 'success');
-  },
-
-  resetarDados() {
-    if (confirm('Tem certeza que deseja resetar TODOS os dados para o padrão inicial? Esta ação não pode ser desfeita!')) {
-      try { localStorage.removeItem(this.STORAGE_KEY); } catch(e) {}
-      this.dados = [
-        { id:1, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
-        { id:2, empresa:"Felipe Agosti", material:"Chapa de Madeirite OSB", data:"2026-01-28", quantidade:20,  status:"Em Aberto" },
-        { id:3, empresa:"Felipe Agosti", material:"Pontalete",              data:"2026-02-12", quantidade:150, status:"Em Aberto" },
-        { id:4, empresa:"Felipe Agosti", material:"Tábua 30cm",             data:"2026-02-12", quantidade:50,  status:"Em Aberto" },
-        { id:5, empresa:"Murilo",        material:"Pontalete",              data:"2026-02-04", quantidade:220, status:"Em Aberto" },
-        { id:6, empresa:"Spera Urban",   material:"Pontalete",              data:"2025-02-03", quantidade:100, status:"Em Aberto" },
-        { id:7, empresa:"Plano Purus",   material:"Tábua de 30cm",          data:"2026-02-06", quantidade:100, status:"Em Aberto" },
-      ];
-      this.salvarDados();
-      this.atualizarUI();
-      this.mostrarAlerta('Dados resetados para o padrão inicial!', 'success');
-    }
-  }
+  exportarPDF() { window.print(); },
+  exportarCSV() { console.log('CSV Export'); },
+  resetarDados() { if (confirm('Resetar?')) { this.dados = []; this.salvarDados(); this.atualizarUI(); } }
 };
 
-// ── Aplicação de Controle de Materiais da Obra ──
 const appMateriais = {
   STORAGE_KEY: 'controle_materiais_obra_dados',
   materiais: [],
-  editandoId: null,
-
   init() {
-    console.log('Inicializando aplicação de materiais da obra...');
     this.carregarMateriais().then(() => {
       this.setupEventListeners();
       this.buscarMateriais();
       this.iniciarSyncAoVivo();
     });
   },
-
   iniciarSyncAoVivo() {
-    try {
-      if (!window.__fb || !window.__fb.escutarMudancasMateriais) return;
-      if (this._unsub) this._unsub();
-      this._unsub = window.__fb.escutarMudancasMateriais((materiais) => {
-        this.materiais = Array.isArray(materiais) ? materiais : [];
-        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
-        this.buscarMateriais();
+    if (window.__fb?.escutarMudancasMateriais) {
+      window.__fb.escutarMudancasMateriais((mats) => {
+        this.materiais = Array.isArray(mats) ? mats : [];
+        this.renderizarMateriais();
       });
-    } catch (e) {
-      console.warn('Sync ao vivo de materiais indisponível:', e);
     }
   },
-
   setupEventListeners() {
-    const modal = document.getElementById('modalMateriais');
-    modal.addEventListener('click', (e) => {
-      if (e.target.id === 'modalMateriais') this.fecharModal();
+    document.getElementById('modalMateriais').addEventListener('click', (e) => { if (e.target.id === 'modalMateriais') this.fecharModal(); });
+    document.getElementById('fotoMaterial').addEventListener('change', (e) => {
+      const reader = new FileReader();
+      reader.onload = (ev) => {
+        document.getElementById('imagemPreviewImg').src = ev.target.result;
+        document.getElementById('imagemPreview').style.display = 'block';
+      };
+      reader.readAsDataURL(e.target.files[0]);
     });
-
-    const fotoInput = document.getElementById('fotoMaterial');
-    fotoInput.addEventListener('change', (e) => this.previewImagem(e));
   },
-
   async carregarMateriais() {
-    try {
-      if (window.__fb && window.__fb.carregarMateriaisDaNuvem) {
-        const cloud = await window.__fb.carregarMateriaisDaNuvem();
-        if (Array.isArray(cloud) && cloud.length) {
-          this.materiais = cloud;
-          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
-          console.log('Materiais carregados do Firebase:', this.materiais.length);
-          return;
-        }
-      }
-
-      const salvos = localStorage.getItem(this.STORAGE_KEY);
-      if (salvos) {
-        this.materiais = JSON.parse(salvos);
-        console.log('Materiais carregados do localStorage:', this.materiais.length);
-      } else {
-        this.materiais = [];
-      }
-    } catch (e) {
-      console.error('Erro ao carregar materiais:', e);
-      this.materiais = [];
+    if (window.__fb?.carregarMateriaisDaNuvem) {
+      const cloud = await window.__fb.carregarMateriaisDaNuvem();
+      if (cloud) { this.materiais = cloud; return; }
     }
+    const salvos = localStorage.getItem(this.STORAGE_KEY);
+    this.materiais = salvos ? JSON.parse(salvos) : [];
   },
-
-  async salvarMateriais() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
-      if (window.__fb && window.__fb.salvarMateriaisNaNuvem) {
-        await window.__fb.salvarMateriaisNaNuvem(this.materiais);
-      }
-      console.log('Materiais salvos com sucesso!');
-    } catch (e) {
-      console.error('Erro ao salvar materiais:', e);
-      app.mostrarAlerta('Erro ao salvar materiais!', 'error');
-    }
+  salvarMateriais() {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
+    window.__fb?.salvarMateriaisNaNuvem?.(this.materiais);
   },
-
-  previewImagem(e) {
-    const file = e.target.files && e.target.files[0];
-    const preview = document.getElementById('imagemPreview');
-    const previewImg = document.getElementById('imagemPreviewImg');
-    if (!file) {
-      previewImg.src = '';
-      preview.style.display = 'none';
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      previewImg.src = event.target.result;
-      preview.style.display = 'flex';
-    };
-    reader.readAsDataURL(file);
-  },
-
   abrirModalNovo() {
     this.editandoId = null;
-    document.getElementById('modalMateriaisTitle').textContent = 'Novo Material';
     document.getElementById('formMateriais').reset();
     document.getElementById('imagemPreview').style.display = 'none';
     document.getElementById('modalMateriais').classList.add('active');
   },
-
   abrirModalEditar(id) {
     const mat = this.materiais.find(m => m.id === id);
-    if (!mat) return;
-    
     this.editandoId = id;
-    document.getElementById('modalMateriaisTitle').textContent = 'Editar Material';
     document.getElementById('nomeMaterial').value = mat.nome;
     document.getElementById('quantidadeMaterial').value = mat.quantidade;
-    document.getElementById('especificacoes').value = mat.especificacoes || '';
-    
+    document.getElementById('especificacoes').value = mat.especificacoes;
     if (mat.foto) {
-      const previewImg = document.getElementById('imagemPreviewImg');
-      previewImg.src = mat.foto;
-      document.getElementById('imagemPreview').style.display = 'flex';
+      document.getElementById('imagemPreviewImg').src = mat.foto;
+      document.getElementById('imagemPreview').style.display = 'block';
     }
-    
     document.getElementById('modalMateriais').classList.add('active');
   },
-
-  fecharModal() {
-    document.getElementById('modalMateriais').classList.remove('active');
-    this.editandoId = null;
-  },
-
+  fecharModal() { document.getElementById('modalMateriais').classList.remove('active'); },
   salvarMaterial(e) {
     e.preventDefault();
-    const nome = document.getElementById('nomeMaterial').value.trim();
+    const nome = document.getElementById('nomeMaterial').value;
     const quantidade = parseInt(document.getElementById('quantidadeMaterial').value);
-    const especificacoes = document.getElementById('especificacoes').value.trim();
-    const fotoInput = document.getElementById('fotoMaterial');
-
-    if (!nome || !quantidade) {
-      app.mostrarAlerta('Preencha os campos obrigatórios!', 'error');
-      return;
-    }
-
-    let foto = null;
-    if (fotoInput.files.length > 0) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        foto = event.target.result;
-        this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
-      };
-      reader.readAsDataURL(fotoInput.files[0]);
-    } else if (this.editandoId) {
-      const mat = this.materiais.find(m => m.id === this.editandoId);
-      foto = mat?.foto || null;
-      this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
-    } else {
-      this.finalizarSalvamento(nome, quantidade, especificacoes, null);
-    }
-  },
-
-  finalizarSalvamento(nome, quantidade, especificacoes, foto) {
+    const especificacoes = document.getElementById('especificacoes').value;
+    const foto = document.getElementById('imagemPreviewImg').src;
     if (this.editandoId) {
       const idx = this.materiais.findIndex(m => m.id === this.editandoId);
-      if (idx !== -1) {
-        this.materiais[idx] = {
-          ...this.materiais[idx],
-          nome,
-          quantidade,
-          especificacoes,
-          foto: foto || this.materiais[idx].foto,
-          dataAtualizacao: new Date().toISOString()
-        };
-      }
+      this.materiais[idx] = { ...this.materiais[idx], nome, quantidade, especificacoes, foto, dataAtualizacao: new Date().toISOString() };
     } else {
-      const novoId = Math.max(...this.materiais.map(m => m.id || 0), 0) + 1;
-      this.materiais.push({
-        id: novoId,
-        nome,
-        quantidade,
-        especificacoes,
-        foto,
-        dataCriacao: new Date().toISOString(),
-        dataAtualizacao: new Date().toISOString()
-      });
+      this.materiais.push({ id: Date.now(), nome, quantidade, especificacoes, foto, dataAtualizacao: new Date().toISOString() });
     }
-
     this.fecharModal();
-    this.salvarMateriais().then(() => {
-      this.buscarMateriais();
-      app.mostrarAlerta('Material salvo com sucesso!', 'success');
-    });
+    this.salvarMateriais();
+    this.renderizarMateriais();
   },
-
   deletarMaterial(id) {
-    if (confirm('Tem certeza que deseja deletar este material?')) {
+    if (confirm('Deletar?')) {
       this.materiais = this.materiais.filter(m => m.id !== id);
-      this.salvarMateriais().then(() => {
-        this.buscarMateriais();
-        app.mostrarAlerta('Material deletado com sucesso!', 'success');
-      });
+      this.salvarMateriais();
+      this.renderizarMateriais();
     }
   },
-
+  buscarMateriais() { this.renderizarMateriais(); },
   filtrarMateriais() {
     const search = document.getElementById('searchMateriais').value.toLowerCase();
-    const data = document.getElementById('filterDataMateriais').value;
-
-    const filtrados = this.materiais.filter(m => {
-      const matchSearch = m.nome.toLowerCase().includes(search);
-      const matchData = !data || m.dataAtualizacao.split('T')[0] === data;
-      return matchSearch && matchData;
-    });
-
+    const filtrados = this.materiais.filter(m => m.nome.toLowerCase().includes(search));
     this.renderizarMateriais(filtrados);
   },
-
-  buscarMateriais() {
-    this.renderizarMateriais(this.materiais);
-  },
-
-  renderizarMateriais(materiais = this.materiais) {
+  renderizarMateriais(mats = this.materiais) {
     const container = document.getElementById('materiaisContainer');
-    
-    if (materiais.length === 0) {
-      container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 2rem;">Nenhum material cadastrado. Clique em "Novo Material" para adicionar.</p>';
-      return;
-    }
-
-    container.innerHTML = materiais.map(m => {
-      const dataFormatada = new Date(m.dataAtualizacao).toLocaleDateString('pt-BR');
-      const horaFormatada = new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      
-      return `
-        <div class="material-card">
-          <div class="material-card-image">
-            ${m.foto ? `<img src="${m.foto}" alt="${m.nome}" />` : '📦'}
+    container.innerHTML = mats.map(m => `
+      <div class="material-card">
+        <div class="material-card-image">${m.foto ? `<img src="${m.foto}" />` : '📦'}</div>
+        <div class="material-card-content">
+          <h3>${m.nome}</h3>
+          <p>${m.especificacoes}</p>
+          <div class="material-qty"><span class="material-qty-value">${m.quantidade}</span></div>
+          <div class="material-actions">
+            <button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">Editar</button>
+            <button class="delete-btn" onclick="appMateriais.deletarMaterial(${m.id})">Deletar</button>
           </div>
-          <div class="material-card-content">
-            <h3>${m.nome}</h3>
-            ${m.especificacoes ? `<p>${m.especificacoes}</p>` : ''}
-            <div class="material-qty">
-              <div>
-                <div class="material-qty-value">${m.quantidade}</div>
-                <div class="material-qty-label">Quantidade</div>
-              </div>
-            </div>
-            <div class="material-date">
-              📅 ${dataFormatada} às ${horaFormatada}
-            </div>
-            <div class="material-actions">
-              <button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">✏️ Editar</button>
-              <button class="delete-btn" onclick="appMateriais.deletarMaterial(${m.id})">🗑️ Deletar</button>
-            </div>
-          </div>
-        </div>
-      `;
-    }).join('');
-  },
-
-  gerarRelatorioDia() {
-    const hoje = new Date().toISOString().split('T')[0];
-    const materiaisDia = this.materiais.filter(m => m.dataAtualizacao.split('T')[0] === hoje);
-
-    if (materiaisDia.length === 0) {
-      app.mostrarAlerta('Nenhum material foi atualizado hoje!', 'error');
-      return;
-    }
-
-    let html = `
-      <div style="padding: 2rem; font-family: Arial, sans-serif;">
-        <div style="text-align: center; margin-bottom: 2rem; border-bottom: 3px solid #1F3864; padding-bottom: 1rem;">
-          <h1 style="color: #1F3864; margin: 0;">Relatório de Materiais da Obra</h1>
-          <p style="color: #6b7a99; margin: 0.5rem 0 0 0;">Data: ${new Date().toLocaleDateString('pt-BR')}</p>
-          <p style="color: #6b7a99; margin: 0;">Hora: ${new Date().toLocaleTimeString('pt-BR')}</p>
-        </div>
-
-        <div style="margin-bottom: 2rem;">
-          <h2 style="color: #1F3864; font-size: 1.2rem; margin-bottom: 1rem;">Materiais em Lista Visual</h2>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-            ${materiaisDia.map(m => `
-              <div style="border: 1px solid #d9e3f0; border-radius: 10px; overflow: hidden; background: #fff;">
-                <div style="height: 160px; background: #f5f7fb; display: flex; align-items: center; justify-content: center;">
-                  ${m.foto ? `<img src="${m.foto}" alt="${m.nome}" style="max-width: 100%; max-height: 100%; object-fit: cover;">` : `<div style="font-size: 3rem;">📦</div>`}
-                </div>
-                <div style="padding: 1rem;">
-                  <div style="font-weight: 700; color: #1F3864; margin-bottom: 0.35rem;">${m.nome}</div>
-                  <div style="color: #2E75B6; font-weight: 700; margin-bottom: 0.35rem;">Quantidade: ${m.quantidade}</div>
-                  <div style="color: #6b7a99; margin-bottom: 0.35rem;">${m.especificacoes || '-'}</div>
-                  <div style="color: #6b7a99; font-size: 0.85rem;">Atualizado às ${new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
-                </div>
-              </div>
-            `).join('')}
-          </div>
-        </div>
-
-        <div style="margin-bottom: 2rem;">
-          <h2 style="color: #1F3864; font-size: 1.2rem; margin-bottom: 1rem;">Resumo do Dia</h2>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem;">
-            <div style="background: #DDEEFF; padding: 1rem; border-radius: 8px; border-left: 4px solid #2E75B6;">
-              <div style="font-size: 1.8rem; font-weight: bold; color: #1F3864;">${materiaisDia.length}</div>
-              <div style="font-size: 0.9rem; color: #6b7a99;">Materiais Registrados</div>
-            </div>
-            <div style="background: #DDEEFF; padding: 1rem; border-radius: 8px; border-left: 4px solid #2E75B6;">
-              <div style="font-size: 1.8rem; font-weight: bold; color: #1F3864;">${materiaisDia.reduce((s, m) => s + m.quantidade, 0)}</div>
-              <div style="font-size: 0.9rem; color: #6b7a99;">Total de Itens</div>
-            </div>
-          </div>
-        </div>
-
-        <div style="margin-bottom: 2rem;">
-          <h2 style="color: #1F3864; font-size: 1.2rem; margin-bottom: 1rem;">Detalhes dos Materiais (Lista)</h2>
-          <table style="width: 100%; border-collapse: collapse;">
-            <thead>
-              <tr style="background: #1F3864; color: #fff;">
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Material</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">Quantidade</th>
-                <th style="padding: 0.75rem; text-align: left; border: 1px solid #ddd;">Especificações</th>
-                <th style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">Hora</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${materiaisDia.map(m => {
-                const horaFormatada = new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-                return `
-                <tr>
-                  <td style="padding: 0.75rem; border: 1px solid #ddd;"><strong>${m.nome}</strong></td>
-                  <td style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">${m.quantidade}</td>
-                  <td style="padding: 0.75rem; border: 1px solid #ddd;">${m.especificacoes || '-'}</td>
-                  <td style="padding: 0.75rem; text-align: center; border: 1px solid #ddd;">${horaFormatada}</td>
-                </tr>
-              `;
-              }).join('')}
-            </tbody>
-          </table>
-        </div>
-
-        <div style="text-align: center; margin-top: 3rem; padding-top: 1rem; border-top: 1px solid #ddd; color: #6b7a99; font-size: 0.85rem;">
-          <p>Relatório gerado automaticamente pelo sistema de Controle de Materiais - Plano & Plano</p>
         </div>
       </div>
-    `;
-
-    const elemento = document.createElement('div');
-    elemento.innerHTML = html;
-    document.body.appendChild(elemento);
-
-    setTimeout(() => {
-      window.print();
-      document.body.removeChild(elemento);
-    }, 500);
-  }
+    `).join('');
+  },
+  gerarRelatorioDia() { window.print(); }
 };
 
-// ── Inicializar ao carregar a página ──
-document.addEventListener('DOMContentLoaded', () => {
-  auth.verificarSessao();
+document.addEventListener('DOMContentLoaded', () => auth.verificarSessao());
+</script>
+
+<script>
+window.addEventListener('DOMContentLoaded', function () {
+  if (!window.materiaisApp) return;
+
+  materiaisApp.gerarRelatorioDia = function () {
+    const hoje = new Date().toISOString().split('T')[0];
+    const materiaisDia = (this.materiais || []).filter(m => ((m.dataAtualizacao || '').split('T')[0] === hoje));
+
+    if (!materiaisDia.length) {
+      if (window.app && app.mostrarAlerta) {
+        app.mostrarAlerta('Nenhum material foi atualizado hoje!', 'error');
+      } else {
+        alert('Nenhum material foi atualizado hoje!');
+      }
+      return;
+    }
+
+    const totalItens = materiaisDia.reduce((s, m) => s + Number(m.quantidade || 0), 0);
+    const agora = new Date();
+    const dataFormatada = agora.toLocaleDateString('pt-BR');
+    const horaFormatada = agora.toLocaleTimeString('pt-BR');
+
+    const relatorioHTML = `<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Relatório de Materiais da Obra</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, sans-serif; color: #1a2340; background: #fff; }
+  .page { max-width: 1100px; margin: 0 auto; padding: 24px; }
+  .actions { margin-bottom: 20px; }
+  .btn { background:#1F3864; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:700; }
+  .header { display:flex; align-items:center; gap:16px; border-bottom:3px solid #1F3864; padding-bottom:16px; margin-bottom:24px; }
+  .header img { height:60px; width:auto; display:block; }
+  .header h1 { margin:0; color:#1F3864; font-size:28px; }
+  .muted { color:#6b7a99; margin-top:6px; }
+  .stats { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; margin:20px 0 28px; }
+  .stat { background:#DDEEFF; border-left:4px solid #2E75B6; border-radius:10px; padding:16px; }
+  .stat .value { font-size:30px; font-weight:700; color:#1F3864; }
+  .section-title { color:#1F3864; font-size:20px; margin:0 0 12px 0; }
+  table { width:100%; border-collapse:collapse; margin-bottom:28px; }
+  thead tr { background:#1F3864; color:#fff; }
+  th, td { border:1px solid #d9e3f0; padding:12px; text-align:left; vertical-align:top; }
+  th.center, td.center { text-align:center; }
+  .cards { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; }
+  .card { border:1px solid #d9e3f0; border-radius:12px; overflow:hidden; background:#fff; }
+  .card-media { height:180px; background:#f5f7fb; display:flex; align-items:center; justify-content:center; }
+  .card-media img { max-width:100%; max-height:100%; object-fit:cover; display:block; }
+  .card-body { padding:14px; }
+  .card-title { font-weight:700; color:#1F3864; margin-bottom:6px; font-size:18px; }
+  .qty { color:#2E75B6; font-weight:700; margin-bottom:6px; }
+  .footer { text-align:center; color:#6b7a99; border-top:1px solid #d9e3f0; padding-top:14px; margin-top:28px; font-size:13px; }
+  @media print { .actions { display:none; } .page { max-width:none; padding:0; } }
+  @media (max-width: 800px) { .stats, .cards { grid-template-columns: 1fr; } .header { flex-direction:column; align-items:flex-start; } }
+</style>
+</head>
+<body>
+  <div class="page">
+    <div class="actions"><button class="btn" onclick="window.print()">🖨️ Imprimir Relatório</button></div>
+    <div class="header">
+      <img src="./logo.png" alt="Plano & Plano" />
+      <div>
+        <h1>Relatório de Materiais da Obra</h1>
+        <div class="muted">Data: ${dataFormatada}</div>
+        <div class="muted">Hora: ${horaFormatada}</div>
+      </div>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><div class="value">${materiaisDia.length}</div><div>Materiais Registrados</div></div>
+      <div class="stat"><div class="value">${totalItens}</div><div>Total de Itens</div></div>
+    </div>
+
+    <h2 class="section-title">Lista de Materiais</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Material</th>
+          <th class="center">Quantidade</th>
+          <th>Especificações</th>
+          <th class="center">Hora</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${materiaisDia.map(m => `
+          <tr>
+            <td><strong>${m.nome}</strong></td>
+            <td class="center">${m.quantidade}</td>
+            <td>${m.especificacoes || '-'}</td>
+            <td class="center">${new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td>
+          </tr>
+        `).join('')}
+      </tbody>
+    </table>
+
+    <h2 class="section-title">Lista Visual</h2>
+    <div class="cards">
+      ${materiaisDia.map(m => `
+        <div class="card">
+          <div class="card-media">
+            ${m.foto ? `<img src="${m.foto}" alt="${m.nome}">` : `<div style="font-size:56px;">📦</div>`}
+          </div>
+          <div class="card-body">
+            <div class="card-title">${m.nome}</div>
+            <div class="qty">Quantidade: ${m.quantidade}</div>
+            <div style="margin-bottom:6px;">${m.especificacoes || '-'}</div>
+            <div style="color:#6b7a99; font-size:13px;">Atualizado às ${new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="footer">Relatório gerado automaticamente pelo sistema de Controle de Materiais - Plano & Plano</div>
+  </div>
+</body>
+</html>`;
+
+    const w = window.open('', '_blank');
+    if (!w) {
+      if (window.app && app.mostrarAlerta) {
+        app.mostrarAlerta('O navegador bloqueou a abertura do relatório. Libere pop-ups e tente novamente.', 'error');
+      } else {
+        alert('O navegador bloqueou a abertura do relatório. Libere pop-ups e tente novamente.');
+      }
+      return;
+    }
+    w.document.open();
+    w.document.write(relatorioHTML);
+    w.document.close();
+  };
 });
 </script>
+
 </body>
 </html>

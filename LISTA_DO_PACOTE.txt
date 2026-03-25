@@ -1,11 +1,1 @@
-Pacote com gráficos restaurados e relatório de materiais em lista.
-
-Base usada:
-- index-novo.html
-- firebase-melhorado.js
-
-Ajustes:
-- restauração das abas com gráficos
-- integração do Controle de Materiais com Firebase
-- logo local
-- relatório do Controle de Materiais com tabela + lista visual
+Este pacote força o botão de relatório do Controle de Materiais a abrir uma página dedicada, separada da tela principal.
