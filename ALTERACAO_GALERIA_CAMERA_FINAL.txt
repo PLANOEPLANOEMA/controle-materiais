@@ -1,0 +1,1 @@
+Corrigido: no celular agora há dois botões separados e o salvamento aceita arquivo vindo da galeria ou da câmera.
