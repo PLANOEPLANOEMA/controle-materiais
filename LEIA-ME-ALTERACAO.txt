@@ -1,0 +1,1 @@
+Correção final aplicada: formulário do Controle de Materiais com Galeria e Câmera separados e lógica de salvamento compatível com celular.
