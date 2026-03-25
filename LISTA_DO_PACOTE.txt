@@ -1,16 +1,11 @@
-Pacote completo do projeto
+Pacote com gráficos restaurados e relatório de materiais em lista.
 
-Arquivos incluídos:
-- index.html
-- firebase.js
-- vercel.json
-- README.md
-- Controle_Materiais_Emprestimo.xlsx
-- Controle de Materiais de Empréstimo.md
-- criar_planilha.py
-- logo.png
-- logotipo.jpg
+Base usada:
+- index-novo.html
+- firebase-melhorado.js
 
-Observação:
-- index.html foi montado a partir do arquivo index-final.html
-- firebase.js foi montado a partir do arquivo firebase-melhorado.js
+Ajustes:
+- restauração das abas com gráficos
+- integração do Controle de Materiais com Firebase
+- logo local
+- relatório do Controle de Materiais com tabela + lista visual
