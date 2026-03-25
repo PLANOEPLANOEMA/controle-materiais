@@ -1,3 +1,504 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Controle de Materiais de Empréstimo - Editável</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark:  #1F3864;
+      --blue-mid:   #2E75B6;
+      --blue-light: #DDEEFF;
+      --accent:     #E84545;
+      --success:    #27AE60;
+      --warning:    #F5A623;
+      --bg:         #F0F4FA;
+      --card:       #FFFFFF;
+      --text:       #1a2340;
+      --muted:      #6b7a99;
+      --radius:     14px;
+      --shadow:     0 4px 24px rgba(31,56,100,.10);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 2.5rem 2rem 2rem;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    header h1 { font-size: 2rem; font-weight: 700; letter-spacing: .5px; position: relative; }
+    header p  { margin-top: .5rem; opacity: .85; font-size: 1rem; position: relative; }
+
+    /* ── Nav pills ── */
+    nav {
+      display: flex; justify-content: center; gap: .75rem;
+      padding: 1.25rem 1rem;
+      background: var(--card);
+      box-shadow: 0 2px 8px rgba(31,56,100,.08);
+      flex-wrap: wrap;
+    }
+    nav button {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border: none; border-radius: 50px;
+      padding: .5rem 1.4rem;
+      font-size: .92rem; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+    }
+    nav button:hover, nav button.active {
+      background: var(--blue-mid);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(46,117,182,.35);
+    }
+
+    /* ── Main layout ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── KPI Cards ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.25rem;
+      margin-bottom: 2.5rem;
+    }
+    .kpi {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.5rem 1.25rem;
+      display: flex; flex-direction: column; align-items: center;
+      border-top: 4px solid var(--blue-mid);
+      transition: transform .2s;
+    }
+    .kpi:hover { transform: translateY(-4px); }
+    .kpi .icon { font-size: 2rem; margin-bottom: .5rem; }
+    .kpi .value { font-size: 2.2rem; font-weight: 800; color: var(--blue-dark); }
+    .kpi .label { font-size: .82rem; color: var(--muted); text-align: center; margin-top: .25rem; text-transform: uppercase; letter-spacing: .5px; }
+
+    /* ── Section ── */
+    section { display: none; }
+    section.active { display: block; }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    .card h2 {
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 1.25rem;
+      padding-bottom: .6rem;
+      border-bottom: 2px solid var(--blue-light);
+      display: flex; align-items: center; gap: .5rem;
+    }
+
+    /* ── Chart grid ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .chart-wrap { position: relative; height: 300px; }
+
+    /* ── Buttons ── */
+    .btn-group {
+      display: flex; gap: .75rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    button.btn {
+      padding: .6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    button.btn-primary {
+      background: var(--blue-mid);
+      color: #fff;
+    }
+    button.btn-primary:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 4px 12px rgba(31,56,100,.3);
+    }
+    button.btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+    button.btn-success:hover {
+      background: #1e8449;
+    }
+    button.btn-danger {
+      background: var(--accent);
+      color: #fff;
+    }
+    button.btn-danger:hover {
+      background: #c73535;
+    }
+    button.btn-secondary {
+      background: #95a5a6;
+      color: #fff;
+    }
+    button.btn-secondary:hover {
+      background: #7f8c8d;
+    }
+    button.btn-warning {
+      background: var(--warning);
+      color: #fff;
+    }
+    button.btn-warning:hover {
+      background: #e0941f;
+    }
+
+    /* ── Modal ── */
+    .modal {
+      display: none;
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.5);
+      z-index: 1000;
+      align-items: center; justify-content: center;
+    }
+    .modal.active { display: flex; }
+    .modal-content {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 40px rgba(0,0,0,.3);
+    }
+    .modal-content h3 {
+      font-size: 1.3rem;
+      color: var(--blue-dark);
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+    .form-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: .4rem;
+      color: var(--blue-dark);
+      font-size: .9rem;
+    }
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: .6rem .8rem;
+      border: 1.5px solid #c8d6ea;
+      border-radius: 8px;
+      font-size: .92rem;
+      outline: none;
+      transition: border-color .2s;
+    }
+    .form-group input:focus, .form-group select:focus {
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 3px rgba(46,117,182,.1);
+    }
+    .modal-buttons {
+      display: flex; gap: .75rem; justify-content: flex-end;
+      margin-top: 1.75rem;
+    }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; font-size: .93rem; }
+    thead tr { background: var(--blue-dark); color: #fff; }
+    thead th { padding: .85rem 1rem; text-align: left; font-weight: 600; white-space: nowrap; }
+    tbody tr { border-bottom: 1px solid #e8edf5; transition: background .15s; }
+    tbody tr:hover { background: var(--blue-light); }
+    tbody td { padding: .75rem 1rem; }
+    .badge {
+      display: inline-block;
+      padding: .3rem .75rem;
+      border-radius: 50px;
+      font-size: .78rem; font-weight: 700;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .badge-aberto {
+      background: #ffeaea; color: var(--accent);
+    }
+    .badge-aberto:hover {
+      background: #ffcccc;
+    }
+    .badge-parcial {
+      background: #fff3cd; color: #856404;
+    }
+    .badge-parcial:hover {
+      background: #ffe69c;
+    }
+    .badge-concluido {
+      background: #d4edda; color: #155724;
+    }
+    .badge-concluido:hover {
+      background: #c3e6cb;
+    }
+    .action-btns {
+      display: flex; gap: .5rem;
+    }
+    .action-btns button {
+      padding: .35rem .6rem;
+      font-size: .8rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: all .2s;
+    }
+    .action-btns .edit-btn {
+      background: #3498db;
+      color: #fff;
+    }
+    .action-btns .edit-btn:hover {
+      background: #2980b9;
+    }
+    .action-btns .delete-btn {
+      background: var(--accent);
+      color: #fff;
+    }
+    .action-btns .delete-btn:hover {
+      background: #c73535;
+    }
+
+    /* ── Search / Filter ── */
+    .filter-bar {
+      display: flex; gap: 1rem; flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+    .filter-bar input, .filter-bar select {
+      padding: .55rem 1rem;
+      border: 1.5px solid #c8d6ea;
+      border-radius: 8px;
+      font-size: .92rem;
+      outline: none;
+      transition: border-color .2s;
+      flex: 1; min-width: 160px;
+    }
+    .filter-bar input:focus, .filter-bar select:focus { border-color: var(--blue-mid); }
+
+    /* ── Progress bars ── */
+    .progress-list { display: flex; flex-direction: column; gap: 1rem; }
+    .progress-item label {
+      display: flex; justify-content: space-between;
+      font-size: .9rem; font-weight: 600; margin-bottom: .3rem;
+      color: var(--blue-dark);
+    }
+    .progress-track {
+      background: var(--blue-light);
+      border-radius: 50px; height: 14px; overflow: hidden;
+    }
+    .progress-fill {
+      height: 100%; border-radius: 50px;
+      background: linear-gradient(90deg, var(--blue-mid), #5ba4e0);
+      transition: width 1s ease;
+    }
+
+    /* ── Alert ── */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .alert-error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
+
+    /* ── Slide Preview ── */
+    .slide-preview {
+      background: white;
+      border: 2px solid var(--blue-mid);
+      border-radius: var(--radius);
+      padding: 2rem;
+      margin-top: 1.5rem;
+      min-height: 400px;
+      page-break-after: always;
+    }
+    .slide-header {
+      text-align: center;
+      margin-bottom: 2rem;
+      border-bottom: 3px solid var(--blue-mid);
+      padding-bottom: 1rem;
+    }
+    .slide-header h1 {
+      font-size: 2.5rem;
+      color: var(--blue-dark);
+      margin-bottom: .5rem;
+    }
+    .slide-header p {
+      font-size: 1.1rem;
+      color: var(--muted);
+    }
+    .slide-content {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+    }
+    .slide-stats {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .stat-box {
+      background: var(--blue-light);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid var(--blue-mid);
+    }
+    .stat-box strong {
+      display: block;
+      font-size: 2rem;
+      color: var(--blue-dark);
+      margin-bottom: .5rem;
+    }
+    .stat-box span {
+      color: var(--muted);
+      font-size: .9rem;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: .82rem;
+      border-top: 1px solid #dde4f0;
+      margin-top: 2rem;
+    }
+
+    /* ── Print ── */
+    @media print {
+      nav, .btn-group, .filter-bar { display: none; }
+      .slide-preview { page-break-after: always; border: none; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 600px) {
+      header h1 { font-size: 1.4rem; }
+      .kpi .value { font-size: 1.7rem; }
+      .modal-content { width: 95%; }
+      .slide-content { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📋 Controle de Materiais de Empréstimo</h1>
+  <p>Painel interativo e editável de débitos em aberto</p>
+</header>
+
+<nav>
+  <button class="active" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
+  <button onclick="app.showSection('por-empresa', this)">Por Empresa</button>
+  <button onclick="app.showSection('por-material', this)">Por Material</button>
+  <button onclick="app.showSection('registros', this)">Gerenciar Registros</button>
+  <button onclick="app.showSection('relatorio', this)">Relatório Visual</button>
+</nav>
+
+<main>
+
+  <!-- Alert ── -->
+  <div id="alert" class="alert"></div>
+
+  <!-- KPIs sempre visíveis -->
+  <div class="kpi-grid">
+    <div class="kpi">
+      <div class="icon">📋</div>
+      <div class="value" id="kpiTotal">660</div>
+      <div class="label">Total de Itens em Débito</div>
+    </div>
+    <div class="kpi">
+      <div class="icon">🏢</div>
+      <div class="value" id="kpiEmpresas">4</div>
+      <div class="label">Empresas Credoras</div>
+    </div>
+    <div class="kpi">
+      <div class="icon">🔨</div>
+      <div class="value" id="kpiMateriais">4</div>
+      <div class="label">Tipos de Material</div>
+    </div>
+    <div class="kpi">
+      <div class="icon">📅</div>
+      <div class="value" id="kpiRegistros">7</div>
+      <div class="label">Registros de Empréstimo</div>
+    </div>
+    <div class="kpi" style="border-top-color: var(--accent);">
+      <div class="icon">⚠️</div>
+      <div class="value" id="kpiAbertos" style="color:var(--accent);">7</div>
+      <div class="label">Itens Em Aberto</div>
+    </div>
+  </div>
+
+  <!-- ── VISÃO GERAL ── -->
+  <section id="visao-geral" class="active">
+    <div class="chart-grid">
+      <div class="card">
+        <h2>📊 Quantidade por Empresa</h2>
+        <div class="chart-wrap"><canvas id="chartEmpresa"></canvas></div>
+      </div>
+      <div class="card">
+        <h2>🏗️ Distribuição por Material</h2>
+        <div class="chart-wrap"><canvas id="chartMaterial"></canvas></div>
+      </div>
+    </div>
+    <div class="card">
+      <h2>📈 Empréstimos por Data</h2>
+      <div class="chart-wrap" style="height:260px"><canvas id="chartData"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ── POR EMPRESA ── -->
+  <section id="por-empresa">
+    <div class="card">
+      <h2>🏢 Participação por Empresa</h2>
+      <div class="progress-list" id="progressEmpresas"></div>
+    </div>
+    <div class="card">
+      <h2>📈 Comparativo de Empresas</h2>
+      <div class="chart-wrap" style="height:320px"><canvas id="chartEmpresaBar"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ── POR MATERIAL ── -->
+  <section id="por-material">
+    <div class="card">
+      <h2>🔨 Participação por Material</h2>
+      <div class="progress-list" id="progressMateriais"></div>
     </div>
     <div class="card">
       <h2>📈 Comparativo de Materiais</h2>
@@ -447,5 +948,146 @@ const app = {
       data: {
         labels: Object.keys(porMaterial),
         datasets: [{
-          
-(Content truncated due to size limit. Use line ranges to read remaining content)
+          label: 'Total de Itens',
+          data: Object.values(porMaterial),
+          backgroundColor: this.CORES,
+          borderRadius: 10,
+          borderSkipped: false
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true, maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { beginAtZero: true, grid: { color: '#e8edf5' } },
+          y: { grid: { display: false } }
+        }
+      }
+    });
+
+    // Progress bars: Empresas
+    const peDiv = document.getElementById('progressEmpresas');
+    peDiv.innerHTML = '';
+    Object.entries(porEmpresa).sort((a,b) => b[1]-a[1]).forEach(([emp, qtd], i) => {
+      const pct = (qtd/total*100).toFixed(1);
+      peDiv.innerHTML += `
+        <div class="progress-item">
+          <label><span>${emp}</span><span>${qtd} itens (${pct}%)</span></label>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${pct}%; background: linear-gradient(90deg, ${this.CORES[i]}, ${this.CORES[(i+1)%this.CORES.length]})"></div>
+          </div>
+        </div>`;
+    });
+
+    // Progress bars: Materiais
+    const pmDiv = document.getElementById('progressMateriais');
+    pmDiv.innerHTML = '';
+    Object.entries(porMaterial).sort((a,b) => b[1]-a[1]).forEach(([mat, qtd], i) => {
+      const pct = (qtd/total*100).toFixed(1);
+      pmDiv.innerHTML += `
+        <div class="progress-item">
+          <label><span>${mat}</span><span>${qtd} itens (${pct}%)</span></label>
+          <div class="progress-track">
+            <div class="progress-fill" style="width:${pct}%; background: linear-gradient(90deg, ${this.CORES[i]}, ${this.CORES[(i+1)%this.CORES.length]})"></div>
+          </div>
+        </div>`;
+    });
+  },
+
+  // ── Gerar Relatório PDF ──
+  gerarRelatorioPDF() {
+    const porEmpresa  = this.agrupar('empresa');
+    const porMaterial = this.agrupar('material');
+    const total = this.dados.reduce((s, d) => s + d.quantidade, 0);
+    const abertos = this.dados.filter(d => d.status === "Em Aberto").length;
+
+    let html = `
+      <div class="slide-preview">
+        <div class="slide-header">
+          <h1>Controle de Materiais de Empréstimo</h1>
+          <p>Relatório Executivo - ${new Date().toLocaleDateString('pt-BR')}</p>
+        </div>
+        <div class="slide-content">
+          <div class="slide-stats">
+            <div class="stat-box">
+              <strong>${total}</strong>
+              <span>Total de Itens em Débito</span>
+            </div>
+            <div class="stat-box">
+              <strong>${Object.keys(porEmpresa).length}</strong>
+              <span>Empresas Credoras</span>
+            </div>
+            <div class="stat-box">
+              <strong>${Object.keys(porMaterial).length}</strong>
+              <span>Tipos de Material</span>
+            </div>
+            <div class="stat-box">
+              <strong>${abertos}</strong>
+              <span>Registros em Aberto</span>
+            </div>
+          </div>
+          <div class="slide-stats">
+            <div style="background: var(--blue-light); padding: 1.5rem; border-radius: 12px; border-left: 4px solid var(--blue-mid);">
+              <strong style="display: block; font-size: 1.2rem; color: var(--blue-dark); margin-bottom: 1rem;">Principais Empresas</strong>
+              ${Object.entries(porEmpresa).sort((a,b) => b[1]-a[1]).slice(0, 3).map(([emp, qtd]) => `
+                <div style="margin-bottom: 0.8rem; padding-bottom: 0.8rem; border-bottom: 1px solid rgba(0,0,0,0.1);">
+                  <div style="font-weight: 600; color: var(--blue-dark);">${emp}</div>
+                  <div style="font-size: 0.9rem; color: var(--muted);">${qtd} itens (${(qtd/total*100).toFixed(1)}%)</div>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    document.getElementById('slideContainer').innerHTML = html;
+  },
+
+  // ── Exportar PDF ──
+  exportarPDF() {
+    const elemento = document.getElementById('slideContainer');
+    const opt = {
+      margin: 10,
+      filename: `relatorio_materiais_${new Date().toISOString().split('T')[0]}.pdf`,
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2 },
+      jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+    };
+    html2pdf().set(opt).from(elemento).save();
+    this.mostrarAlerta('PDF gerado com sucesso!', 'success');
+  },
+
+  // ── Exportar CSV ──
+  exportarCSV() {
+    let csv = 'ID,Empresa,Material,Data do Empréstimo,Quantidade,Status\n';
+    this.dados.forEach(d => {
+      csv += `${d.id},"${d.empresa}","${d.material}","${d.data}",${d.quantidade},"${d.status}"\n`;
+    });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `controle_emprestimos_${new Date().toISOString().split('T')[0]}.csv`;
+    link.click();
+    this.mostrarAlerta('Arquivo CSV exportado com sucesso!', 'success');
+  },
+
+  // ── Resetar ──
+  resetarDados() {
+    if (confirm('Tem certeza que deseja resetar TODOS os dados para o padrão inicial? Esta ação não pode ser desfeita!')) {
+      localStorage.removeItem(this.STORAGE_KEY);
+      this.carregarDados();
+      this.atualizarUI();
+      this.mostrarAlerta('Dados resetados para o padrão inicial!', 'success');
+    }
+  }
+};
+
+// ── Inicializar ao carregar a página ──
+document.addEventListener('DOMContentLoaded', () => {
+  app.init();
+});
+</script>
+</body>
+</html>
