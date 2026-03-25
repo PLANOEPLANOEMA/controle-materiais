@@ -1,0 +1,16 @@
+Pacote completo do projeto
+
+Arquivos incluídos:
+- index.html
+- firebase.js
+- vercel.json
+- README.md
+- Controle_Materiais_Emprestimo.xlsx
+- Controle de Materiais de Empréstimo.md
+- criar_planilha.py
+- logo.png
+- logotipo.jpg
+
+Observação:
+- index.html foi montado a partir do arquivo index-final.html
+- firebase.js foi montado a partir do arquivo firebase-melhorado.js
