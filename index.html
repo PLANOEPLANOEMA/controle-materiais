@@ -514,7 +514,6 @@
       .materiais-grid { grid-template-columns: 1fr; }
     }
   
-    /* ── Galeria/Câmera estilo app ── */
     .camera-helper {
       display:block;
       color: var(--muted);
@@ -828,7 +827,7 @@
       
 <div class="form-group">
   <label for="fotoMaterial">Foto do Material</label>
-  <small class="camera-helper">No celular, use <strong>Galeria</strong> para escolher uma imagem já salva ou <strong>Câmera</strong> para tirar a foto na hora.</small>
+  <small class="camera-helper">No celular, use <strong>Galeria</strong> para escolher uma imagem salva ou <strong>Câmera</strong> para tirar a foto na hora.</small>
 
   <input type="file" id="fotoMaterial" accept="image/*" style="display:none;" />
   <input type="file" id="fotoMaterialCamera" accept="image/*" capture="environment" style="display:none;" />
@@ -1539,7 +1538,6 @@ const appMateriais = {
     const file = e.target.files && e.target.files[0];
     const preview = document.getElementById('imagemPreview');
     const previewImg = document.getElementById('imagemPreviewImg');
-
     if (!file) {
       previewImg.src = '';
       preview.style.display = 'none';
@@ -1785,7 +1783,6 @@ const appMateriais = {
       .header { flex-direction:column; align-items:flex-start; }
     }
   
-    /* ── Galeria/Câmera estilo app ── */
     .camera-helper {
       display:block;
       color: var(--muted);
