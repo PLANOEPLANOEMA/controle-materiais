@@ -1046,9 +1046,9 @@ const auth = {
 
     const permitidas = {
       admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','rastreabilidade','relatorio-dia'],
-      go: ['materiais-obra','rastreabilidade','relatorio-dia'],
-      engenharia: ['relatorio-dia']
+      almoxarife: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      go: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
     document.querySelectorAll('nav button').forEach((btn) => {
@@ -1082,7 +1082,7 @@ const auth = {
       admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo'],
       almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
-      engenharia: ['ver_relatorio_dia']
+      engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
     return (mapa[role] || []).includes(acao);
   }
@@ -1216,8 +1216,8 @@ const app = {
   },
 
   abrirModalNovo() {
-    if (!auth.pode('editar_emprestimos')) {
-      this.mostrarAlerta('Seu perfil não pode alterar registros de empréstimo.', 'error');
+    if (!auth.pode('editar_materiais')) {
+      app.mostrarAlerta('Seu perfil não pode cadastrar materiais.', 'error');
       return;
     }
     this.editandoId = null;
@@ -1840,8 +1840,8 @@ const appMateriais = {
   },
 
   abrirModalNovo() {
-    if (!auth.pode('editar_emprestimos')) {
-      this.mostrarAlerta('Seu perfil não pode alterar registros de empréstimo.', 'error');
+    if (!auth.pode('editar_materiais')) {
+      app.mostrarAlerta('Seu perfil não pode cadastrar materiais.', 'error');
       return;
     }
     this.editandoId = null;
