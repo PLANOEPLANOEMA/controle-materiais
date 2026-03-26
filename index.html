@@ -621,6 +621,7 @@
   <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
   <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
   <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+  <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
   <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
   <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
 </nav>
@@ -752,6 +753,9 @@
         <button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">
           📋 Relatório do Dia
         </button>
+        <button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">
+          📊 Relatório Completo
+        </button>
         <button class="btn btn-secondary" onclick="appMateriais.buscarMateriais()">
           🔄 Atualizar
         </button>
@@ -772,9 +776,28 @@
       <h2>📋 Relatório do Dia</h2>
       <div class="btn-group">
         <button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Abrir Relatório para Impressão</button>
+        <button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Abrir Relatório Completo</button>
         <button class="btn btn-secondary" onclick="appMateriais.renderizarRelatorioDia()">🔄 Atualizar Painel</button>
       </div>
       <div id="painelRelatorioDia"></div>
+    </div>
+  </section>
+
+  <!-- ── RASTREABILIDADE COMPLETA ── -->
+  <section id="rastreabilidade">
+    <div class="card">
+      <h2>🧾 Rastreabilidade Completa</h2>
+      <div class="btn-group">
+        <button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>
+        <button class="btn btn-secondary" onclick="appMateriais.renderizarRastreabilidadeCompleta()">🔄 Atualizar</button>
+      </div>
+      <div class="filter-bar">
+        <input type="date" id="rastFiltroData" onchange="appMateriais.renderizarRastreabilidadeCompleta()" />
+        <input type="text" id="rastFiltroMaterial" placeholder="🔍 Buscar material..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" />
+        <input type="text" id="rastFiltroPessoa" placeholder="👤 Buscar quem retirou..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" />
+        <input type="text" id="rastFiltroSetor" placeholder="🏗️ Buscar setor/função..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" />
+      </div>
+      <div id="rastreabilidadeCompletaContainer"></div>
     </div>
   </section>
 
@@ -1022,9 +1045,9 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','relatorio-dia'],
-      go: ['materiais-obra','relatorio-dia'],
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','rastreabilidade','relatorio-dia'],
+      go: ['materiais-obra','rastreabilidade','relatorio-dia'],
       engenharia: ['relatorio-dia']
     }[role] || ['relatorio-dia'];
 
@@ -1056,9 +1079,9 @@ const auth = {
   pode(acao) {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
-      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia'],
-      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia'],
-      go: ['ver_rastreabilidade','ver_relatorio_dia'],
+      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo'],
+      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
+      go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
       engenharia: ['ver_relatorio_dia']
     };
     return (mapa[role] || []).includes(acao);
@@ -1186,6 +1209,9 @@ const app = {
     }
     if (id === 'relatorio-dia' && window.appMateriais && typeof window.appMateriais.renderizarRelatorioDia === 'function') {
       window.appMateriais.renderizarRelatorioDia();
+    }
+    if (id === 'rastreabilidade' && window.appMateriais && typeof window.appMateriais.renderizarRastreabilidadeCompleta === 'function') {
+      window.appMateriais.renderizarRastreabilidadeCompleta();
     }
   },
 
@@ -1728,9 +1754,11 @@ const appMateriais = {
     const materiaisSection = document.getElementById('materiais-obra');
     if (!materiaisSection) return;
     const btnNovo = materiaisSection.querySelector('.btn.btn-primary');
-    const btnRel = materiaisSection.querySelector('.btn.btn-success');
+    const btnRelDia = materiaisSection.querySelector('.btn.btn-success');
+    const btnRelCompleto = materiaisSection.querySelector('.btn.btn-warning');
     if (btnNovo) btnNovo.style.display = auth.pode('editar_materiais') ? 'inline-flex' : 'none';
-    if (btnRel) btnRel.style.display = auth.pode('ver_relatorio_dia') ? 'inline-flex' : 'none';
+    if (btnRelDia) btnRelDia.style.display = auth.pode('ver_relatorio_dia') ? 'inline-flex' : 'none';
+    if (btnRelCompleto) btnRelCompleto.style.display = auth.pode('ver_relatorio_completo') ? 'inline-flex' : 'none';
     const search = document.getElementById('searchMateriais');
     const filterData = document.getElementById('filterDataMateriais');
     if (search) search.disabled = false;
@@ -2097,7 +2125,58 @@ const appMateriais = {
     }
     box.style.display = 'block';
     const itens = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 20);
-    box.innerHTML = `<h2>🧾 Rastreabilidade de Retiradas</h2>${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
+    box.innerHTML = `<h2>🧾 Últimas Retiradas</h2>
+      <div class="btn-group" style="margin-bottom:1rem;">
+        ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
+        <button class="btn btn-secondary" onclick="app.showSection('rastreabilidade', document.querySelector('nav button[data-section=&quot;rastreabilidade&quot;]'))">📋 Ver Rastreabilidade Completa</button>
+      </div>
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
+  },
+
+  obterMovimentacoesFiltradas() {
+    const data = document.getElementById('rastFiltroData')?.value || '';
+    const material = (document.getElementById('rastFiltroMaterial')?.value || '').toLowerCase().trim();
+    const pessoa = (document.getElementById('rastFiltroPessoa')?.value || '').toLowerCase().trim();
+    const setor = (document.getElementById('rastFiltroSetor')?.value || '').toLowerCase().trim();
+    return this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).filter(m => {
+      const dataOk = !data || (m.dataHora || '').split('T')[0] === data;
+      const materialOk = !material || (m.materialNome || '').toLowerCase().includes(material);
+      const pessoaOk = !pessoa || (m.responsavel || '').toLowerCase().includes(pessoa) || (m.lancadoPor || '').toLowerCase().includes(pessoa);
+      const setorTexto = [m.setor, m.funcao].filter(Boolean).join(' ').toLowerCase();
+      const setorOk = !setor || setorTexto.includes(setor);
+      return dataOk && materialOk && pessoaOk && setorOk;
+    });
+  },
+
+  renderizarRastreabilidadeCompleta() {
+    const container = document.getElementById('rastreabilidadeCompletaContainer');
+    if (!container) return;
+    if (!auth.pode('ver_rastreabilidade')) {
+      container.innerHTML = '<p style="color:#6b7a99;">Seu perfil não tem acesso à rastreabilidade.</p>';
+      return;
+    }
+    const itens = this.obterMovimentacoesFiltradas();
+    container.innerHTML = `
+      <div class="btn-group" style="margin-bottom:1rem;">
+        <span class="btn btn-primary" style="cursor:default;">🧾 ${itens.length} registros</span>
+        ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
+      </div>
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
+  },
+
+  async excluirMovimentacao(id) {
+    if (!auth.pode('excluir_rastreabilidade')) {
+      app.mostrarAlerta('Somente o administrador pode excluir rastreabilidade.', 'error');
+      return;
+    }
+    if (!confirm('Deseja realmente excluir este registro de rastreabilidade?')) return;
+    this.movimentacoes = this.movimentacoes.filter(m => m.id !== id);
+    await this.salvarMovimentacoes();
+    this.renderizarMovimentacoes();
+    this.renderizarRastreabilidadeCompleta();
+    this.renderizarRelatorioDia();
+    this.buscarMateriais();
+    app.mostrarAlerta('Rastreabilidade excluída com sucesso!', 'success');
   },
 
   renderizarRelatorioDia() {
@@ -2119,21 +2198,11 @@ const appMateriais = {
     `;
   },
 
-  gerarRelatorioDia() {
-    const hoje = new Date().toISOString().split('T')[0];
-    const materiaisDia = this.materiais.filter(m => (m.dataAtualizacao || '').split('T')[0] === hoje);
-
-    if (materiaisDia.length === 0) {
-      app.mostrarAlerta('Nenhum material foi atualizado hoje!', 'error');
-      return;
-    }
-
-    const totalItens = materiaisDia.reduce((s, m) => s + Number(m.quantidade || 0), 0);
+  abrirJanelaRelatorio({ titulo, subtitulo, materiais, movimentacoes }) {
+    const totalItens = materiais.reduce((s, m) => s + Number(m.quantidade || 0), 0);
     const agora = new Date();
     const dataFormatada = agora.toLocaleDateString('pt-BR');
     const horaFormatada = agora.toLocaleTimeString('pt-BR');
-
-    const movimentacoesDia = this.movimentacoes.filter(m => (m.dataHora || '').split('T')[0] === hoje);
 
     const html = `
 <!DOCTYPE html>
@@ -2141,7 +2210,7 @@ const appMateriais = {
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Relatório de Materiais da Obra</title>
+  <title>${titulo}</title>
   <style>
     * { box-sizing: border-box; }
     body { font-family: Arial, sans-serif; margin: 0; color: #1a2340; background: #fff; }
@@ -2150,7 +2219,7 @@ const appMateriais = {
     .header img { height:60px; width:auto; display:block; }
     .header h1 { margin:0; color:#1F3864; font-size:28px; }
     .muted { color:#6b7a99; margin-top:6px; }
-    .stats { display:grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap:16px; margin: 20px 0 28px; }
+    .stats { display:grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap:16px; margin: 20px 0 28px; }
     .stat { background:#DDEEFF; border-left:4px solid #2E75B6; border-radius:10px; padding:16px; }
     .stat .value { font-size:30px; font-weight:700; color:#1F3864; }
     .section-title { color:#1F3864; font-size:20px; margin: 0 0 12px 0; }
@@ -2168,68 +2237,8 @@ const appMateriais = {
     .footer { text-align:center; color:#6b7a99; border-top:1px solid #d9e3f0; padding-top:14px; margin-top:28px; font-size:13px; }
     .actions { margin: 0 0 20px 0; }
     .btn { background:#1F3864; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:700; }
-    @media print {
-      .actions { display:none; }
-      .page { max-width:none; padding:0; }
-      body { margin: 0; }
-    }
-    @media (max-width: 800px) {
-      .stats, .cards { grid-template-columns: 1fr; }
-      .header { flex-direction:column; align-items:flex-start; }
-    }
-  
-    .camera-helper {
-      display:block;
-      color: var(--muted);
-      margin-top: .35rem;
-      margin-bottom: .85rem;
-      line-height: 1.45;
-      font-size: .86rem;
-    }
-    .camera-actions {
-      display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
-      gap: .85rem;
-      margin-top: .35rem;
-    }
-    .camera-actions .btn {
-      min-height: 62px;
-      border-radius: 16px;
-      justify-content: center;
-      flex-direction: column;
-      gap: .25rem;
-      box-shadow: 0 8px 24px rgba(31,56,100,.12);
-      font-size: .92rem;
-      font-weight: 700;
-      width: 100%;
-    }
-    .camera-btn-icon { font-size: 1.35rem; line-height: 1; }
-    .gallery-btn {
-      background: #eef5ff;
-      color: var(--blue-dark);
-      border: 1px solid #cfe0fb;
-    }
-    .gallery-btn:hover { background: #e3efff; }
-    .capture-btn {
-      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
-      color: #fff;
-      border: none;
-    }
-    .capture-btn:hover { filter: brightness(1.03); }
-    .image-preview-app {
-      margin-top: 1rem;
-      border: 2px dashed #c8d6ea;
-      border-radius: 16px;
-      height: 220px;
-      background: linear-gradient(180deg, #f8fbff 0%, #edf4ff 100%);
-    }
-    .image-preview-app img { border-radius: 12px; }
-    @media (max-width: 768px) {
-      .camera-actions { grid-template-columns: 1fr; }
-      .camera-actions .btn { min-height: 58px; flex-direction: row; }
-      .image-preview-app { height: 200px; }
-    }
-
+    @media print { .actions { display:none; } .page { max-width:none; padding:0; } body { margin: 0; } }
+    @media (max-width: 800px) { .stats, .cards { grid-template-columns: 1fr; } .header { flex-direction:column; align-items:flex-start; } }
   </style>
 </head>
 <body>
@@ -2241,48 +2250,24 @@ const appMateriais = {
     <div class="header">
       <img src="./logo.png" alt="Plano & Plano" />
       <div>
-        <h1>Relatório de Materiais da Obra</h1>
-        <div class="muted">Data: ${dataFormatada}</div>
-        <div class="muted">Hora: ${horaFormatada}</div>
+        <h1>${titulo}</h1>
+        <div class="muted">${subtitulo}</div>
+        <div class="muted">Gerado em ${dataFormatada} às ${horaFormatada}</div>
       </div>
     </div>
 
     <div class="stats">
-      <div class="stat">
-        <div class="value">${materiaisDia.length}</div>
-        <div>Materiais Registrados</div>
-      </div>
-      <div class="stat">
-        <div class="value">${totalItens}</div>
-        <div>Total de Itens</div>
-      </div>
+      <div class="stat"><div class="value">${materiais.length}</div><div>Materiais listados</div></div>
+      <div class="stat"><div class="value">${totalItens}</div><div>Saldo total</div></div>
+      <div class="stat"><div class="value">${movimentacoes.length}</div><div>Registros de rastreabilidade</div></div>
     </div>
 
     <h2 class="section-title">Lista de Materiais</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Material</th>
-          <th class="center">Quantidade</th>
-          <th>Especificações</th>
-          <th class="center">Hora</th>
-        </tr>
-      </thead>
-      <tbody>
-        ${materiaisDia.map(m => `
-          <tr>
-            <td><strong>${m.nome}</strong></td>
-            <td class="center">${m.quantidade}</td>
-            <td>${m.especificacoes || '-'}</td>
-            <td class="center">${new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td>
-          </tr>
-        `).join('')}
-      </tbody>
-    </table>
+    ${materiais.length ? `<table><thead><tr><th>Material</th><th class="center">Quantidade</th><th>Especificações</th><th class="center">Última atualização</th></tr></thead><tbody>${materiais.map(m => `<tr><td><strong>${m.nome}</strong></td><td class="center">${m.quantidade}</td><td>${m.especificacoes || '-'}</td><td class="center">${new Date(m.dataAtualizacao).toLocaleString('pt-BR')}</td></tr>`).join('')}</tbody></table>` : `<p style="color:#6b7a99; margin-bottom:24px;">Nenhum material encontrado.</p>`}
 
     <h2 class="section-title">Lista Visual</h2>
     <div class="cards">
-      ${materiaisDia.map(m => `
+      ${materiais.map(m => `
         <div class="card">
           <div class="card-media">
             ${m.foto ? `<img src="${m.foto}" alt="${m.nome}">` : `<div style="font-size:56px;">📦</div>`}
@@ -2291,18 +2276,16 @@ const appMateriais = {
             <div class="card-title">${m.nome}</div>
             <div class="qty">Quantidade: ${m.quantidade}</div>
             <div style="margin-bottom:6px;">${m.especificacoes || '-'}</div>
-            <div style="color:#6b7a99; font-size:13px;">Atualizado às ${new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</div>
+            <div style="color:#6b7a99; font-size:13px;">Atualizado em ${new Date(m.dataAtualizacao).toLocaleString('pt-BR')}</div>
           </div>
         </div>
       `).join('')}
     </div>
 
-    <h2 class="section-title">Rastreabilidade do Dia</h2>
-    ${movimentacoesDia.length ? `<table><thead><tr><th>Horário</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th></tr></thead><tbody>${movimentacoesDia.map(m => `<tr><td>${new Date(m.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td><td>${m.materialNome}</td><td class="center">${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}</td><td>${m.lancadoPor}</td></tr>`).join('')}</tbody></table>` : `<p style="color:#6b7a99; margin-bottom:24px;">Nenhuma retirada registrada hoje.</p>`}
+    <h2 class="section-title">Rastreabilidade</h2>
+    ${movimentacoes.length ? `<table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th></tr></thead><tbody>${movimentacoes.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td class="center">${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td></tr>`).join('')}</tbody></table>` : `<p style="color:#6b7a99; margin-bottom:24px;">Nenhuma retirada registrada para este relatório.</p>`}
 
-    <div class="footer">
-      Relatório gerado automaticamente pelo sistema de Controle de Materiais - Plano & Plano
-    </div>
+    <div class="footer">Relatório gerado automaticamente pelo sistema de Controle de Materiais - Plano & Plano</div>
   </div>
 </body>
 </html>`;
@@ -2315,8 +2298,42 @@ const appMateriais = {
     win.document.open();
     win.document.write(html);
     win.document.close();
-  }
-};
+  },
+
+  gerarRelatorioDia() {
+    const hoje = new Date().toISOString().split('T')[0];
+    const materiaisDia = this.materiais.filter(m => (m.dataAtualizacao || '').split('T')[0] === hoje);
+    if (materiaisDia.length === 0) {
+      app.mostrarAlerta('Nenhum material foi atualizado hoje!', 'error');
+      return;
+    }
+    const movimentacoesDia = this.movimentacoes.filter(m => (m.dataHora || '').split('T')[0] === hoje);
+    this.abrirJanelaRelatorio({
+      titulo: 'Relatório do Dia - Materiais da Obra',
+      subtitulo: `Data de referência: ${new Date().toLocaleDateString('pt-BR')}`,
+      materiais: materiaisDia,
+      movimentacoes: movimentacoesDia
+    });
+  },
+
+  gerarRelatorioCompleto() {
+    if (!auth.pode('ver_relatorio_completo')) {
+      app.mostrarAlerta('Seu perfil não pode abrir o relatório completo.', 'error');
+      return;
+    }
+    const materiaisOrdenados = this.materiais.slice().sort((a,b) => new Date(b.dataAtualizacao) - new Date(a.dataAtualizacao));
+    const movimentacoesOrdenadas = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora));
+    if (!materiaisOrdenados.length && !movimentacoesOrdenadas.length) {
+      app.mostrarAlerta('Ainda não há dados suficientes para o relatório completo.', 'error');
+      return;
+    }
+    this.abrirJanelaRelatorio({
+      titulo: 'Relatório Completo - Materiais da Obra',
+      subtitulo: 'Todos os materiais cadastrados e toda a rastreabilidade registrada no sistema.',
+      materiais: materiaisOrdenados,
+      movimentacoes: movimentacoesOrdenadas
+    });
+  }};
 
 // ── Inicializar ao carregar a página ──
 document.addEventListener('DOMContentLoaded', () => {
