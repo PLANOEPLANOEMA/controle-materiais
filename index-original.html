@@ -607,22 +607,16 @@
       <p>Gestão profissional de empréstimos e estoque - Plano & Plano</p>
     </div>
   </div>
-  <div class="user-area" id="userArea" style="position:relative; z-index:1; text-align:right; min-width:220px;">
-    <div id="currentUserLabel" style="font-weight:700; font-size:0.95rem;"></div>
-    <div id="currentUserRole" style="opacity:.85; font-size:0.85rem; margin-top:0.25rem;"></div>
-    <button class="btn btn-secondary" style="margin-top:0.6rem;" onclick="auth.logout()">Sair</button>
-  </div>
 
 </header>
 
 <nav>
-  <button class="active" data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
-  <button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button>
-  <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
-  <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
-  <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
-  <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
-  <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
+  <button class="active" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
+  <button onclick="app.showSection('por-empresa', this)">Por Empresa</button>
+  <button onclick="app.showSection('por-material', this)">Por Material</button>
+  <button onclick="app.showSection('registros', this)">Gerenciar Registros</button>
+  <button onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+  <button onclick="app.showSection('relatorio', this)">Relatório Visual</button>
 </nav>
 
 <main>
@@ -764,20 +758,6 @@
     </div>
   </section>
 
-
-
-  <!-- ── RELATÓRIO DO DIA ── -->
-  <section id="relatorio-dia">
-    <div class="card">
-      <h2>📋 Relatório do Dia</h2>
-      <div class="btn-group">
-        <button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Abrir Relatório para Impressão</button>
-        <button class="btn btn-secondary" onclick="appMateriais.renderizarRelatorioDia()">🔄 Atualizar Painel</button>
-      </div>
-      <div id="painelRelatorioDia"></div>
-    </div>
-  </section>
-
   <!-- ── RELATÓRIO VISUAL ── -->
   <section id="relatorio">
     <div class="card">
@@ -876,49 +856,6 @@
   </div>
 </div>
 
-
-<!-- ── MODAL RETIRADA DE MATERIAL ── -->
-<div id="modalRetirada" class="modal">
-  <div class="modal-content">
-    <h3>Registrar Retirada</h3>
-    <form id="formRetirada" onsubmit="appMateriais.salvarRetirada(event)">
-      <input type="hidden" id="retiradaMaterialId" />
-      <div class="form-group">
-        <label for="retiradaMaterialNome">Material</label>
-        <input type="text" id="retiradaMaterialNome" readonly />
-      </div>
-      <div class="form-group">
-        <label for="retiradaQuantidade">Quantidade retirada *</label>
-        <input type="number" id="retiradaQuantidade" min="1" required />
-      </div>
-      <div class="form-group">
-        <label for="retiradaResponsavel">Quem retirou *</label>
-        <input type="text" id="retiradaResponsavel" required placeholder="Nome de quem retirou" />
-      </div>
-      <div class="form-group">
-        <label for="retiradaFuncao">Função</label>
-        <input type="text" id="retiradaFuncao" placeholder="Ex: Pedreiro, Encarregado" />
-      </div>
-      <div class="form-group">
-        <label for="retiradaSetor">Setor</label>
-        <input type="text" id="retiradaSetor" placeholder="Ex: Engenharia, Canteiro" />
-      </div>
-      <div class="form-group">
-        <label for="retiradaMotivo">Motivo da retirada *</label>
-        <textarea id="retiradaMotivo" rows="3" required placeholder="Descreva o motivo da retirada"></textarea>
-      </div>
-      <div class="form-group">
-        <label for="retiradaObservacoes">Observações</label>
-        <textarea id="retiradaObservacoes" rows="2" placeholder="Opcional"></textarea>
-      </div>
-      <div class="modal-buttons">
-        <button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">Cancelar</button>
-        <button type="submit" class="btn btn-success">Salvar Retirada</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 <footer>
   Controle de Materiais de Empréstimo e Estoque — Plano & Plano &mdash; Dados salvos automaticamente
 </footer>
@@ -931,11 +868,8 @@
     escutarMudancas,
     salvarMateriaisNaNuvem,
     carregarMateriaisDaNuvem,
-    escutarMudancasMateriais,
-    salvarMovimentacoesNaNuvem,
-    carregarMovimentacoesDaNuvem,
-    escutarMudancasMovimentacoes
-  } from "./firebase-controle-usuarios.js";
+    escutarMudancasMateriais
+  } from "./firebase.js";
 
   window.__fb = {
     salvarNaNuvem,
@@ -943,31 +877,20 @@
     escutarMudancas,
     salvarMateriaisNaNuvem,
     carregarMateriaisDaNuvem,
-    escutarMudancasMateriais,
-    salvarMovimentacoesNaNuvem,
-    carregarMovimentacoesDaNuvem,
-    escutarMudancasMovimentacoes
+    escutarMudancasMateriais
   };
 </script>
 
 <script>
-// ── AUTENTICAÇÃO / PERFIS ──
+// ── AUTENTICAÇÃO ──
 const auth = {
-  USUARIOS: {
-    admin: { senha: '@plano123', nome: 'Administrador', role: 'admin' },
-    engenharia: { senha: '@plano123', nome: 'Engenharia/Canteiro', role: 'engenharia' },
-    canteiro: { senha: '@plano123', nome: 'Engenharia/Canteiro', role: 'engenharia' },
-    go: { senha: '@plano123', nome: 'Gerente de Obras', role: 'go' },
-    almoxarife: { senha: '@plano123', nome: 'Almoxarife', role: 'almoxarife' }
+  CREDENCIAIS: {
+    login: 'planonana',
+    senha: '@plano123'
   },
-  SESSION_KEY: 'plano_session_auth_v2',
+  SESSION_KEY: 'plano_session_auth',
 
   verificarSessao() {
-    const sessao = this.obterSessao();
-    if (sessao && sessao.role) {
-      this.mostrarApp(sessao);
-      return;
-    }
     document.getElementById('login-screen').classList.remove('hidden');
     document.querySelector('header').style.display = 'none';
     document.querySelector('nav').style.display = 'none';
@@ -975,25 +898,14 @@ const auth = {
     document.querySelector('footer').style.display = 'none';
   },
 
-  obterSessao() {
-    try {
-      return JSON.parse(localStorage.getItem(this.SESSION_KEY) || 'null');
-    } catch (e) {
-      return null;
-    }
-  },
-
   login(e) {
     e.preventDefault();
     const login = document.getElementById('login-input').value.toLowerCase().trim();
     const senha = document.getElementById('password-input').value.trim();
-    const usuario = this.USUARIOS[login];
 
-    if (usuario && senha === usuario.senha) {
-      const sessao = { username: login, nome: usuario.nome, role: usuario.role, loginAt: new Date().toISOString() };
-      localStorage.setItem(this.SESSION_KEY, JSON.stringify(sessao));
+    if (login === this.CREDENCIAIS.login && senha === this.CREDENCIAIS.senha) {
       document.getElementById('login-error').classList.remove('show');
-      this.mostrarApp(sessao);
+      this.mostrarApp();
     } else {
       document.getElementById('login-error').classList.add('show');
       document.getElementById('password-input').value = '';
@@ -1006,62 +918,14 @@ const auth = {
     input.type = (input.type === 'password') ? 'text' : 'password';
   },
 
-  logout() {
-    localStorage.removeItem(this.SESSION_KEY);
-    window.location.reload();
-  },
-
-  roleLabel(role) {
-    return ({ admin: 'Administrador', engenharia: 'Engenharia/Canteiro', go: 'GO', almoxarife: 'Almoxarife' })[role] || role;
-  },
-
-  aplicarPermissoes(sessao) {
-    const role = sessao?.role || 'admin';
-    document.body.dataset.role = role;
-    document.getElementById('currentUserLabel').textContent = `Usuário: ${sessao.username}`;
-    document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
-
-    const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','relatorio-dia'],
-      go: ['materiais-obra','relatorio-dia'],
-      engenharia: ['relatorio-dia']
-    }[role] || ['relatorio-dia'];
-
-    document.querySelectorAll('nav button').forEach((btn) => {
-      const section = btn.dataset.section;
-      btn.style.display = permitidas.includes(section) ? 'inline-flex' : 'none';
-    });
-
-    document.querySelector('.kpi-grid').style.display = (role === 'admin') ? 'grid' : 'none';
-
-    const firstBtn = [...document.querySelectorAll('nav button')].find(btn => btn.style.display !== 'none');
-    if (firstBtn) {
-      app.showSection(firstBtn.dataset.section, firstBtn);
-    }
-  },
-
-  mostrarApp(sessao = this.obterSessao()) {
-    window.currentUser = sessao || { username: 'admin', role: 'admin', nome: 'Administrador' };
+  mostrarApp() {
     document.getElementById('login-screen').classList.add('hidden');
     document.querySelector('header').style.display = 'flex';
     document.querySelector('nav').style.display = 'flex';
     document.querySelector('main').style.display = 'block';
     document.querySelector('footer').style.display = 'block';
-    this.aplicarPermissoes(window.currentUser);
     app.init();
     appMateriais.init();
-  },
-
-  pode(acao) {
-    const role = window.currentUser?.role || 'admin';
-    const mapa = {
-      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia'],
-      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia'],
-      go: ['ver_rastreabilidade','ver_relatorio_dia'],
-      engenharia: ['ver_relatorio_dia']
-    };
-    return (mapa[role] || []).includes(acao);
   }
 };
 
@@ -1177,23 +1041,15 @@ const app = {
   showSection(id, btn) {
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
-    const section = document.getElementById(id);
-    if (section) section.classList.add('active');
-    if (btn) btn.classList.add('active');
-
+    document.getElementById(id).classList.add('active');
+    btn.classList.add('active');
+    
     if (id === 'relatorio') {
       this.gerarRelatorioPDF();
-    }
-    if (id === 'relatorio-dia' && window.appMateriais && typeof window.appMateriais.renderizarRelatorioDia === 'function') {
-      window.appMateriais.renderizarRelatorioDia();
     }
   },
 
   abrirModalNovo() {
-    if (!auth.pode('editar_emprestimos')) {
-      this.mostrarAlerta('Seu perfil não pode alterar registros de empréstimo.', 'error');
-      return;
-    }
     this.editandoId = null;
     document.getElementById('modalTitle').textContent = 'Novo Registro';
     document.getElementById('formRegistro').reset();
@@ -1201,10 +1057,6 @@ const app = {
   },
 
   abrirModalEditar(id) {
-    if (!auth.pode('editar_emprestimos')) {
-      this.mostrarAlerta('Seu perfil não pode editar registros de empréstimo.', 'error');
-      return;
-    }
     const reg = this.dados.find(d => d.id === id);
     if (!reg) return;
     this.editandoId = id;
@@ -1607,44 +1459,27 @@ const app = {
 // ── Aplicação de Controle de Materiais da Obra ──
 const appMateriais = {
   STORAGE_KEY: 'controle_materiais_obra_dados',
-  STORAGE_KEY_MOV: 'controle_materiais_movimentacoes',
   materiais: [],
-  movimentacoes: [],
   editandoId: null,
-  _unsub: null,
-  _unsubMov: null,
 
   init() {
     console.log('Inicializando aplicação de materiais da obra...');
-    Promise.all([this.carregarMateriais(), this.carregarMovimentacoes()]).then(() => {
+    this.carregarMateriais().then(() => {
       this.setupEventListeners();
       this.buscarMateriais();
-      this.renderizarRelatorioDia();
-      this.aplicarPermissoesVisuais();
       this.iniciarSyncAoVivo();
     });
   },
 
   iniciarSyncAoVivo() {
     try {
-      if (window.__fb && window.__fb.escutarMudancasMateriais) {
-        if (this._unsub) this._unsub();
-        this._unsub = window.__fb.escutarMudancasMateriais((materiais) => {
-          this.materiais = Array.isArray(materiais) ? materiais : [];
-          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
-          this.buscarMateriais();
-          this.renderizarRelatorioDia();
-        });
-      }
-      if (window.__fb && window.__fb.escutarMudancasMovimentacoes) {
-        if (this._unsubMov) this._unsubMov();
-        this._unsubMov = window.__fb.escutarMudancasMovimentacoes((movimentacoes) => {
-          this.movimentacoes = Array.isArray(movimentacoes) ? movimentacoes : [];
-          try { localStorage.setItem(this.STORAGE_KEY_MOV, JSON.stringify(this.movimentacoes)); } catch(e) {}
-          this.renderizarRelatorioDia();
-          this.renderizarMovimentacoes();
-        });
-      }
+      if (!window.__fb || !window.__fb.escutarMudancasMateriais) return;
+      if (this._unsub) this._unsub();
+      this._unsub = window.__fb.escutarMudancasMateriais((materiais) => {
+        this.materiais = Array.isArray(materiais) ? materiais : [];
+        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
+        this.buscarMateriais();
+      });
     } catch (e) {
       console.warn('Sync ao vivo de materiais indisponível:', e);
     }
@@ -1655,12 +1490,6 @@ const appMateriais = {
     modal.addEventListener('click', (e) => {
       if (e.target.id === 'modalMateriais') this.fecharModal();
     });
-    const modalRetirada = document.getElementById('modalRetirada');
-    if (modalRetirada) {
-      modalRetirada.addEventListener('click', (e) => {
-        if (e.target.id === 'modalRetirada') this.fecharModalRetirada();
-      });
-    }
 
     const fotoInput = document.getElementById('fotoMaterial');
     const fotoInputCamera = document.getElementById('fotoMaterialCamera');
@@ -1690,51 +1519,6 @@ const appMateriais = {
       console.error('Erro ao carregar materiais:', e);
       this.materiais = [];
     }
-  },
-
-
-  async carregarMovimentacoes() {
-    try {
-      if (window.__fb && window.__fb.carregarMovimentacoesDaNuvem) {
-        const cloud = await window.__fb.carregarMovimentacoesDaNuvem();
-        if (Array.isArray(cloud)) {
-          this.movimentacoes = cloud;
-          try { localStorage.setItem(this.STORAGE_KEY_MOV, JSON.stringify(this.movimentacoes)); } catch(e) {}
-          return;
-        }
-      }
-      const salvos = localStorage.getItem(this.STORAGE_KEY_MOV);
-      this.movimentacoes = salvos ? JSON.parse(salvos) : [];
-    } catch (e) {
-      console.error('Erro ao carregar movimentações:', e);
-      this.movimentacoes = [];
-    }
-  },
-
-  async salvarMovimentacoes() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY_MOV, JSON.stringify(this.movimentacoes));
-      if (window.__fb && window.__fb.salvarMovimentacoesNaNuvem) {
-        await window.__fb.salvarMovimentacoesNaNuvem(this.movimentacoes);
-      }
-    } catch (e) {
-      console.error('Erro ao salvar movimentações:', e);
-      app.mostrarAlerta('Erro ao salvar rastreabilidade!', 'error');
-    }
-  },
-
-  aplicarPermissoesVisuais() {
-    const role = window.currentUser?.role || 'admin';
-    const materiaisSection = document.getElementById('materiais-obra');
-    if (!materiaisSection) return;
-    const btnNovo = materiaisSection.querySelector('.btn.btn-primary');
-    const btnRel = materiaisSection.querySelector('.btn.btn-success');
-    if (btnNovo) btnNovo.style.display = auth.pode('editar_materiais') ? 'inline-flex' : 'none';
-    if (btnRel) btnRel.style.display = auth.pode('ver_relatorio_dia') ? 'inline-flex' : 'none';
-    const search = document.getElementById('searchMateriais');
-    const filterData = document.getElementById('filterDataMateriais');
-    if (search) search.disabled = false;
-    if (filterData) filterData.disabled = false;
   },
 
   async salvarMateriais() {
@@ -1812,10 +1596,6 @@ const appMateriais = {
   },
 
   abrirModalNovo() {
-    if (!auth.pode('editar_emprestimos')) {
-      this.mostrarAlerta('Seu perfil não pode alterar registros de empréstimo.', 'error');
-      return;
-    }
     this.editandoId = null;
     document.getElementById('modalMateriaisTitle').textContent = 'Novo Material';
     document.getElementById('formMateriais').reset();
@@ -1829,10 +1609,6 @@ const appMateriais = {
   },
 
   abrirModalEditar(id) {
-    if (!auth.pode('editar_materiais')) {
-      app.mostrarAlerta('Seu perfil não pode editar materiais.', 'error');
-      return;
-    }
     const mat = this.materiais.find(m => m.id === id);
     if (!mat) return;
     
@@ -1862,10 +1638,6 @@ const appMateriais = {
 
   async salvarMaterial(e) {
     e.preventDefault();
-    if (!auth.pode('editar_materiais')) {
-      app.mostrarAlerta('Seu perfil não pode salvar materiais.', 'error');
-      return;
-    }
     const nome = document.getElementById('nomeMaterial').value.trim();
     const quantidade = parseInt(document.getElementById('quantidadeMaterial').value);
     const especificacoes = document.getElementById('especificacoes').value.trim();
@@ -1933,10 +1705,6 @@ const appMateriais = {
   },
 
   deletarMaterial(id) {
-    if (!auth.pode('deletar_materiais')) {
-      app.mostrarAlerta('Seu perfil não pode deletar materiais.', 'error');
-      return;
-    }
     if (confirm('Tem certeza que deseja deletar este material?')) {
       this.materiais = this.materiais.filter(m => m.id !== id);
       this.salvarMateriais().then(() => {
@@ -1967,17 +1735,13 @@ const appMateriais = {
     const container = document.getElementById('materiaisContainer');
     
     if (materiais.length === 0) {
-      container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 2rem;">Nenhum material cadastrado.</p>';
+      container.innerHTML = '<p style="grid-column: 1/-1; text-align: center; color: #999; padding: 2rem;">Nenhum material cadastrado. Clique em "Novo Material" para adicionar.</p>';
       return;
     }
-
-    const podeEditar = auth.pode('editar_materiais');
-    const podeRetirar = auth.pode('registrar_retirada');
 
     container.innerHTML = materiais.map(m => {
       const dataFormatada = new Date(m.dataAtualizacao).toLocaleDateString('pt-BR');
       const horaFormatada = new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const ultimaMov = this.movimentacoes.filter(x => x.materialId === m.id).sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora))[0];
       
       return `
         <div class="material-card">
@@ -1990,133 +1754,20 @@ const appMateriais = {
             <div class="material-qty">
               <div>
                 <div class="material-qty-value">${m.quantidade}</div>
-                <div class="material-qty-label">Saldo em estoque</div>
+                <div class="material-qty-label">Quantidade</div>
               </div>
             </div>
-            <div class="material-date">📅 ${dataFormatada} às ${horaFormatada}</div>
-            ${ultimaMov ? `<div class="material-date">🧾 Última retirada: ${ultimaMov.responsavel} - ${ultimaMov.quantidade} un.</div>` : ''}
+            <div class="material-date">
+              📅 ${dataFormatada} às ${horaFormatada}
+            </div>
             <div class="material-actions">
-              ${podeRetirar ? `<button class="btn btn-warning" onclick="appMateriais.abrirModalRetirada(${m.id})">📤 Registrar Retirada</button>` : ''}
-              ${podeEditar ? `<button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">✏️ Editar</button>` : ''}
-              ${podeEditar ? `<button class="delete-btn" onclick="appMateriais.deletarMaterial(${m.id})">🗑️ Deletar</button>` : ''}
+              <button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">✏️ Editar</button>
+              <button class="delete-btn" onclick="appMateriais.deletarMaterial(${m.id})">🗑️ Deletar</button>
             </div>
           </div>
         </div>
       `;
     }).join('');
-
-    this.renderizarMovimentacoes();
-  },
-
-  abrirModalRetirada(id) {
-    if (!auth.pode('registrar_retirada')) {
-      app.mostrarAlerta('Seu perfil não pode registrar retiradas.', 'error');
-      return;
-    }
-    const mat = this.materiais.find(m => m.id === id);
-    if (!mat) return;
-    document.getElementById('retiradaMaterialId').value = mat.id;
-    document.getElementById('retiradaMaterialNome').value = `${mat.nome} (saldo: ${mat.quantidade})`;
-    document.getElementById('formRetirada').reset();
-    document.getElementById('retiradaMaterialId').value = mat.id;
-    document.getElementById('retiradaMaterialNome').value = `${mat.nome} (saldo: ${mat.quantidade})`;
-    document.getElementById('modalRetirada').classList.add('active');
-  },
-
-  fecharModalRetirada() {
-    document.getElementById('modalRetirada').classList.remove('active');
-    document.getElementById('formRetirada').reset();
-  },
-
-  async salvarRetirada(e) {
-    e.preventDefault();
-    if (!auth.pode('registrar_retirada')) {
-      app.mostrarAlerta('Seu perfil não pode registrar retiradas.', 'error');
-      return;
-    }
-    const materialId = Number(document.getElementById('retiradaMaterialId').value);
-    const quantidade = Number(document.getElementById('retiradaQuantidade').value);
-    const responsavel = document.getElementById('retiradaResponsavel').value.trim();
-    const funcao = document.getElementById('retiradaFuncao').value.trim();
-    const setor = document.getElementById('retiradaSetor').value.trim();
-    const motivo = document.getElementById('retiradaMotivo').value.trim();
-    const observacoes = document.getElementById('retiradaObservacoes').value.trim();
-    const material = this.materiais.find(m => m.id === materialId);
-    if (!material) {
-      app.mostrarAlerta('Material não encontrado.', 'error');
-      return;
-    }
-    if (!quantidade || quantidade < 1 || quantidade > Number(material.quantidade || 0)) {
-      app.mostrarAlerta('Quantidade inválida para retirada.', 'error');
-      return;
-    }
-    if (!responsavel || !motivo) {
-      app.mostrarAlerta('Informe quem retirou e o motivo.', 'error');
-      return;
-    }
-
-    material.quantidade = Number(material.quantidade || 0) - quantidade;
-    material.dataAtualizacao = new Date().toISOString();
-
-    const novaMov = {
-      id: Date.now(),
-      materialId: material.id,
-      materialNome: material.nome,
-      quantidade,
-      responsavel,
-      funcao,
-      setor,
-      motivo,
-      observacoes,
-      dataHora: new Date().toISOString(),
-      lancadoPor: window.currentUser?.username || 'sistema'
-    };
-
-    this.movimentacoes.unshift(novaMov);
-    await this.salvarMateriais();
-    await this.salvarMovimentacoes();
-    this.fecharModalRetirada();
-    this.buscarMateriais();
-    this.renderizarRelatorioDia();
-    app.mostrarAlerta('Retirada registrada com sucesso!', 'success');
-  },
-
-  renderizarMovimentacoes() {
-    const section = document.getElementById('materiais-obra');
-    if (!section) return;
-    let box = document.getElementById('movimentacoesContainer');
-    if (!box) {
-      box = document.createElement('div');
-      box.id = 'movimentacoesContainer';
-      box.className = 'card';
-      section.appendChild(box);
-    }
-    if (!auth.pode('ver_rastreabilidade')) {
-      box.style.display = 'none';
-      return;
-    }
-    box.style.display = 'block';
-    const itens = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 20);
-    box.innerHTML = `<h2>🧾 Rastreabilidade de Retiradas</h2>${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
-  },
-
-  renderizarRelatorioDia() {
-    const painel = document.getElementById('painelRelatorioDia');
-    if (!painel) return;
-    const hoje = new Date().toISOString().split('T')[0];
-    const materiaisDia = this.materiais.filter(m => (m.dataAtualizacao || '').split('T')[0] === hoje);
-    const movDia = this.movimentacoes.filter(m => (m.dataHora || '').split('T')[0] === hoje);
-    const totalItens = materiaisDia.reduce((s, m) => s + Number(m.quantidade || 0), 0);
-    painel.innerHTML = `
-      <div class="btn-group" style="margin-bottom:1rem;">
-        <span class="btn btn-primary" style="cursor:default;">📅 ${new Date().toLocaleDateString('pt-BR')}</span>
-        <span class="btn btn-secondary" style="cursor:default;">📦 ${materiaisDia.length} materiais atualizados</span>
-        <span class="btn btn-warning" style="cursor:default;">🧾 ${movDia.length} retiradas registradas</span>
-        <span class="btn btn-success" style="cursor:default;">🔢 saldo total ${totalItens}</span>
-      </div>
-      ${materiaisDia.length ? `<div class="table-wrap"><table><thead><tr><th>Material</th><th>Quantidade</th><th>Especificações</th><th>Atualização</th></tr></thead><tbody>${materiaisDia.map(m => `<tr><td>${m.nome}</td><td>${m.quantidade}</td><td>${m.especificacoes || '-'}</td><td>${new Date(m.dataAtualizacao).toLocaleString('pt-BR')}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhum material atualizado hoje.</p>`}
-      ${auth.pode('ver_rastreabilidade') ? `<div style="margin-top:1.5rem;"><h3 style="margin-bottom:0.8rem; color:#1F3864;">Rastreabilidade do dia</h3>${movDia.length ? `<div class="table-wrap"><table><thead><tr><th>Horário</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Motivo</th></tr></thead><tbody>${movDia.map(m => `<tr><td>${new Date(m.dataHora).toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'})}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.motivo}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada hoje.</p>`}</div>` : ''}
-    `;
   },
 
   gerarRelatorioDia() {
@@ -2132,8 +1783,6 @@ const appMateriais = {
     const agora = new Date();
     const dataFormatada = agora.toLocaleDateString('pt-BR');
     const horaFormatada = agora.toLocaleTimeString('pt-BR');
-
-    const movimentacoesDia = this.movimentacoes.filter(m => (m.dataHora || '').split('T')[0] === hoje);
 
     const html = `
 <!DOCTYPE html>
@@ -2297,9 +1946,6 @@ const appMateriais = {
       `).join('')}
     </div>
 
-    <h2 class="section-title">Rastreabilidade do Dia</h2>
-    ${movimentacoesDia.length ? `<table><thead><tr><th>Horário</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th></tr></thead><tbody>${movimentacoesDia.map(m => `<tr><td>${new Date(m.dataHora).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}</td><td>${m.materialNome}</td><td class="center">${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}</td><td>${m.lancadoPor}</td></tr>`).join('')}</tbody></table>` : `<p style="color:#6b7a99; margin-bottom:24px;">Nenhuma retirada registrada hoje.</p>`}
-
     <div class="footer">
       Relatório gerado automaticamente pelo sistema de Controle de Materiais - Plano & Plano
     </div>
@@ -2320,10 +1966,7 @@ const appMateriais = {
 
 // ── Inicializar ao carregar a página ──
 document.addEventListener('DOMContentLoaded', () => {
-  window.auth = auth;
-window.app = app;
-window.appMateriais = appMateriais;
-auth.verificarSessao();
+  auth.verificarSessao();
 });
 </script>
 </body>
