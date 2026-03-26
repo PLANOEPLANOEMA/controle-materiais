@@ -2323,17 +2323,18 @@ const appMateriais = {
       app.mostrarAlerta('Seu perfil não pode abrir o relatório completo.', 'error');
       return;
     }
-    const materiaisOrdenados = this.materiais.slice().sort((a,b) => new Date(b.dataAtualizacao) - new Date(a.dataAtualizacao));
-    const movimentacoesOrdenadas = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora));
-    if (!materiaisOrdenados.length && !movimentacoesOrdenadas.length) {
-      app.mostrarAlerta('Ainda não há dados suficientes para o relatório completo.', 'error');
+    const materiaisOrdenados = this.materiais.slice().sort((a, b) =>
+      (a.nome || '').localeCompare((b.nome || ''), 'pt-BR', { sensitivity: 'base' })
+    );
+    if (!materiaisOrdenados.length) {
+      app.mostrarAlerta('Ainda não há materiais cadastrados para o relatório completo.', 'error');
       return;
     }
     this.abrirJanelaRelatorio({
       titulo: 'Relatório Completo - Materiais da Obra',
-      subtitulo: 'Todos os materiais cadastrados e toda a rastreabilidade registrada no sistema.',
+      subtitulo: 'Todos os materiais cadastrados no sistema, em ordem alfabética.',
       materiais: materiaisOrdenados,
-      movimentacoes: movimentacoesOrdenadas
+      movimentacoes: []
     });
   },
 
