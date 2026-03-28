@@ -1,0 +1,9 @@
+{
+  "appId": "com.plano.controlemateriais",
+  "appName": "Controle de Materiais",
+  "webDir": ".",
+  "bundledWebRuntime": false,
+  "server": {
+    "cleartext": true
+  }
+}
