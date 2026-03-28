@@ -1,0 +1,15 @@
+PACOTE V12 - MOBILE / CAPACITOR
+
+Principais ajustes:
+- formulário responsivo no celular
+- botão flutuante de voltar ao início
+- botões voltar dentro dos modais
+- scroll corrigido nos formulários
+- index.html já atualizado
+
+Para atualizar o app Android:
+1) abra o terminal nesta pasta
+2) rode: npx cap sync android
+3) rode: npx cap open android
+
+O arquivo principal web está em: www/index.html

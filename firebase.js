@@ -21,10 +21,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// Documentos para empréstimos, materiais da obra e rastreabilidade
+// Documentos para empréstimos e materiais da obra
 const REF_EMPRESTIMOS = doc(db, "controle", "dados");
 const REF_MATERIAIS = doc(db, "controle", "materiais");
-const REF_MOVIMENTACOES = doc(db, "controle", "movimentacoes");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
@@ -57,23 +56,5 @@ export function escutarMudancasMateriais(callback) {
   return onSnapshot(REF_MATERIAIS, (snap) => {
     if (!snap.exists()) return;
     callback(snap.data().materiais ?? []);
-  });
-}
-
-
-// ── RASTREABILIDADE / MOVIMENTAÇÕES ──
-export async function salvarMovimentacoesNaNuvem(movimentacoes) {
-  await setDoc(REF_MOVIMENTACOES, { movimentacoes, updatedAt: Date.now() }, { merge: true });
-}
-
-export async function carregarMovimentacoesDaNuvem() {
-  const snap = await getDoc(REF_MOVIMENTACOES);
-  return snap.exists() ? (snap.data().movimentacoes ?? null) : null;
-}
-
-export function escutarMudancasMovimentacoes(callback) {
-  return onSnapshot(REF_MOVIMENTACOES, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().movimentacoes ?? []);
   });
 }
