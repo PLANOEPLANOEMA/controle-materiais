@@ -4,7 +4,7 @@
   "private": true,
   "description": "Controle de Materiais - pacote pronto para Capacitor",
   "scripts": {
-    "cap:init": "npx cap init 'Controle de Materiais' 'com.plano.controlemateriais' --web-dir=.",
+    "cap:init": "npx cap init 'Controle de Materiais' 'com.plano.controlemateriais' --web-dir=www",
     "cap:add:android": "npx cap add android",
     "cap:add:ios": "npx cap add ios",
     "cap:sync": "npx cap sync",
