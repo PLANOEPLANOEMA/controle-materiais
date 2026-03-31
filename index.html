@@ -1089,6 +1089,79 @@
   </div>
 </div>
 
+<!-- ── MODAL RT DIA A DIA ── -->
+<div id="modalRTDiaDia" class="modal">
+  <div class="modal-content">
+    <div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appRT.fecharModalDiaDia()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">RT Dia a Dia</span></div>
+    <h3 id="modalRTDiaDiaTitle">Nova RT Dia a Dia</h3>
+    <form id="formRTDiaDia" onsubmit="appRT.salvarDiaDia(event)">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rtDiaServico">Serviço *</label>
+          <select id="rtDiaServico" required></select>
+        </div>
+        <div class="form-group">
+          <label for="rtDiaMaterial">Material / RT *</label>
+          <input type="text" id="rtDiaMaterial" required placeholder="Ex: Argamassa AC2 / Porta de Madeira" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rtDiaTorre">Torre</label>
+          <input type="text" id="rtDiaTorre" placeholder="Ex: Torre A" />
+        </div>
+        <div class="form-group">
+          <label for="rtDiaPavimento">Pavimento</label>
+          <input type="text" id="rtDiaPavimento" placeholder="Ex: 5º Pavto" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rtDiaQuantidade">Quantidade</label>
+          <input type="number" id="rtDiaQuantidade" min="0" step="1" placeholder="Ex: 100" />
+        </div>
+        <div class="form-group">
+          <label for="rtDiaDataNecessidade">Data da necessidade *</label>
+          <input type="date" id="rtDiaDataNecessidade" required />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rtDiaLeadTime">Lead time (dias) *</label>
+          <input type="number" id="rtDiaLeadTime" min="1" step="1" value="20" required />
+        </div>
+        <div class="form-group">
+          <label for="rtDiaStatus">Status *</label>
+          <select id="rtDiaStatus" required></select>
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rtDiaPrioridadeManual">Prioridade manual</label>
+          <select id="rtDiaPrioridadeManual">
+            <option value="">Automática</option>
+            <option value="Alta">Alta</option>
+            <option value="Média">Média</option>
+            <option value="Baixa">Baixa</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Datas automáticas</label>
+          <div id="rtDiaStatusResumo" class="status-resumo-box">As datas serão registradas automaticamente conforme você alterar o status.</div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="rtDiaObservacoes">Observações</label>
+        <textarea id="rtDiaObservacoes" rows="3" placeholder="Ex: necessidade emergencial identificada na obra / acompanhamento via e-mail"></textarea>
+      </div>
+      <div class="modal-buttons">
+        <button type="button" class="btn btn-secondary" onclick="appRT.fecharModalDiaDia()">Cancelar</button>
+        <button type="submit" class="btn btn-success">Salvar RT Dia a Dia</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- ── MODAL PLANEJAMENTO RT ── -->
 <div id="modalPlanejamentoRT" class="modal">
   <div class="modal-content">
@@ -1156,18 +1229,8 @@
           <input type="date" id="rtDataRT" />
         </div>
         <div class="form-group">
-          <label for="rtDataAprovSupr">Aprovação suprimentos</label>
-          <input type="date" id="rtDataAprovSupr" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDataAutorizacao">Autorizado para compra</label>
-          <input type="date" id="rtDataAutorizacao" />
-        </div>
-        <div class="form-group">
-          <label for="rtDataEntrega">Entrega do material</label>
-          <input type="date" id="rtDataEntrega" />
+          <label>Datas automáticas do acompanhamento</label>
+          <div id="rtStatusResumo" class="status-resumo-box">Aprovação de suprimentos, autorização e entrega serão registradas automaticamente conforme você alterar o status.</div>
         </div>
       </div>
       <div class="form-group">
@@ -1201,7 +1264,10 @@
     escutarMudancasMovimentacoes,
     salvarPlanejamentoRTNaNuvem,
     carregarPlanejamentoRTDaNuvem,
-    escutarMudancasPlanejamentoRT
+    escutarMudancasPlanejamentoRT,
+    salvarRTDiaDiaNaNuvem,
+    carregarRTDiaDiaDaNuvem,
+    escutarMudancasRTDiaDia
   } from "./firebase-controle-usuarios.js";
 
   window.__fb = {
@@ -1216,7 +1282,10 @@
     escutarMudancasMovimentacoes,
     salvarPlanejamentoRTNaNuvem,
     carregarPlanejamentoRTDaNuvem,
-    escutarMudancasPlanejamentoRT
+    escutarMudancasPlanejamentoRT,
+    salvarRTDiaDiaNaNuvem,
+    carregarRTDiaDiaDaNuvem,
+    escutarMudancasRTDiaDia
   };
 </script>
 
@@ -2754,6 +2823,8 @@ const appRT = {
         modalDia.addEventListener('click', (e) => { if (e.target.id === 'modalRTDiaDia') this.fecharModalDiaDia(); });
         modalDia.dataset.bound = '1';
       }
+      document.getElementById('rtStatus')?.addEventListener('change', () => this.atualizarResumoStatusPlanejamento());
+      document.getElementById('rtDiaStatus')?.addEventListener('change', () => this.atualizarResumoStatusDiaDia());
     });
   },
 
@@ -2889,6 +2960,44 @@ const appRT = {
       dataIdealPedido: this.calcularDataIdeal(dataNecessidade, leadTime),
       origem: item.origem || 'dia-a-dia'
     };
+  },
+
+  hojeISO() {
+    return new Date().toISOString().slice(0,10);
+  },
+
+  montarResumoStatus(item) {
+    const partes = [];
+    if (item.dataRT) partes.push(`RT: ${new Date(item.dataRT+'T12:00:00').toLocaleDateString('pt-BR')}`);
+    if (item.dataAprovSupr) partes.push(`Suprimentos: ${new Date(item.dataAprovSupr+'T12:00:00').toLocaleDateString('pt-BR')}`);
+    if (item.dataAutorizacao) partes.push(`Autorizado: ${new Date(item.dataAutorizacao+'T12:00:00').toLocaleDateString('pt-BR')}`);
+    if (item.dataEntrega) partes.push(`Entrega: ${new Date(item.dataEntrega+'T12:00:00').toLocaleDateString('pt-BR')}`);
+    return partes.length ? partes.join(' • ') : 'As datas serão registradas automaticamente conforme o avanço do status.';
+  },
+
+  atualizarResumoStatusPlanejamento(item = {}) {
+    const el = document.getElementById('rtStatusResumo');
+    if (el) el.textContent = this.montarResumoStatus(item);
+  },
+
+  atualizarResumoStatusDiaDia(item = {}) {
+    const el = document.getElementById('rtDiaStatusResumo');
+    if (el) el.textContent = this.montarResumoStatus(item);
+  },
+
+  aplicarDatasPorStatus(item, anterior = {}) {
+    const hoje = this.hojeISO();
+    item.dataRT = item.dataRT || anterior.dataRT || '';
+    item.dataAprovSupr = item.dataAprovSupr || anterior.dataAprovSupr || '';
+    item.dataAutorizacao = item.dataAutorizacao || anterior.dataAutorizacao || '';
+    item.dataEntrega = item.dataEntrega || anterior.dataEntrega || '';
+
+    if (['RT lançada','Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataRT) item.dataRT = hoje;
+    if (['Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataAprovSupr) item.dataAprovSupr = hoje;
+    if (['Autorizado para compra','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataAutorizacao) item.dataAutorizacao = hoje;
+    if (['Entregue','Concluído'].includes(item.status) && !item.dataEntrega) item.dataEntrega = hoje;
+
+    return item;
   },
 
   async importarPlanejamentoBase() {
@@ -3030,10 +3139,8 @@ const appRT = {
     document.getElementById('rtStatus').value = item.status || 'Planejado';
     document.getElementById('rtPrioridadeManual').value = item.prioridadeManual || '';
     document.getElementById('rtDataRT').value = item.dataRT || '';
-    document.getElementById('rtDataAprovSupr').value = item.dataAprovSupr || '';
-    document.getElementById('rtDataAutorizacao').value = item.dataAutorizacao || '';
-    document.getElementById('rtDataEntrega').value = item.dataEntrega || '';
     document.getElementById('rtObservacoes').value = item.observacoes || '';
+    this.atualizarResumoStatusPlanejamento(item);
     document.getElementById('modalPlanejamentoRT').classList.add('active');
     atualizarBotaoMobile();
   },
@@ -3067,6 +3174,35 @@ const appRT = {
     const mapa = { Alta: '#E84545', Média: '#F5A623', Baixa: '#27AE60' };
     return `<span style="display:inline-flex;padding:4px 10px;border-radius:999px;background:${mapa[pri] || '#95a5a6'};color:#fff;font-weight:700;font-size:12px;">${pri}</span>`;
   },
+  statusSelectHtml(item, tipo = 'planejamento') {
+    if (!auth.pode(tipo === 'dia' ? 'editar_rt_dia_dia' : 'editar_planejamento_rt')) {
+      return `<span>${this.statusSugerido(item)}</span>`;
+    }
+    const onchange = tipo === 'dia' ? `appRT.atualizarStatusDiaDia('${item.id}', this.value)` : `appRT.atualizarStatus('${item.id}', this.value)`;
+    return `<select class="status-inline-select" onchange="${onchange}">${this.statusList.map(s => `<option value="${s}" ${this.statusSugerido(item)===s?'selected':''}>${s}</option>`).join('')}</select>`;
+  },
+
+  async atualizarStatus(id, novoStatus) {
+    const idx = this.itens.findIndex(i => i.id === id);
+    if (idx < 0) return;
+    const item = { ...this.itens[idx], status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, this.itens[idx]);
+    this.itens[idx] = item;
+    await this.salvarDados();
+    this.renderizar();
+    app.mostrarAlerta('Status do planejamento RT atualizado.', 'success');
+  },
+
+  async atualizarStatusDiaDia(id, novoStatus) {
+    const idx = this.itensDiaDia.findIndex(i => i.id === id);
+    if (idx < 0) return;
+    const item = { ...this.itensDiaDia[idx], status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, this.itensDiaDia[idx]);
+    this.itensDiaDia[idx] = item;
+    await this.salvarDadosDiaDia();
+    this.renderizarDiaDia();
+    app.mostrarAlerta('Status da RT do Dia a Dia atualizado.', 'success');
+  },
 
   statusSugerido(item) {
     if (item.status && item.status !== 'Planejado') return item.status;
@@ -3089,9 +3225,9 @@ const appRT = {
       status: document.getElementById('rtStatus').value,
       prioridadeManual: document.getElementById('rtPrioridadeManual').value,
       dataRT: document.getElementById('rtDataRT').value,
-      dataAprovSupr: document.getElementById('rtDataAprovSupr').value,
-      dataAutorizacao: document.getElementById('rtDataAutorizacao').value,
-      dataEntrega: document.getElementById('rtDataEntrega').value,
+      dataAprovSupr: '',
+      dataAutorizacao: '',
+      dataEntrega: '',
       observacoes: document.getElementById('rtObservacoes').value.trim(),
       updatedAt: new Date().toISOString()
     };
@@ -3157,7 +3293,7 @@ const appRT = {
       .filter(i => i.mes === mes && this.prioridadeAutomatica(i) === 'Alta')
       .sort((a,b) => (a.dataRT || '').localeCompare(b.dataRT || '') || (a.dataServico || '').localeCompare(b.dataServico || ''));
     if (!container) return;
-    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Data RT</th><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.dataRT ? new Date(i.dataRT+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
+    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Data RT</th><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.dataRT ? new Date(i.dataRT+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSelectHtml(i, 'planejamento')}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
   },
 
 
@@ -3169,6 +3305,7 @@ const appRT = {
     document.getElementById('formRTDiaDia').reset();
     document.getElementById('rtDiaStatus').value = 'Pedir agora';
     document.getElementById('rtDiaLeadTime').value = 20;
+    this.atualizarResumoStatusDiaDia({});
     document.getElementById('modalRTDiaDia').classList.add('active');
     atualizarBotaoMobile();
   },
@@ -3188,11 +3325,8 @@ const appRT = {
     document.getElementById('rtDiaLeadTime').value = item.leadTime || 20;
     document.getElementById('rtDiaStatus').value = item.status || 'Pedir agora';
     document.getElementById('rtDiaPrioridadeManual').value = item.prioridadeManual || '';
-    document.getElementById('rtDiaDataRT').value = item.dataRT || '';
-    document.getElementById('rtDiaDataAprovSupr').value = item.dataAprovSupr || '';
-    document.getElementById('rtDiaDataAutorizacao').value = item.dataAutorizacao || '';
-    document.getElementById('rtDiaDataEntrega').value = item.dataEntrega || '';
     document.getElementById('rtDiaObservacoes').value = item.observacoes || '';
+    this.atualizarResumoStatusDiaDia(item);
     document.getElementById('modalRTDiaDia').classList.add('active');
     atualizarBotaoMobile();
   },
@@ -3215,14 +3349,16 @@ const appRT = {
       leadTime: Number(document.getElementById('rtDiaLeadTime').value || 20),
       status: document.getElementById('rtDiaStatus').value,
       prioridadeManual: document.getElementById('rtDiaPrioridadeManual').value,
-      dataRT: document.getElementById('rtDiaDataRT').value,
-      dataAprovSupr: document.getElementById('rtDiaDataAprovSupr').value,
-      dataAutorizacao: document.getElementById('rtDiaDataAutorizacao').value,
-      dataEntrega: document.getElementById('rtDiaDataEntrega').value,
+      dataRT: '',
+      dataAprovSupr: '',
+      dataAutorizacao: '',
+      dataEntrega: '',
       observacoes: document.getElementById('rtDiaObservacoes').value.trim(),
       updatedAt: new Date().toISOString()
     });
     const idx = this.itensDiaDia.findIndex(i => i.id === item.id);
+    const anterior = idx >= 0 ? this.itensDiaDia[idx] : {};
+    this.aplicarDatasPorStatus(item, anterior);
     if (idx >= 0) this.itensDiaDia[idx] = item; else this.itensDiaDia.unshift(item);
     await this.salvarDadosDiaDia();
     this.preencherFiltroTorresDiaDia();
@@ -3273,7 +3409,7 @@ const appRT = {
     const container = document.getElementById('rtDiaCriticas');
     if (!container) return;
     const lista = this.itensDiaDiaFiltrados().filter(i => this.prioridadeAutomatica(i) === 'Alta');
-    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 RTs Críticas do Dia a Dia</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Necessidade</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma RT crítica do dia a dia no momento.</p>`}</div>`;
+    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 RTs Críticas do Dia a Dia</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Necessidade</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSelectHtml(i, 'dia')}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma RT crítica do dia a dia no momento.</p>`}</div>`;
   },
 
   renderizarDiaDia() {
@@ -3287,7 +3423,7 @@ const appRT = {
       container.innerHTML = '<p style="color:#6b7a99;">Nenhuma RT do Dia a Dia encontrada.</p>';
       return;
     }
-    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.leadTime || '-'} dia(s)</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td><div class="btn-group" style="margin:0;"><button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button></div></td></tr>`).join('')}</tbody></table></div>`;
+    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.leadTime || '-'} dia(s)</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSelectHtml(i, 'dia')}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td><div class="btn-group" style="margin:0;"><button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button></div></td></tr>`).join('')}</tbody></table></div>`;
   },
 
   renderizar() {
@@ -3328,7 +3464,7 @@ const appRT = {
                   <td>${i.dataServico ? new Date(i.dataServico+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
                   <td>${i.leadTime || '-'} dia(s)</td>
                   <td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
-                  <td>${this.statusSugerido(i)}</td>
+                  <td>${this.statusSelectHtml(i, 'planejamento')}</td>
                   <td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td>
                   <td>
                     <div class="btn-group" style="margin:0;">
