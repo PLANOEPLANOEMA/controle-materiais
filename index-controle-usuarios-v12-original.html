@@ -621,7 +621,6 @@
   <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
   <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
   <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
-  <button data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
   <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
   <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
   <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
@@ -770,44 +769,6 @@
         <input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" />
       </div>
       <div id="materiaisContainer" class="materiais-grid"></div>
-    </div>
-  </section>
-
-
-  <!-- ── PLANEJAMENTO RT ── -->
-  <section id="planejamento-rt">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📅 Voltar para início</button></div>
-    <div class="card">
-      <h2>📅 Planejamento RT da Escadinha</h2>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
-        <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
-        <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
-      </div>
-      <div class="filter-bar">
-        <select id="rtMesFiltro" onchange="appRT.renderizar()">
-          <option value="">Todos os meses</option>
-        </select>
-        <select id="rtStatusFiltro" onchange="appRT.renderizar()">
-          <option value="">Todos os status</option>
-          <option value="Planejado">Planejado</option>
-          <option value="Pedir agora">Pedir agora</option>
-          <option value="RT lançada">RT lançada</option>
-          <option value="Em suprimentos">Em suprimentos</option>
-          <option value="Autorizado para compra">Autorizado para compra</option>
-          <option value="Aguardando entrega">Aguardando entrega</option>
-          <option value="Entregue">Entregue</option>
-          <option value="Concluído">Concluído</option>
-        </select>
-        <input type="text" id="rtBusca" placeholder="🔍 Buscar serviço ou material..." oninput="appRT.renderizar()" />
-      </div>
-      <div id="rtResumo" class="kpi-grid" style="margin-top:1rem;"></div>
-      <div id="rtPrioridadesMes" style="margin-top:1rem;"></div>
-    </div>
-
-    <div class="card">
-      <h2>🗂️ Planejamento por Mês</h2>
-      <div id="rtPlanejamentoContainer"></div>
     </div>
   </section>
 
@@ -1040,90 +1001,6 @@
   </div>
 </div>
 
-<!-- ── MODAL PLANEJAMENTO RT ── -->
-<div id="modalPlanejamentoRT" class="modal">
-  <div class="modal-content">
-    <div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appRT.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Planejamento RT</span></div>
-    <h3 id="modalPlanejamentoRTTitle">Novo Planejamento RT</h3>
-    <form id="formPlanejamentoRT" onsubmit="appRT.salvar(event)">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtMes">Mês da Escadinha *</label>
-          <select id="rtMes" required></select>
-        </div>
-        <div class="form-group">
-          <label for="rtServico">Serviço *</label>
-          <select id="rtServico" required></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtMaterial">Material *</label>
-          <input type="text" id="rtMaterial" required placeholder="Ex: Argamassa AC2" />
-        </div>
-        <div class="form-group">
-          <label for="rtQuantidade">Quantidade</label>
-          <input type="number" id="rtQuantidade" min="0" step="1" placeholder="Ex: 100" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDataServico">Data prevista do serviço *</label>
-          <input type="date" id="rtDataServico" required />
-        </div>
-        <div class="form-group">
-          <label for="rtLeadTime">Lead time (dias) *</label>
-          <input type="number" id="rtLeadTime" min="1" step="1" value="15" required />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtStatus">Status *</label>
-          <select id="rtStatus" required></select>
-        </div>
-        <div class="form-group">
-          <label for="rtPrioridadeManual">Prioridade manual</label>
-          <select id="rtPrioridadeManual">
-            <option value="">Automática</option>
-            <option value="Alta">Alta</option>
-            <option value="Média">Média</option>
-            <option value="Baixa">Baixa</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDataRT">Data da RT</label>
-          <input type="date" id="rtDataRT" />
-        </div>
-        <div class="form-group">
-          <label for="rtDataAprovSupr">Aprovação suprimentos</label>
-          <input type="date" id="rtDataAprovSupr" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDataAutorizacao">Autorizado para compra</label>
-          <input type="date" id="rtDataAutorizacao" />
-        </div>
-        <div class="form-group">
-          <label for="rtDataEntrega">Entrega do material</label>
-          <input type="date" id="rtDataEntrega" />
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="rtObservacoes">Observações</label>
-        <textarea id="rtObservacoes" rows="3" placeholder="Ex: antecipado para não travar a escadinha"></textarea>
-      </div>
-      <div class="modal-buttons">
-        <button type="button" class="btn btn-secondary" onclick="appRT.fecharModal()">Cancelar</button>
-        <button type="submit" class="btn btn-success">Salvar Planejamento</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-
 <footer>
   Controle de Materiais de Empréstimo e Estoque — Plano & Plano &mdash; Dados salvos automaticamente
 </footer>
@@ -1139,10 +1016,7 @@
     escutarMudancasMateriais,
     salvarMovimentacoesNaNuvem,
     carregarMovimentacoesDaNuvem,
-    escutarMudancasMovimentacoes,
-    salvarPlanejamentoRTNaNuvem,
-    carregarPlanejamentoRTDaNuvem,
-    escutarMudancasPlanejamentoRT
+    escutarMudancasMovimentacoes
   } from "./firebase-controle-usuarios.js";
 
   window.__fb = {
@@ -1154,10 +1028,7 @@
     escutarMudancasMateriais,
     salvarMovimentacoesNaNuvem,
     carregarMovimentacoesDaNuvem,
-    escutarMudancasMovimentacoes,
-    salvarPlanejamentoRTNaNuvem,
-    carregarPlanejamentoRTDaNuvem,
-    escutarMudancasPlanejamentoRT
+    escutarMudancasMovimentacoes
   };
 </script>
 
@@ -1266,10 +1137,10 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
-      go: ['materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
-      engenharia: ['materiais-obra','planejamento-rt','relatorio','relatorio-dia']
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      go: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
     document.querySelectorAll('nav button').forEach((btn) => {
@@ -1295,17 +1166,16 @@ const auth = {
     this.aplicarPermissoes(window.currentUser);
     app.init();
     appMateriais.init();
-    appRT.init();
     setTimeout(() => atualizarBotaoMobile('visao-geral'), 50);
   },
 
   pode(acao) {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
-      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
-      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
-      go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
-      engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt']
+      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo'],
+      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
+      go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
+      engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
     return (mapa[role] || []).includes(acao);
   }
@@ -1435,9 +1305,6 @@ const app = {
     }
     if (id === 'rastreabilidade' && window.appMateriais && typeof window.appMateriais.renderizarRastreabilidadeCompleta === 'function') {
       window.appMateriais.renderizarRastreabilidadeCompleta();
-    }
-    if (id === 'planejamento-rt' && window.appRT && typeof window.appRT.renderizar === 'function') {
-      window.appRT.renderizar();
     }
     atualizarBotaoMobile(id);
   },
@@ -2658,287 +2525,11 @@ const appMateriais = {
     });
   }};
 
-
-const appRT = {
-  STORAGE_KEY: 'planejamento_rt_dados',
-  itens: [],
-  editandoId: null,
-  _unsub: null,
-  meses: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  servicos: ['Contra piso','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
-  statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'],
-
-  init() {
-    this.preencherSelects();
-    this.carregar().then(() => {
-      this.iniciarSyncAoVivo();
-      this.renderizar();
-      const modal = document.getElementById('modalPlanejamentoRT');
-      if (modal && !modal.dataset.bound) {
-        modal.addEventListener('click', (e) => { if (e.target.id === 'modalPlanejamentoRT') this.fecharModal(); });
-        modal.dataset.bound = '1';
-      }
-    });
-  },
-
-  preencherSelects() {
-    const mesSel = document.getElementById('rtMes');
-    const mesFiltro = document.getElementById('rtMesFiltro');
-    const servSel = document.getElementById('rtServico');
-    const statusSel = document.getElementById('rtStatus');
-    if (mesSel && !mesSel.dataset.ready) {
-      mesSel.innerHTML = this.meses.map(m => `<option value="${m}">${m}</option>`).join('');
-      mesSel.dataset.ready = '1';
-    }
-    if (mesFiltro && !mesFiltro.dataset.ready) {
-      mesFiltro.innerHTML = '<option value="">Todos os meses</option>' + this.meses.map(m => `<option value="${m}">${m}</option>`).join('');
-      mesFiltro.dataset.ready = '1';
-      mesFiltro.value = this.mesAtualNome();
-    }
-    if (servSel && !servSel.dataset.ready) {
-      servSel.innerHTML = this.servicos.map(s => `<option value="${s}">${s}</option>`).join('');
-      servSel.dataset.ready = '1';
-    }
-    if (statusSel && !statusSel.dataset.ready) {
-      statusSel.innerHTML = this.statusList.map(s => `<option value="${s}">${s}</option>`).join('');
-      statusSel.dataset.ready = '1';
-    }
-  },
-
-  mesAtualNome() { return this.meses[new Date().getMonth()]; },
-
-  async carregar() {
-    try {
-      if (window.__fb?.carregarPlanejamentoRTDaNuvem) {
-        const cloud = await window.__fb.carregarPlanejamentoRTDaNuvem();
-        if (Array.isArray(cloud)) {
-          this.itens = cloud;
-          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens));
-          return;
-        }
-      }
-      const salvos = localStorage.getItem(this.STORAGE_KEY);
-      this.itens = salvos ? JSON.parse(salvos) : [];
-    } catch (e) {
-      console.error('Erro ao carregar planejamento RT:', e);
-      this.itens = [];
-    }
-  },
-
-  iniciarSyncAoVivo() {
-    try {
-      if (window.__fb?.escutarMudancasPlanejamentoRT) {
-        if (this._unsub) this._unsub();
-        this._unsub = window.__fb.escutarMudancasPlanejamentoRT((itens) => {
-          this.itens = Array.isArray(itens) ? itens : [];
-          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens)); } catch(e) {}
-          this.renderizar();
-        });
-      }
-    } catch (e) { console.warn('Sync ao vivo do planejamento indisponível:', e); }
-  },
-
-  async salvarDados() {
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens));
-    if (window.__fb?.salvarPlanejamentoRTNaNuvem) await window.__fb.salvarPlanejamentoRTNaNuvem(this.itens);
-  },
-
-  abrirModalNovo() {
-    if (!auth.pode('editar_planejamento_rt')) return app.mostrarAlerta('Seu perfil não pode editar o planejamento RT.', 'error');
-    this.editandoId = null;
-    document.getElementById('modalPlanejamentoRTTitle').textContent = 'Novo Planejamento RT';
-    document.getElementById('formPlanejamentoRT').reset();
-    document.getElementById('rtMes').value = document.getElementById('rtMesFiltro')?.value || this.mesAtualNome();
-    document.getElementById('rtStatus').value = 'Planejado';
-    document.getElementById('rtLeadTime').value = 15;
-    document.getElementById('modalPlanejamentoRT').classList.add('active');
-    atualizarBotaoMobile();
-  },
-
-  abrirModalEditar(id) {
-    if (!auth.pode('editar_planejamento_rt')) return app.mostrarAlerta('Seu perfil não pode editar o planejamento RT.', 'error');
-    const item = this.itens.find(i => i.id === id);
-    if (!item) return;
-    this.editandoId = id;
-    document.getElementById('modalPlanejamentoRTTitle').textContent = 'Editar Planejamento RT';
-    document.getElementById('rtMes').value = item.mes || this.mesAtualNome();
-    document.getElementById('rtServico').value = item.servico || this.servicos[0];
-    document.getElementById('rtMaterial').value = item.material || '';
-    document.getElementById('rtQuantidade').value = item.quantidade || '';
-    document.getElementById('rtDataServico').value = item.dataServico || '';
-    document.getElementById('rtLeadTime').value = item.leadTime || 15;
-    document.getElementById('rtStatus').value = item.status || 'Planejado';
-    document.getElementById('rtPrioridadeManual').value = item.prioridadeManual || '';
-    document.getElementById('rtDataRT').value = item.dataRT || '';
-    document.getElementById('rtDataAprovSupr').value = item.dataAprovSupr || '';
-    document.getElementById('rtDataAutorizacao').value = item.dataAutorizacao || '';
-    document.getElementById('rtDataEntrega').value = item.dataEntrega || '';
-    document.getElementById('rtObservacoes').value = item.observacoes || '';
-    document.getElementById('modalPlanejamentoRT').classList.add('active');
-    atualizarBotaoMobile();
-  },
-
-  fecharModal() {
-    document.getElementById('modalPlanejamentoRT').classList.remove('active');
-    atualizarBotaoMobile();
-  },
-
-  calcularDataIdeal(dataServico, leadTime) {
-    if (!dataServico) return '';
-    const d = new Date(dataServico + 'T12:00:00');
-    d.setDate(d.getDate() - Number(leadTime || 0));
-    return d.toISOString().split('T')[0];
-  },
-
-  prioridadeAutomatica(item) {
-    if (item.prioridadeManual) return item.prioridadeManual;
-    if (['Entregue','Concluído'].includes(item.status)) return 'Baixa';
-    const ideal = item.dataIdealPedido || this.calcularDataIdeal(item.dataServico, item.leadTime);
-    if (!ideal) return 'Média';
-    const hoje = new Date(); hoje.setHours(0,0,0,0);
-    const dataIdeal = new Date(ideal + 'T00:00:00');
-    const diff = Math.ceil((dataIdeal - hoje) / 86400000);
-    if (diff < 0 || item.status === 'Pedir agora') return 'Alta';
-    if (diff <= 7) return 'Média';
-    return 'Baixa';
-  },
-
-  badgePrioridade(pri) {
-    const mapa = { Alta: '#E84545', Média: '#F5A623', Baixa: '#27AE60' };
-    return `<span style="display:inline-flex;padding:4px 10px;border-radius:999px;background:${mapa[pri] || '#95a5a6'};color:#fff;font-weight:700;font-size:12px;">${pri}</span>`;
-  },
-
-  statusSugerido(item) {
-    if (item.status && item.status !== 'Planejado') return item.status;
-    const pri = this.prioridadeAutomatica(item);
-    return pri === 'Alta' ? 'Pedir agora' : 'Planejado';
-  },
-
-  async salvar(event) {
-    event.preventDefault();
-    const item = {
-      id: this.editandoId || Date.now(),
-      mes: document.getElementById('rtMes').value,
-      servico: document.getElementById('rtServico').value,
-      material: document.getElementById('rtMaterial').value.trim(),
-      quantidade: Number(document.getElementById('rtQuantidade').value || 0),
-      dataServico: document.getElementById('rtDataServico').value,
-      leadTime: Number(document.getElementById('rtLeadTime').value || 0),
-      status: document.getElementById('rtStatus').value,
-      prioridadeManual: document.getElementById('rtPrioridadeManual').value,
-      dataRT: document.getElementById('rtDataRT').value,
-      dataAprovSupr: document.getElementById('rtDataAprovSupr').value,
-      dataAutorizacao: document.getElementById('rtDataAutorizacao').value,
-      dataEntrega: document.getElementById('rtDataEntrega').value,
-      observacoes: document.getElementById('rtObservacoes').value.trim(),
-      updatedAt: new Date().toISOString()
-    };
-    item.dataIdealPedido = this.calcularDataIdeal(item.dataServico, item.leadTime);
-    const idx = this.itens.findIndex(i => i.id === item.id);
-    if (idx >= 0) this.itens[idx] = item; else this.itens.push(item);
-    await this.salvarDados();
-    this.fecharModal();
-    this.renderizar();
-    app.mostrarAlerta('Planejamento RT salvo com sucesso!', 'success');
-  },
-
-  async excluir(id) {
-    if (!auth.pode('editar_planejamento_rt')) return app.mostrarAlerta('Seu perfil não pode excluir planejamentos RT.', 'error');
-    if (!confirm('Deseja realmente excluir este item do planejamento RT?')) return;
-    this.itens = this.itens.filter(i => i.id !== id);
-    await this.salvarDados();
-    this.renderizar();
-    app.mostrarAlerta('Planejamento RT excluído.', 'success');
-  },
-
-  itensFiltrados() {
-    const mes = document.getElementById('rtMesFiltro')?.value || '';
-    const status = document.getElementById('rtStatusFiltro')?.value || '';
-    const busca = (document.getElementById('rtBusca')?.value || '').toLowerCase();
-    return this.itens.filter(item => {
-      const okMes = !mes || item.mes === mes;
-      const okStatus = !status || this.statusSugerido(item) === status || item.status === status;
-      const blob = `${item.servico} ${item.material} ${item.observacoes || ''}`.toLowerCase();
-      const okBusca = !busca || blob.includes(busca);
-      return okMes && okStatus && okBusca;
-    }).sort((a,b) => {
-      const mi = this.meses.indexOf(a.mes) - this.meses.indexOf(b.mes);
-      if (mi !== 0) return mi;
-      return (a.dataServico || '').localeCompare(b.dataServico || '');
-    });
-  },
-
-  renderResumo(lista) {
-    const el = document.getElementById('rtResumo');
-    if (!el) return;
-    const altas = lista.filter(i => this.prioridadeAutomatica(i) === 'Alta').length;
-    const medias = lista.filter(i => this.prioridadeAutomatica(i) === 'Média').length;
-    const concluidos = lista.filter(i => ['Entregue','Concluído'].includes(i.status)).length;
-    el.innerHTML = `
-      <div class="kpi"><div class="icon">📌</div><div class="value">${lista.length}</div><div class="label">Itens planejados</div></div>
-      <div class="kpi"><div class="icon">🔴</div><div class="value">${altas}</div><div class="label">Prioridade alta</div></div>
-      <div class="kpi"><div class="icon">🟡</div><div class="value">${medias}</div><div class="label">Atenção</div></div>
-      <div class="kpi"><div class="icon">✅</div><div class="value">${concluidos}</div><div class="label">Entregues/Concluídos</div></div>`;
-  },
-
-  verPrioridadesDoMes() {
-    const mes = document.getElementById('rtMesFiltro')?.value || this.mesAtualNome();
-    const container = document.getElementById('rtPrioridadesMes');
-    const lista = this.itens.filter(i => i.mes === mes && this.prioridadeAutomatica(i) === 'Alta');
-    if (!container) return;
-    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.servico}</td><td>${i.material}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
-  },
-
-  renderizar() {
-    const container = document.getElementById('rtPlanejamentoContainer');
-    if (!container) return;
-    const lista = this.itensFiltrados();
-    this.renderResumo(lista);
-    this.verPrioridadesDoMes();
-    if (!lista.length) {
-      container.innerHTML = '<p style="color:#6b7a99;">Nenhum item de planejamento RT encontrado.</p>';
-      return;
-    }
-    const grupos = {};
-    for (const item of lista) { (grupos[item.mes] ||= []).push(item); }
-    container.innerHTML = Object.entries(grupos).map(([mes, itens]) => `
-      <div class="card" style="margin-bottom:1rem;">
-        <h2>📅 ${mes}</h2>
-        <div class="table-wrap">
-          <table>
-            <thead><tr><th>Serviço</th><th>Material</th><th>Qtd.</th><th>Início do serviço</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead>
-            <tbody>
-              ${itens.map(i => `
-                <tr>
-                  <td><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td>
-                  <td>${i.material}</td>
-                  <td>${i.quantidade || '-'}</td>
-                  <td>${i.dataServico ? new Date(i.dataServico+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
-                  <td>${i.leadTime || '-'} dia(s)</td>
-                  <td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
-                  <td>${this.statusSugerido(i)}</td>
-                  <td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td>
-                  <td>
-                    <div class="btn-group" style="margin:0;">
-                      <button class="btn btn-secondary" onclick="appRT.abrirModalEditar(${i.id})">✏️ Editar</button>
-                      <button class="btn btn-danger" onclick="appRT.excluir(${i.id})">🗑️ Excluir</button>
-                    </div>
-                  </td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>`).join('');
-  }
-};
-
-
 // ── Inicializar ao carregar a página ──
 document.addEventListener('DOMContentLoaded', () => {
   window.auth = auth;
 window.app = app;
 window.appMateriais = appMateriais;
-window.appRT = appRT;
 auth.verificarSessao();
 });
 </script>
