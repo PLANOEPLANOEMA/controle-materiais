@@ -622,6 +622,7 @@
   <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
   <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
   <button data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
+  <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
   <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
   <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
   <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
@@ -819,6 +820,46 @@
     </div>
   </section>
 
+
+  <!-- ── RT DIA A DIA ── -->
+  <section id="rt-dia-dia">
+    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📝 Voltar para início</button></div>
+    <div class="card">
+      <h2>📝 RT do Dia a Dia</h2>
+      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Use esta área para RTs avulsas, emergenciais e acompanhamentos fora da escadinha. Acesso liberado somente para Admin e GO.</p>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="appRT.abrirModalNovoDiaDia()">➕ Nova RT Dia a Dia</button>
+        <button class="btn btn-warning" onclick="appRT.verPrioridadesDiaDia()">🚨 Ver RTs Críticas</button>
+        <button class="btn btn-secondary" onclick="appRT.renderizarDiaDia()">🔄 Atualizar</button>
+      </div>
+      <div class="filter-bar">
+        <select id="rtDiaStatusFiltro" onchange="appRT.renderizarDiaDia()">
+          <option value="">Todos os status</option>
+          <option value="Planejado">Planejado</option>
+          <option value="Pedir agora">Pedir agora</option>
+          <option value="RT lançada">RT lançada</option>
+          <option value="Em suprimentos">Em suprimentos</option>
+          <option value="Autorizado para compra">Autorizado para compra</option>
+          <option value="Aguardando entrega">Aguardando entrega</option>
+          <option value="Entregue">Entregue</option>
+          <option value="Concluído">Concluído</option>
+        </select>
+        <select id="rtDiaTorreFiltro" onchange="appRT.renderizarDiaDia()">
+          <option value="">Todas as torres</option>
+        </select>
+        <select id="rtDiaServicoFiltro" onchange="appRT.renderizarDiaDia()">
+          <option value="">Todos os serviços</option>
+        </select>
+        <input type="text" id="rtDiaBusca" placeholder="🔍 Buscar RT avulsa, material, torre ou observação..." oninput="appRT.renderizarDiaDia()" />
+      </div>
+      <div id="rtDiaResumo" class="kpi-grid" style="margin-top:1rem;"></div>
+      <div id="rtDiaCriticas" style="margin-top:1rem;"></div>
+    </div>
+    <div class="card">
+      <h2>📋 Acompanhamento Diário de RTs</h2>
+      <div id="rtDiaDiaContainer"></div>
+    </div>
+  </section>
 
 
   <!-- ── RELATÓRIO DO DIA ── -->
@@ -1284,9 +1325,9 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       almoxarife: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
-      go: ['materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
+      go: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
@@ -1320,9 +1361,9 @@ const auth = {
   pode(acao) {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
-      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
+      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
       almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
-      go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
+      go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
     return (mapa[role] || []).includes(acao);
@@ -2685,12 +2726,16 @@ const appMateriais = {
 
 const appRT = {
   STORAGE_KEY: 'planejamento_rt_dados',
+  STORAGE_KEY_DIA_DIA: 'planejamento_rt_dia_dia_dados',
   BASE_FILE: 'planejamento_rts_vila_ema.csv',
   itens: [],
+  itensDiaDia: [],
   editandoId: null,
+  editandoIdDiaDia: null,
   _unsub: null,
+  _unsubDiaDia: null,
   meses: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  servicos: ['Contra piso','Contrapiso','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
+  servicos: ['Fachada','Estrutura de Concreto','Alvenaria Estrutural + Distribuição Elétrica','Gradil','Requadração de Caixilhos','Enfiação','Prumada Hidráulica + Aranha','Ramal Sanitário','Alvenaria dos Shafts','Contrapiso','Gesso Liso','Forro de Gesso','Impermeabilização','Cerâmica, Baguete, Soleira, Azulejo','Caixilhos','Bancada','Pintura (Aparelhamento)','Portas de Madeira','Interrupt, Tomadas, QDL','Louças e Metais','Limpeza Grossa','Arremates Gerais','Piso Laminado','Pintura Final','Limpeza Fina','Apto Pronto para Entrega','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
   statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'],
 
   init() {
@@ -2698,10 +2743,16 @@ const appRT = {
     this.carregar().then(() => {
       this.iniciarSyncAoVivo();
       this.renderizar();
+      this.renderizarDiaDia();
       const modal = document.getElementById('modalPlanejamentoRT');
       if (modal && !modal.dataset.bound) {
         modal.addEventListener('click', (e) => { if (e.target.id === 'modalPlanejamentoRT') this.fecharModal(); });
         modal.dataset.bound = '1';
+      }
+      const modalDia = document.getElementById('modalRTDiaDia');
+      if (modalDia && !modalDia.dataset.bound) {
+        modalDia.addEventListener('click', (e) => { if (e.target.id === 'modalRTDiaDia') this.fecharModalDiaDia(); });
+        modalDia.dataset.bound = '1';
       }
     });
   },
@@ -2712,6 +2763,9 @@ const appRT = {
     const servSel = document.getElementById('rtServico');
     const servFiltro = document.getElementById('rtServicoFiltro');
     const statusSel = document.getElementById('rtStatus');
+    const servDiaSel = document.getElementById('rtDiaServico');
+    const servDiaFiltro = document.getElementById('rtDiaServicoFiltro');
+    const statusDiaSel = document.getElementById('rtDiaStatus');
     if (mesSel && !mesSel.dataset.ready) {
       mesSel.innerHTML = this.meses.map(m => `<option value="${m}">${m}</option>`).join('');
       mesSel.dataset.ready = '1';
@@ -2733,13 +2787,35 @@ const appRT = {
       statusSel.innerHTML = this.statusList.map(s => `<option value="${s}">${s}</option>`).join('');
       statusSel.dataset.ready = '1';
     }
+    if (servDiaSel && !servDiaSel.dataset.ready) {
+      servDiaSel.innerHTML = this.servicos.map(s => `<option value="${s}">${s}</option>`).join('');
+      servDiaSel.dataset.ready = '1';
+    }
+    if (servDiaFiltro && !servDiaFiltro.dataset.ready) {
+      servDiaFiltro.innerHTML = '<option value="">Todos os serviços</option>' + this.servicos.map(s => `<option value="${s}">${s}</option>`).join('');
+      servDiaFiltro.dataset.ready = '1';
+    }
+    if (statusDiaSel && !statusDiaSel.dataset.ready) {
+      statusDiaSel.innerHTML = this.statusList.map(s => `<option value="${s}">${s}</option>`).join('');
+      statusDiaSel.dataset.ready = '1';
+    }
     this.preencherFiltroTorres();
+    this.preencherFiltroTorresDiaDia();
   },
 
   preencherFiltroTorres() {
     const torreFiltro = document.getElementById('rtTorreFiltro');
     if (!torreFiltro) return;
     const torres = Array.from(new Set(this.itens.map(i => i.torre).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    const atual = torreFiltro.value || '';
+    torreFiltro.innerHTML = '<option value="">Todas as torres</option>' + torres.map(t => `<option value="${t}">${t}</option>`).join('');
+    torreFiltro.value = torres.includes(atual) ? atual : '';
+  },
+
+  preencherFiltroTorresDiaDia() {
+    const torreFiltro = document.getElementById('rtDiaTorreFiltro');
+    if (!torreFiltro) return;
+    const torres = Array.from(new Set(this.itensDiaDia.map(i => i.torre).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt-BR'));
     const atual = torreFiltro.value || '';
     torreFiltro.innerHTML = '<option value="">Todas as torres</option>' + torres.map(t => `<option value="${t}">${t}</option>`).join('');
     torreFiltro.value = torres.includes(atual) ? atual : '';
@@ -2786,6 +2862,32 @@ const appRT = {
       origem: item.origem || 'escadinha',
       updatedAt: item.updatedAt || new Date().toISOString(),
       dataIdealPedido: this.calcularDataIdeal(dataServico, Number(item.leadTime || 20))
+    };
+  },
+
+
+  normalizarDiaDia(item, idx = 0) {
+    const dataNecessidade = item.dataNecessidade || item.dataServico || '';
+    const leadTime = Number(item.leadTime || 20);
+    return {
+      id: item.id || `rtdia_${idx}_${Date.now()}`,
+      servico: item.servico || '',
+      material: item.material || '',
+      torre: item.torre || '',
+      pavimento: item.pavimento || '',
+      quantidade: Number(item.quantidade || 0),
+      dataNecessidade,
+      leadTime,
+      status: item.status || 'Pedir agora',
+      prioridadeManual: item.prioridadeManual || '',
+      dataRT: item.dataRT || '',
+      dataAprovSupr: item.dataAprovSupr || '',
+      dataAutorizacao: item.dataAutorizacao || '',
+      dataEntrega: item.dataEntrega || '',
+      observacoes: item.observacoes || '',
+      updatedAt: item.updatedAt || new Date().toISOString(),
+      dataIdealPedido: this.calcularDataIdeal(dataNecessidade, leadTime),
+      origem: item.origem || 'dia-a-dia'
     };
   },
 
@@ -2839,17 +2941,30 @@ const appRT = {
         if (Array.isArray(cloud)) {
           this.itens = cloud;
           localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens));
-          return;
         }
       }
-      const salvos = localStorage.getItem(this.STORAGE_KEY);
-      this.itens = salvos ? JSON.parse(salvos) : [];
+      if (window.__fb?.carregarRTDiaDiaDaNuvem) {
+        const cloudDia = await window.__fb.carregarRTDiaDiaDaNuvem();
+        if (Array.isArray(cloudDia)) {
+          this.itensDiaDia = cloudDia;
+          localStorage.setItem(this.STORAGE_KEY_DIA_DIA, JSON.stringify(this.itensDiaDia));
+        }
+      }
+      if (!this.itens.length) {
+        const salvos = localStorage.getItem(this.STORAGE_KEY);
+        this.itens = salvos ? JSON.parse(salvos) : [];
+      }
+      if (!this.itensDiaDia.length) {
+        const salvosDia = localStorage.getItem(this.STORAGE_KEY_DIA_DIA);
+        this.itensDiaDia = salvosDia ? JSON.parse(salvosDia) : [];
+      }
       if (!this.itens.length) {
         await this.importarPlanejamentoBase();
       }
     } catch (e) {
       console.error('Erro ao carregar planejamento RT:', e);
       this.itens = [];
+      this.itensDiaDia = [];
     }
   },
 
@@ -2863,12 +2978,25 @@ const appRT = {
           this.renderizar();
         });
       }
+      if (window.__fb?.escutarMudancasRTDiaDia) {
+        if (this._unsubDiaDia) this._unsubDiaDia();
+        this._unsubDiaDia = window.__fb.escutarMudancasRTDiaDia((itens) => {
+          this.itensDiaDia = Array.isArray(itens) ? itens : [];
+          try { localStorage.setItem(this.STORAGE_KEY_DIA_DIA, JSON.stringify(this.itensDiaDia)); } catch(e) {}
+          this.renderizarDiaDia();
+        });
+      }
     } catch (e) { console.warn('Sync ao vivo do planejamento indisponível:', e); }
   },
 
   async salvarDados() {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens));
     if (window.__fb?.salvarPlanejamentoRTNaNuvem) await window.__fb.salvarPlanejamentoRTNaNuvem(this.itens);
+  },
+
+  async salvarDadosDiaDia() {
+    localStorage.setItem(this.STORAGE_KEY_DIA_DIA, JSON.stringify(this.itensDiaDia));
+    if (window.__fb?.salvarRTDiaDiaNaNuvem) await window.__fb.salvarRTDiaDiaNaNuvem(this.itensDiaDia);
   },
 
   abrirModalNovo() {
@@ -3030,6 +3158,136 @@ const appRT = {
       .sort((a,b) => (a.dataRT || '').localeCompare(b.dataRT || '') || (a.dataServico || '').localeCompare(b.dataServico || ''));
     if (!container) return;
     container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Data RT</th><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.dataRT ? new Date(i.dataRT+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
+  },
+
+
+
+  abrirModalNovoDiaDia() {
+    if (!auth.pode('editar_rt_dia_dia')) return app.mostrarAlerta('Seu perfil não pode editar RT do Dia a Dia.', 'error');
+    this.editandoIdDiaDia = null;
+    document.getElementById('modalRTDiaDiaTitle').textContent = 'Nova RT Dia a Dia';
+    document.getElementById('formRTDiaDia').reset();
+    document.getElementById('rtDiaStatus').value = 'Pedir agora';
+    document.getElementById('rtDiaLeadTime').value = 20;
+    document.getElementById('modalRTDiaDia').classList.add('active');
+    atualizarBotaoMobile();
+  },
+
+  abrirModalEditarDiaDia(id) {
+    if (!auth.pode('editar_rt_dia_dia')) return app.mostrarAlerta('Seu perfil não pode editar RT do Dia a Dia.', 'error');
+    const item = this.itensDiaDia.find(i => i.id === id);
+    if (!item) return;
+    this.editandoIdDiaDia = id;
+    document.getElementById('modalRTDiaDiaTitle').textContent = 'Editar RT Dia a Dia';
+    document.getElementById('rtDiaServico').value = item.servico || this.servicos[0];
+    document.getElementById('rtDiaMaterial').value = item.material || '';
+    document.getElementById('rtDiaTorre').value = item.torre || '';
+    document.getElementById('rtDiaPavimento').value = item.pavimento || '';
+    document.getElementById('rtDiaQuantidade').value = item.quantidade || '';
+    document.getElementById('rtDiaDataNecessidade').value = item.dataNecessidade || '';
+    document.getElementById('rtDiaLeadTime').value = item.leadTime || 20;
+    document.getElementById('rtDiaStatus').value = item.status || 'Pedir agora';
+    document.getElementById('rtDiaPrioridadeManual').value = item.prioridadeManual || '';
+    document.getElementById('rtDiaDataRT').value = item.dataRT || '';
+    document.getElementById('rtDiaDataAprovSupr').value = item.dataAprovSupr || '';
+    document.getElementById('rtDiaDataAutorizacao').value = item.dataAutorizacao || '';
+    document.getElementById('rtDiaDataEntrega').value = item.dataEntrega || '';
+    document.getElementById('rtDiaObservacoes').value = item.observacoes || '';
+    document.getElementById('modalRTDiaDia').classList.add('active');
+    atualizarBotaoMobile();
+  },
+
+  fecharModalDiaDia() {
+    document.getElementById('modalRTDiaDia').classList.remove('active');
+    atualizarBotaoMobile();
+  },
+
+  async salvarDiaDia(event) {
+    event.preventDefault();
+    const item = this.normalizarDiaDia({
+      id: this.editandoIdDiaDia || Date.now(),
+      servico: document.getElementById('rtDiaServico').value,
+      material: document.getElementById('rtDiaMaterial').value.trim(),
+      torre: document.getElementById('rtDiaTorre').value.trim(),
+      pavimento: document.getElementById('rtDiaPavimento').value.trim(),
+      quantidade: Number(document.getElementById('rtDiaQuantidade').value || 0),
+      dataNecessidade: document.getElementById('rtDiaDataNecessidade').value,
+      leadTime: Number(document.getElementById('rtDiaLeadTime').value || 20),
+      status: document.getElementById('rtDiaStatus').value,
+      prioridadeManual: document.getElementById('rtDiaPrioridadeManual').value,
+      dataRT: document.getElementById('rtDiaDataRT').value,
+      dataAprovSupr: document.getElementById('rtDiaDataAprovSupr').value,
+      dataAutorizacao: document.getElementById('rtDiaDataAutorizacao').value,
+      dataEntrega: document.getElementById('rtDiaDataEntrega').value,
+      observacoes: document.getElementById('rtDiaObservacoes').value.trim(),
+      updatedAt: new Date().toISOString()
+    });
+    const idx = this.itensDiaDia.findIndex(i => i.id === item.id);
+    if (idx >= 0) this.itensDiaDia[idx] = item; else this.itensDiaDia.unshift(item);
+    await this.salvarDadosDiaDia();
+    this.preencherFiltroTorresDiaDia();
+    this.fecharModalDiaDia();
+    this.renderizarDiaDia();
+    app.mostrarAlerta('RT do Dia a Dia salva com sucesso!', 'success');
+  },
+
+  async excluirDiaDia(id) {
+    if (!auth.pode('editar_rt_dia_dia')) return app.mostrarAlerta('Seu perfil não pode excluir RT do Dia a Dia.', 'error');
+    if (!confirm('Deseja realmente excluir esta RT do Dia a Dia?')) return;
+    this.itensDiaDia = this.itensDiaDia.filter(i => i.id !== id);
+    await this.salvarDadosDiaDia();
+    this.renderizarDiaDia();
+    app.mostrarAlerta('RT do Dia a Dia excluída.', 'success');
+  },
+
+  itensDiaDiaFiltrados() {
+    const status = document.getElementById('rtDiaStatusFiltro')?.value || '';
+    const torre = document.getElementById('rtDiaTorreFiltro')?.value || '';
+    const servico = document.getElementById('rtDiaServicoFiltro')?.value || '';
+    const busca = (document.getElementById('rtDiaBusca')?.value || '').toLowerCase();
+    return this.itensDiaDia.filter(item => {
+      const okStatus = !status || item.status === status || this.statusSugerido(item) === status;
+      const okTorre = !torre || item.torre === torre;
+      const okServico = !servico || item.servico === servico;
+      const blob = `${item.servico} ${item.material} ${item.pavimento || ''} ${item.torre || ''} ${item.observacoes || ''}`.toLowerCase();
+      const okBusca = !busca || blob.includes(busca);
+      return okStatus && okTorre && okServico && okBusca;
+    }).sort((a,b) => (a.dataNecessidade || '').localeCompare(b.dataNecessidade || '') || (a.dataRT || '').localeCompare(b.dataRT || ''));
+  },
+
+  renderResumoDiaDia(lista) {
+    const el = document.getElementById('rtDiaResumo');
+    if (!el) return;
+    const altas = lista.filter(i => this.prioridadeAutomatica(i) === 'Alta').length;
+    const emSupr = lista.filter(i => i.status === 'Em suprimentos').length;
+    const aguardando = lista.filter(i => i.status === 'Aguardando entrega').length;
+    const concluidos = lista.filter(i => ['Entregue','Concluído'].includes(i.status)).length;
+    el.innerHTML = `
+      <div class="kpi"><div class="icon">📝</div><div class="value">${lista.length}</div><div class="label">RTs do dia a dia</div></div>
+      <div class="kpi"><div class="icon">🔴</div><div class="value">${altas}</div><div class="label">Críticas</div></div>
+      <div class="kpi"><div class="icon">📦</div><div class="value">${emSupr}</div><div class="label">Em suprimentos</div></div>
+      <div class="kpi"><div class="icon">✅</div><div class="value">${concluidos + aguardando}</div><div class="label">Entrega/fechamento</div></div>`;
+  },
+
+  verPrioridadesDiaDia() {
+    const container = document.getElementById('rtDiaCriticas');
+    if (!container) return;
+    const lista = this.itensDiaDiaFiltrados().filter(i => this.prioridadeAutomatica(i) === 'Alta');
+    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 RTs Críticas do Dia a Dia</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Necessidade</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma RT crítica do dia a dia no momento.</p>`}</div>`;
+  },
+
+  renderizarDiaDia() {
+    const container = document.getElementById('rtDiaDiaContainer');
+    if (!container) return;
+    this.preencherFiltroTorresDiaDia();
+    const lista = this.itensDiaDiaFiltrados();
+    this.renderResumoDiaDia(lista);
+    this.verPrioridadesDiaDia();
+    if (!lista.length) {
+      container.innerHTML = '<p style="color:#6b7a99;">Nenhuma RT do Dia a Dia encontrada.</p>';
+      return;
+    }
+    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.leadTime || '-'} dia(s)</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td><div class="btn-group" style="margin:0;"><button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button></div></td></tr>`).join('')}</tbody></table></div>`;
   },
 
   renderizar() {
