@@ -892,8 +892,7 @@
         <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
         <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
-        <button id="btnExcluirTudoPlanejamentoRT" class="btn btn-danger" onclick="appRT.excluirTudoPlanejamento()">🗑️ Excluir todo planejamento</button>
-        <button class="btn btn-success" onclick="appRT.gerarPdfPlanejamento()">📄 PDF dos Status</button>
+        <button class="btn btn-danger" onclick="appRT.excluirTudoPlanejamento()">🗑️ Excluir todo planejamento</button>
       </div>
       <div class="filter-bar">
         <select id="rtMesFiltro" onchange="appRT.renderizar()">
@@ -905,7 +904,8 @@
           <option value="Pedir agora">Pedir agora</option>
           <option value="RT lançada">RT lançada</option>
           <option value="Em suprimentos">Em suprimentos</option>
-                    <option value="Aguardando entrega">Aguardando entrega</option>
+          <option value="Autorizado para compra">Autorizado para compra</option>
+          <option value="Aguardando entrega">Aguardando entrega</option>
           <option value="Entregue">Entregue</option>
           <option value="Concluído">Concluído</option>
         </select>
@@ -935,10 +935,9 @@
       <h2>📝 RT do Dia a Dia</h2>
       <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Use esta área para RTs avulsas, emergenciais e acompanhamentos fora da escadinha. Acesso liberado somente para Admin e GO.</p>
       <div class="btn-group">
-        <button id="btnNovoRTDiaDia" class="btn btn-primary" onclick="appRT.abrirModalNovoDiaDia()">➕ Nova RT Dia a Dia</button>
+        <button class="btn btn-primary" onclick="appRT.abrirModalNovoDiaDia()">➕ Nova RT Dia a Dia</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDiaDia()">🚨 Ver RTs Críticas</button>
         <button class="btn btn-secondary" onclick="appRT.renderizarDiaDia()">🔄 Atualizar</button>
-        <button class="btn btn-success" onclick="appRT.gerarPdfDiaDia()">📄 PDF dos Status</button>
       </div>
       <div class="filter-bar">
         <select id="rtDiaStatusFiltro" onchange="appRT.renderizarDiaDia()">
@@ -947,7 +946,8 @@
           <option value="Pedir agora">Pedir agora</option>
           <option value="RT lançada">RT lançada</option>
           <option value="Em suprimentos">Em suprimentos</option>
-                    <option value="Aguardando entrega">Aguardando entrega</option>
+          <option value="Autorizado para compra">Autorizado para compra</option>
+          <option value="Aguardando entrega">Aguardando entrega</option>
           <option value="Entregue">Entregue</option>
           <option value="Concluído">Concluído</option>
         </select>
@@ -1502,7 +1502,7 @@ const auth = {
 
     const permitidas = {
       admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
       go: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
@@ -1538,7 +1538,7 @@ const auth = {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
       admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
-      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','receber_rt'],
+      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
@@ -2925,58 +2925,7 @@ const appRT = {
   _unsubDiaDia: null,
   meses: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
   servicos: ['Fachada','Estrutura de Concreto','Alvenaria Estrutural + Distribuição Elétrica','Gradil','Requadração de Caixilhos','Enfiação','Prumada Hidráulica + Aranha','Ramal Sanitário','Alvenaria dos Shafts','Contrapiso','Gesso Liso','Forro de Gesso','Impermeabilização','Cerâmica, Baguete, Soleira, Azulejo','Caixilhos','Bancada','Pintura (Aparelhamento)','Portas de Madeira','Interrupt, Tomadas, QDL','Louças e Metais','Limpeza Grossa','Arremates Gerais','Piso Laminado','Pintura Final','Limpeza Fina','Apto Pronto para Entrega','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
-  statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Aguardando entrega','Entregue','Concluído'],
-
-  usuarioRole() {
-    return window.currentUser?.role || 'admin';
-  },
-
-  podeEditarPlanejamento() {
-    return auth.pode('editar_planejamento_rt');
-  },
-
-  podeEditarDiaDia() {
-    return auth.pode('editar_rt_dia_dia');
-  },
-
-  podeSomenteReceberRT() {
-    return auth.pode('receber_rt');
-  },
-
-  podeAlterarStatusItem(item, novoStatus) {
-    const role = this.usuarioRole();
-    if (role === 'admin' || role === 'go') return true;
-    if (role === 'almoxarife') {
-      return (item?.status === 'Aguardando entrega' && novoStatus === 'Entregue');
-    }
-    return false;
-  },
-
-  opcoesStatusHtml(item, tipo='planejamento') {
-    const statusAtual = this.statusSugerido(item);
-    if (this.usuarioRole() === 'almoxarife') {
-      if (statusAtual === 'Aguardando entrega') {
-        return ['Aguardando entrega','Entregue'].map(s => `<option value="${s}" ${statusAtual===s?'selected':''}>${s}</option>`).join('');
-      }
-      return `<option value="${statusAtual}" selected>${statusAtual}</option>`;
-    }
-    return this.statusList.map(s => `<option value="${s}" ${statusAtual===s?'selected':''}>${s}</option>`).join('');
-  },
-
-  ajustarPermissoesUI() {
-    const podeEditarPlanejamento = this.podeEditarPlanejamento();
-    const podeEditarDiaDia = this.podeEditarDiaDia();
-    const mapa = [
-      ['btnNovoPlanejamentoRT', podeEditarPlanejamento],
-      ['btnExcluirTudoPlanejamentoRT', podeEditarPlanejamento],
-      ['btnNovoRTDiaDia', podeEditarDiaDia]
-    ];
-    mapa.forEach(([id, visivel]) => {
-      const el = document.getElementById(id);
-      if (el) el.style.display = visivel ? 'inline-flex' : 'none';
-    });
-  },
-
+  statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'],
 
   init() {
     this.preencherSelects();
@@ -2984,7 +2933,6 @@ const appRT = {
       this.iniciarSyncAoVivo();
       this.renderizar();
       this.renderizarDiaDia();
-      this.ajustarPermissoesUI();
       const modal = document.getElementById('modalPlanejamentoRT');
       if (modal && !modal.dataset.bound) {
         modal.addEventListener('click', (e) => { if (e.target.id === 'modalPlanejamentoRT') this.fecharModal(); });
@@ -3065,12 +3013,7 @@ const appRT = {
   },
 
   mesAtualNome() { return this.meses[new Date().getMonth()]; },
-  
-  normalizarStatus(valor) {
-    return valor === 'Autorizado para compra' ? 'Aguardando entrega' : (valor || 'Planejado');
-  },
-
-mesPorData(dataIso) {
+  mesPorData(dataIso) {
     if (!dataIso) return this.mesAtualNome();
     const dt = new Date(dataIso + 'T12:00:00');
     return this.meses[dt.getMonth()] || this.mesAtualNome();
@@ -3100,7 +3043,7 @@ mesPorData(dataIso) {
       quantidade: Number(item.quantidade || 0),
       dataServico,
       leadTime: Number(item.leadTime || 20),
-      status: this.normalizarStatus(item.status || 'Planejado'),
+      status: item.status || 'Planejado',
       prioridadeManual: item.prioridadeManual || '',
       dataRT,
       dataAprovSupr: item.dataAprovSupr || '',
@@ -3126,7 +3069,7 @@ mesPorData(dataIso) {
       quantidade: Number(item.quantidade || 0),
       dataNecessidade,
       leadTime,
-      status: this.normalizarStatus(item.status || 'Pedir agora'),
+      status: item.status || 'Pedir agora',
       prioridadeManual: item.prioridadeManual || '',
       dataRT: item.dataRT || '',
       dataAprovSupr: item.dataAprovSupr || '',
@@ -3147,7 +3090,7 @@ mesPorData(dataIso) {
     const partes = [];
     if (item.dataRT) partes.push(`RT: ${new Date(item.dataRT+'T12:00:00').toLocaleDateString('pt-BR')}`);
     if (item.dataAprovSupr) partes.push(`Suprimentos: ${new Date(item.dataAprovSupr+'T12:00:00').toLocaleDateString('pt-BR')}`);
-    if (item.dataAutorizacao) partes.push(`Entrega planejada: ${new Date(item.dataAutorizacao+'T12:00:00').toLocaleDateString('pt-BR')}`);
+    if (item.dataAutorizacao) partes.push(`Autorizado: ${new Date(item.dataAutorizacao+'T12:00:00').toLocaleDateString('pt-BR')}`);
     if (item.dataEntrega) partes.push(`Entrega: ${new Date(item.dataEntrega+'T12:00:00').toLocaleDateString('pt-BR')}`);
     return partes.length ? partes.join(' • ') : 'As datas serão registradas automaticamente conforme o avanço do status.';
   },
@@ -3169,9 +3112,9 @@ mesPorData(dataIso) {
     item.dataAutorizacao = item.dataAutorizacao || anterior.dataAutorizacao || '';
     item.dataEntrega = item.dataEntrega || anterior.dataEntrega || '';
 
-    if (['RT lançada','Em suprimentos','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataRT) item.dataRT = hoje;
-    if (['Em suprimentos','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataAprovSupr) item.dataAprovSupr = hoje;
-    if (['Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataAutorizacao) item.dataAutorizacao = hoje;
+    if (['RT lançada','Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataRT) item.dataRT = hoje;
+    if (['Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataAprovSupr) item.dataAprovSupr = hoje;
+    if (['Autorizado para compra','Aguardando entrega','Entregue','Concluído'].includes(item.status) && !item.dataAutorizacao) item.dataAutorizacao = hoje;
     if (['Entregue','Concluído'].includes(item.status) && !item.dataEntrega) item.dataEntrega = hoje;
 
     return item;
@@ -3352,46 +3295,34 @@ mesPorData(dataIso) {
     return `<span style="display:inline-flex;padding:4px 10px;border-radius:999px;background:${mapa[pri] || '#95a5a6'};color:#fff;font-weight:700;font-size:12px;">${pri}</span>`;
   },
   statusSelectHtml(item, tipo = 'planejamento') {
-    const role = this.usuarioRole();
-    const podeEditar = tipo === 'dia' ? this.podeEditarDiaDia() : this.podeEditarPlanejamento();
-    if (!podeEditar && role !== 'almoxarife') {
+    if (!auth.pode(tipo === 'dia' ? 'editar_rt_dia_dia' : 'editar_planejamento_rt')) {
       return `<span>${this.statusSugerido(item)}</span>`;
     }
     const onchange = tipo === 'dia' ? `appRT.atualizarStatusDiaDia('${item.id}', this.value)` : `appRT.atualizarStatus('${item.id}', this.value)`;
-    return `<select class="status-inline-select" onchange="${onchange}">${this.opcoesStatusHtml(item, tipo)}</select>`;
+    return `<select class="status-inline-select" onchange="${onchange}">${this.statusList.map(s => `<option value="${s}" ${this.statusSugerido(item)===s?'selected':''}>${s}</option>`).join('')}</select>`;
   },
 
   async atualizarStatus(id, novoStatus) {
     const idx = this.itens.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
-    const atual = this.itens[idx];
-    if (!this.podeAlterarStatusItem(atual, novoStatus)) {
-      return app.mostrarAlerta('Seu perfil só pode alterar de Aguardando entrega para Entregue.', 'error');
-    }
-    const item = { ...atual, status: novoStatus, updatedAt: new Date().toISOString() };
-    this.aplicarDatasPorStatus(item, atual);
+    const item = { ...this.itens[idx], status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, this.itens[idx]);
     this.itens[idx] = item;
     await this.salvarDados();
     this.preencherFiltroTorres();
     this.renderizar();
-    this.ajustarPermissoesUI();
     app.mostrarAlerta('Status do planejamento RT atualizado.', 'success');
   },
 
   async atualizarStatusDiaDia(id, novoStatus) {
     const idx = this.itensDiaDia.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
-    const atual = this.itensDiaDia[idx];
-    if (!this.podeAlterarStatusItem(atual, novoStatus)) {
-      return app.mostrarAlerta('Seu perfil só pode alterar de Aguardando entrega para Entregue.', 'error');
-    }
-    const item = { ...atual, status: novoStatus, updatedAt: new Date().toISOString() };
-    this.aplicarDatasPorStatus(item, atual);
+    const item = { ...this.itensDiaDia[idx], status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, this.itensDiaDia[idx]);
     this.itensDiaDia[idx] = item;
     await this.salvarDadosDiaDia();
     this.preencherFiltroTorresDiaDia();
     this.renderizarDiaDia();
-    this.ajustarPermissoesUI();
     app.mostrarAlerta('Status da RT do Dia a Dia atualizado.', 'success');
   },
 
@@ -3631,13 +3562,12 @@ mesPorData(dataIso) {
     this.preencherFiltroTorresDiaDia();
     const lista = this.itensDiaDiaFiltrados();
     this.renderResumoDiaDia(lista);
-    this.ajustarPermissoesUI();
     this.verPrioridadesDiaDia();
     if (!lista.length) {
       container.innerHTML = '<p style="color:#6b7a99;">Nenhuma RT do Dia a Dia encontrada.</p>';
       return;
     }
-    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td data-label="Torre">${i.torre || '-'}</td><td data-label="Pavimento">${i.pavimento || '-'}</td><td data-label="Serviço"><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td data-label="Material">${i.material}</td><td data-label="Data necessidade">${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Lead time">${i.leadTime || '-'} dia(s)</td><td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Status">${this.statusSelectHtml(i, 'dia')}</td><td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td data-label="Ações"><div class="btn-group" style="margin:0;">${this.podeEditarDiaDia() ? `<button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button>` : ''}</div></td></tr>`).join('')}</tbody></table></div>`;
+    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td data-label="Torre">${i.torre || '-'}</td><td data-label="Pavimento">${i.pavimento || '-'}</td><td data-label="Serviço"><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td data-label="Material">${i.material}</td><td data-label="Data necessidade">${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Lead time">${i.leadTime || '-'} dia(s)</td><td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Status">${this.statusSelectHtml(i, 'dia')}</td><td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td data-label="Ações"><div class="btn-group" style="margin:0;"><button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button></div></td></tr>`).join('')}</tbody></table></div>`;
   },
 
   renderizar() {
@@ -3647,7 +3577,6 @@ mesPorData(dataIso) {
     const lista = this.itensFiltrados();
     this.renderResumo(lista);
     this.verPrioridadesDoMes();
-    this.ajustarPermissoesUI();
     if (!lista.length) {
       container.innerHTML = '<p style="color:#6b7a99;">Nenhum item de planejamento RT encontrado.</p>';
       return;
@@ -3683,8 +3612,8 @@ mesPorData(dataIso) {
                   <td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td>
                   <td data-label="Ações">
                     <div class="btn-group" style="margin:0;">
-                      ${this.podeEditarPlanejamento() ? `<button class="btn btn-secondary" onclick="appRT.abrirModalEditar('${i.id}')">✏️ Editar</button>
-                      <button class="btn btn-danger" onclick="appRT.excluir('${i.id}')">🗑️ Excluir</button>` : ''}
+                      <button class="btn btn-secondary" onclick="appRT.abrirModalEditar('${i.id}')">✏️ Editar</button>
+                      <button class="btn btn-danger" onclick="appRT.excluir('${i.id}')">🗑️ Excluir</button>
                     </div>
                   </td>
                 </tr>`).join('')}
@@ -3700,91 +3629,6 @@ document.addEventListener('DOMContentLoaded', () => {
   window.auth = auth;
 window.app = app;
 window.appMateriais = appMateriais;
-
-  formatarDataBR(dataIso) {
-    return dataIso ? new Date(dataIso + 'T12:00:00').toLocaleDateString('pt-BR') : '-';
-  },
-
-  gerarHtmlPdfStatus(titulo, linhas, tipo = 'planejamento') {
-    const hoje = new Date().toLocaleDateString('pt-BR');
-    const cabecalho = tipo === 'planejamento'
-      ? '<tr><th>RT</th><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Início do serviço</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr>'
-      : '<tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Necessidade</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr>';
-
-    const corpo = linhas.map(i => tipo === 'planejamento'
-      ? `<tr>
-          <td>${this.formatarDataBR(i.dataRT)}</td>
-          <td>${i.torre || '-'}</td>
-          <td>${i.pavimento || '-'}</td>
-          <td>${i.servico || '-'}</td>
-          <td>${i.material || '-'}</td>
-          <td>${this.formatarDataBR(i.dataServico)}</td>
-          <td>${this.formatarDataBR(i.dataIdealPedido)}</td>
-          <td>${this.statusSugerido(i)}</td>
-          <td>${this.prioridadeAutomatica(i)}</td>
-        </tr>`
-      : `<tr>
-          <td>${i.torre || '-'}</td>
-          <td>${i.pavimento || '-'}</td>
-          <td>${i.servico || '-'}</td>
-          <td>${i.material || '-'}</td>
-          <td>${this.formatarDataBR(i.dataNecessidade)}</td>
-          <td>${this.formatarDataBR(i.dataIdealPedido)}</td>
-          <td>${this.statusSugerido(i)}</td>
-          <td>${this.prioridadeAutomatica(i)}</td>
-        </tr>`
-    ).join('');
-
-    return `
-      <div style="font-family:Segoe UI,Arial,sans-serif;padding:24px;color:#1a2340;">
-        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #2E75B6;padding-bottom:12px;margin-bottom:18px;">
-          <div>
-            <h1 style="margin:0;color:#1F3864;font-size:24px;">${titulo}</h1>
-            <p style="margin:6px 0 0 0;color:#6b7a99;">Gerado em ${hoje}</p>
-          </div>
-          <div style="font-weight:700;color:#1F3864;">Plano & Plano</div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead>
-            ${cabecalho}
-          </thead>
-          <tbody>
-            ${corpo || '<tr><td colspan="9" style="padding:12px;border:1px solid #d9e3f1;">Nenhum registro encontrado.</td></tr>'}
-          </tbody>
-        </table>
-      </div>
-    `;
-  },
-
-  gerarPdfPlanejamento() {
-    const lista = this.itensFiltrados();
-    const html = this.gerarHtmlPdfStatus('Planejamento RT - Status', lista, 'planejamento');
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = html;
-    html2pdf().set({
-      margin: 0.4,
-      filename: 'planejamento-rt-status.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-    }).from(wrapper).save();
-  },
-
-  gerarPdfDiaDia() {
-    const lista = this.itensDiaDiaFiltrados();
-    const html = this.gerarHtmlPdfStatus('RT Dia a Dia - Status', lista, 'dia');
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = html;
-    html2pdf().set({
-      margin: 0.4,
-      filename: 'rt-dia-dia-status.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
-    }).from(wrapper).save();
-  },
-
-
 window.appRT = appRT;
 auth.verificarSessao();
 });
