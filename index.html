@@ -892,7 +892,7 @@
         <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
         <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
-        <span id="acao-excluir-planejamento"></span>
+        <button id="btnExcluirTudoPlanejamentoRT" class="btn btn-danger" onclick="appRT.excluirTudoPlanejamento()">🗑️ Excluir todo planejamento</button>
         <button class="btn btn-success" onclick="appRT.gerarPdfPlanejamento()">📄 PDF dos Status</button>
       </div>
       <div class="filter-bar">
@@ -935,7 +935,7 @@
       <h2>📝 RT do Dia a Dia</h2>
       <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Use esta área para RTs avulsas, emergenciais e acompanhamentos fora da escadinha. Acesso liberado somente para Admin e GO.</p>
       <div class="btn-group">
-        <button class="btn btn-primary" onclick="appRT.abrirModalNovoDiaDia()">➕ Nova RT Dia a Dia</button>
+        <button id="btnNovoRTDiaDia" class="btn btn-primary" onclick="appRT.abrirModalNovoDiaDia()">➕ Nova RT Dia a Dia</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDiaDia()">🚨 Ver RTs Críticas</button>
         <button class="btn btn-secondary" onclick="appRT.renderizarDiaDia()">🔄 Atualizar</button>
         <button class="btn btn-success" onclick="appRT.gerarPdfDiaDia()">📄 PDF dos Status</button>
@@ -1502,7 +1502,7 @@ const auth = {
 
     const permitidas = {
       admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       go: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
@@ -1538,7 +1538,7 @@ const auth = {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
       admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
-      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
+      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','receber_rt'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
@@ -1823,7 +1823,7 @@ const app = {
           <td><span class="badge ${statusClass}" onclick="app.alterarStatus(${d.id})">${d.status}</span></td>
           <td>
             <div class="action-btns">
-              <button class="edit-btn" onclick="app.abrirModalEditar(${d.id})">${podeGerenciarLinha ? '✏️ Editar' : ''}</button>
+              <button class="edit-btn" onclick="app.abrirModalEditar(${d.id})">✏️ Editar</button>
               <button class="delete-btn" onclick="app.deletarRegistro(${d.id})">🗑️ Deletar</button>
             </div>
           </td>
@@ -2516,7 +2516,7 @@ const appMateriais = {
             ${ultimaMov ? `<div class="material-date">🧾 Última retirada: ${ultimaMov.responsavel} - ${ultimaMov.quantidade} un.</div>` : ''}
             <div class="material-actions">
               ${podeRetirar ? `<button class="btn btn-warning" onclick="appMateriais.abrirModalRetirada(${m.id})">📤 Registrar Retirada</button>` : ''}
-              ${podeEditar ? `<button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">${podeGerenciarLinha ? '✏️ Editar' : ''}</button>` : ''}
+              ${podeEditar ? `<button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">✏️ Editar</button>` : ''}
               ${podeEditar ? `<button class="delete-btn" onclick="appMateriais.deletarMaterial(${m.id})">🗑️ Deletar</button>` : ''}
             </div>
           </div>
@@ -2913,39 +2913,7 @@ const appMateriais = {
   }};
 
 
-
-const rolesRT = {
-  podeVer: (user) => ['admin','go','almoxarife'].includes(user?.role),
-  podeGerenciarTotal: (user) => ['admin','go'].includes(user?.role),
-  podeSomenteEntregar: (user) => user?.role === 'almoxarife',
-  podeAlterarStatus: (user, statusAtual, novoStatus) => {
-    if (['admin','go'].includes(user?.role)) return true;
-    if (user?.role === 'almoxarife') {
-      return statusAtual === 'Aguardando entrega' && novoStatus === 'Entregue';
-    }
-    return false;
-  }
-};
-
 const appRT = {
-
-  usuarioAtual() {
-    try { return JSON.parse(localStorage.getItem('usuarioLogado') || '{}'); } catch(e) { return {}; }
-  },
-
-  podeGerenciarRT() {
-    return rolesRT.podeGerenciarTotal(this.usuarioAtual());
-  },
-
-  podeSomenteEntregar() {
-    return rolesRT.podeSomenteEntregar(this.usuarioAtual());
-  },
-
-  podeVerRT() {
-    return rolesRT.podeVer(this.usuarioAtual());
-  },
-
-
   STORAGE_KEY: 'planejamento_rt_dados',
   STORAGE_KEY_DIA_DIA: 'planejamento_rt_dia_dia_dados',
   BASE_FILE: 'planejamento_rts_vila_ema.csv',
@@ -2959,13 +2927,64 @@ const appRT = {
   servicos: ['Fachada','Estrutura de Concreto','Alvenaria Estrutural + Distribuição Elétrica','Gradil','Requadração de Caixilhos','Enfiação','Prumada Hidráulica + Aranha','Ramal Sanitário','Alvenaria dos Shafts','Contrapiso','Gesso Liso','Forro de Gesso','Impermeabilização','Cerâmica, Baguete, Soleira, Azulejo','Caixilhos','Bancada','Pintura (Aparelhamento)','Portas de Madeira','Interrupt, Tomadas, QDL','Louças e Metais','Limpeza Grossa','Arremates Gerais','Piso Laminado','Pintura Final','Limpeza Fina','Apto Pronto para Entrega','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
   statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Aguardando entrega','Entregue','Concluído'],
 
+  usuarioRole() {
+    return window.currentUser?.role || 'admin';
+  },
+
+  podeEditarPlanejamento() {
+    return auth.pode('editar_planejamento_rt');
+  },
+
+  podeEditarDiaDia() {
+    return auth.pode('editar_rt_dia_dia');
+  },
+
+  podeSomenteReceberRT() {
+    return auth.pode('receber_rt');
+  },
+
+  podeAlterarStatusItem(item, novoStatus) {
+    const role = this.usuarioRole();
+    if (role === 'admin' || role === 'go') return true;
+    if (role === 'almoxarife') {
+      return (item?.status === 'Aguardando entrega' && novoStatus === 'Entregue');
+    }
+    return false;
+  },
+
+  opcoesStatusHtml(item, tipo='planejamento') {
+    const statusAtual = this.statusSugerido(item);
+    if (this.usuarioRole() === 'almoxarife') {
+      if (statusAtual === 'Aguardando entrega') {
+        return ['Aguardando entrega','Entregue'].map(s => `<option value="${s}" ${statusAtual===s?'selected':''}>${s}</option>`).join('');
+      }
+      return `<option value="${statusAtual}" selected>${statusAtual}</option>`;
+    }
+    return this.statusList.map(s => `<option value="${s}" ${statusAtual===s?'selected':''}>${s}</option>`).join('');
+  },
+
+  ajustarPermissoesUI() {
+    const podeEditarPlanejamento = this.podeEditarPlanejamento();
+    const podeEditarDiaDia = this.podeEditarDiaDia();
+    const mapa = [
+      ['btnNovoPlanejamentoRT', podeEditarPlanejamento],
+      ['btnExcluirTudoPlanejamentoRT', podeEditarPlanejamento],
+      ['btnNovoRTDiaDia', podeEditarDiaDia]
+    ];
+    mapa.forEach(([id, visivel]) => {
+      const el = document.getElementById(id);
+      if (el) el.style.display = visivel ? 'inline-flex' : 'none';
+    });
+  },
+
+
   init() {
     this.preencherSelects();
     this.carregar().then(() => {
       this.iniciarSyncAoVivo();
       this.renderizar();
       this.renderizarDiaDia();
-    this.renderizarAcoesRT();
+      this.ajustarPermissoesUI();
       const modal = document.getElementById('modalPlanejamentoRT');
       if (modal && !modal.dataset.bound) {
         modal.addEventListener('click', (e) => { if (e.target.id === 'modalPlanejamentoRT') this.fecharModal(); });
@@ -3333,36 +3352,46 @@ mesPorData(dataIso) {
     return `<span style="display:inline-flex;padding:4px 10px;border-radius:999px;background:${mapa[pri] || '#95a5a6'};color:#fff;font-weight:700;font-size:12px;">${pri}</span>`;
   },
   statusSelectHtml(item, tipo = 'planejamento') {
-    if (!auth.pode(tipo === 'dia' ? 'editar_rt_dia_dia' : 'editar_planejamento_rt')) {
+    const role = this.usuarioRole();
+    const podeEditar = tipo === 'dia' ? this.podeEditarDiaDia() : this.podeEditarPlanejamento();
+    if (!podeEditar && role !== 'almoxarife') {
       return `<span>${this.statusSugerido(item)}</span>`;
     }
     const onchange = tipo === 'dia' ? `appRT.atualizarStatusDiaDia('${item.id}', this.value)` : `appRT.atualizarStatus('${item.id}', this.value)`;
-    return `<select class="status-inline-select" onchange="${onchange}">${this.statusList.map(s => `<option value="${s}" ${this.statusSugerido(item)===s?'selected':''}>${s}</option>`).join('')}</select>`;
+    return `<select class="status-inline-select" onchange="${onchange}">${this.opcoesStatusHtml(item, tipo)}</select>`;
   },
 
   async atualizarStatus(id, novoStatus) {
     const idx = this.itens.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
-    const item = { ...this.itens[idx], status: novoStatus, updatedAt: new Date().toISOString() };
-    this.aplicarDatasPorStatus(item, this.itens[idx]);
+    const atual = this.itens[idx];
+    if (!this.podeAlterarStatusItem(atual, novoStatus)) {
+      return app.mostrarAlerta('Seu perfil só pode alterar de Aguardando entrega para Entregue.', 'error');
+    }
+    const item = { ...atual, status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, atual);
     this.itens[idx] = item;
     await this.salvarDados();
     this.preencherFiltroTorres();
     this.renderizar();
+    this.ajustarPermissoesUI();
     app.mostrarAlerta('Status do planejamento RT atualizado.', 'success');
   },
 
   async atualizarStatusDiaDia(id, novoStatus) {
-    const itemAtual = (this.rtDiaDia || []).find(x => String(x.id) === String(id));
-    if (itemAtual && !rolesRT.podeAlterarStatus(this.usuarioAtual(), itemAtual.status, novoStatus)) { alert('Almoxarife só pode mudar de Aguardando entrega para Entregue.'); return; }
     const idx = this.itensDiaDia.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
-    const item = { ...this.itensDiaDia[idx], status: novoStatus, updatedAt: new Date().toISOString() };
-    this.aplicarDatasPorStatus(item, this.itensDiaDia[idx]);
+    const atual = this.itensDiaDia[idx];
+    if (!this.podeAlterarStatusItem(atual, novoStatus)) {
+      return app.mostrarAlerta('Seu perfil só pode alterar de Aguardando entrega para Entregue.', 'error');
+    }
+    const item = { ...atual, status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, atual);
     this.itensDiaDia[idx] = item;
     await this.salvarDadosDiaDia();
     this.preencherFiltroTorresDiaDia();
     this.renderizarDiaDia();
+    this.ajustarPermissoesUI();
     app.mostrarAlerta('Status da RT do Dia a Dia atualizado.', 'success');
   },
 
@@ -3418,7 +3447,6 @@ mesPorData(dataIso) {
   },
 
   async excluirTudoPlanejamento() {
-    if (!this.podeGerenciarRT()) { alert('Você não tem permissão para excluir o planejamento.'); return; }
     if (!auth.pode('editar_planejamento_rt')) return app.mostrarAlerta('Seu perfil não pode excluir o planejamento RT.', 'error');
     const senha = this.solicitarSenhaAdmin();
     if (senha === null) return;
@@ -3522,7 +3550,6 @@ mesPorData(dataIso) {
   },
 
   async salvarDiaDia(event) {
-    if (!this.podeGerenciarRT()) { alert('Você não tem permissão para salvar este item.'); return; }
     event.preventDefault();
     const item = this.normalizarDiaDia({
       id: String(this.editandoIdDiaDia || Date.now()),
@@ -3554,7 +3581,6 @@ mesPorData(dataIso) {
   },
 
   async excluirDiaDia(id) {
-    if (!this.podeGerenciarRT()) { alert('Você não tem permissão para excluir itens.'); return; }
     if (!auth.pode('editar_rt_dia_dia')) return app.mostrarAlerta('Seu perfil não pode excluir RT do Dia a Dia.', 'error');
     if (!confirm('Deseja realmente excluir esta RT do Dia a Dia?')) return;
     this.itensDiaDia = this.itensDiaDia.filter(i => String(i.id) !== String(id));
@@ -3605,12 +3631,13 @@ mesPorData(dataIso) {
     this.preencherFiltroTorresDiaDia();
     const lista = this.itensDiaDiaFiltrados();
     this.renderResumoDiaDia(lista);
+    this.ajustarPermissoesUI();
     this.verPrioridadesDiaDia();
     if (!lista.length) {
       container.innerHTML = '<p style="color:#6b7a99;">Nenhuma RT do Dia a Dia encontrada.</p>';
       return;
     }
-    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td data-label="Torre">${i.torre || '-'}</td><td data-label="Pavimento">${i.pavimento || '-'}</td><td data-label="Serviço"><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td data-label="Material">${i.material}</td><td data-label="Data necessidade">${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Lead time">${i.leadTime || '-'} dia(s)</td><td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Status">${this.statusSelectHtml(i, 'dia')}</td><td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td data-label="Ações"><div class="btn-group" style="margin:0;"><button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">${podeGerenciarLinha ? '✏️ Editar' : ''}</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button></div></td></tr>`).join('')}</tbody></table></div>`;
+    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td data-label="Torre">${i.torre || '-'}</td><td data-label="Pavimento">${i.pavimento || '-'}</td><td data-label="Serviço"><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td data-label="Material">${i.material}</td><td data-label="Data necessidade">${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Lead time">${i.leadTime || '-'} dia(s)</td><td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Status">${this.statusSelectHtml(i, 'dia')}</td><td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td data-label="Ações"><div class="btn-group" style="margin:0;">${this.podeEditarDiaDia() ? `<button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button>` : ''}</div></td></tr>`).join('')}</tbody></table></div>`;
   },
 
   renderizar() {
@@ -3620,6 +3647,7 @@ mesPorData(dataIso) {
     const lista = this.itensFiltrados();
     this.renderResumo(lista);
     this.verPrioridadesDoMes();
+    this.ajustarPermissoesUI();
     if (!lista.length) {
       container.innerHTML = '<p style="color:#6b7a99;">Nenhum item de planejamento RT encontrado.</p>';
       return;
@@ -3655,8 +3683,8 @@ mesPorData(dataIso) {
                   <td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td>
                   <td data-label="Ações">
                     <div class="btn-group" style="margin:0;">
-                      <button class="btn btn-secondary" onclick="appRT.abrirModalEditar('${i.id}')">${podeGerenciarLinha ? '✏️ Editar' : ''}</button>
-                      <button class="btn btn-danger" onclick="appRT.excluir('${i.id}')">🗑️ Excluir</button>
+                      ${this.podeEditarPlanejamento() ? `<button class="btn btn-secondary" onclick="appRT.abrirModalEditar('${i.id}')">✏️ Editar</button>
+                      <button class="btn btn-danger" onclick="appRT.excluir('${i.id}')">🗑️ Excluir</button>` : ''}
                     </div>
                   </td>
                 </tr>`).join('')}
@@ -3740,30 +3768,6 @@ window.appMateriais = appMateriais;
       html2canvas: { scale: 2, useCORS: true },
       jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
     }).from(wrapper).save();
-  },
-
-
-  renderizarAcoesRT() {
-    const podeGerenciar = this.podeGerenciarRT();
-    const elNovoPlanejamento = document.getElementById('acao-novo-planejamento');
-    const elExcluirPlanejamento = document.getElementById('acao-excluir-planejamento');
-    const elNovoDiaDia = document.getElementById('acao-novo-dia-dia');
-
-    if (elNovoPlanejamento) {
-      elNovoPlanejamento.innerHTML = podeGerenciar
-        ? '<button class="btn btn-primary" onclick="appRT.abrirModalPlanejamento()">➕ Novo Planejamento</button>'
-        : '';
-    }
-    if (elExcluirPlanejamento) {
-      elExcluirPlanejamento.innerHTML = podeGerenciar
-        ? '<button class="btn btn-danger" onclick="appRT.excluirTudoPlanejamento()">🗑️ Excluir todo planejamento</button>'
-        : '';
-    }
-    if (elNovoDiaDia) {
-      elNovoDiaDia.innerHTML = podeGerenciar
-        ? '<button class="btn btn-primary" onclick="appRT.abrirModalDiaDia()">➕ Nova RT Dia a Dia</button>'
-        : '';
-    }
   },
 
   gerarPdfDiaDia() {
