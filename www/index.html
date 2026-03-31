@@ -589,7 +589,91 @@
       .image-preview-app { height: 200px; }
     }
 
-  </style>
+  
+
+    /* ── Planejamento RT / RT Dia a Dia Mobile ── */
+    .danger-zone-note { font-size: .82rem; color: var(--muted); margin-top: .5rem; }
+    @media (max-width: 768px) {
+      #planejamento-rt .filter-bar,
+      #rt-dia-dia .filter-bar {
+        grid-template-columns: 1fr !important;
+      }
+      #planejamento-rt .btn-group,
+      #rt-dia-dia .btn-group {
+        flex-direction: column;
+      }
+      #planejamento-rt .btn-group .btn,
+      #rt-dia-dia .btn-group .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      #planejamento-rt .table-wrap,
+      #rt-dia-dia .table-wrap {
+        overflow: visible !important;
+      }
+      #planejamento-rt table,
+      #rt-dia-dia table {
+        width: 100%;
+        border-collapse: separate;
+      }
+      #planejamento-rt thead,
+      #rt-dia-dia thead {
+        display: none;
+      }
+      #planejamento-rt tbody,
+      #rt-dia-dia tbody,
+      #planejamento-rt tr,
+      #rt-dia-dia tr,
+      #planejamento-rt td,
+      #rt-dia-dia td {
+        display: block;
+        width: 100%;
+      }
+      #planejamento-rt tr,
+      #rt-dia-dia tr {
+        background: #fff;
+        border: 1px solid #dbe5f3;
+        border-radius: 12px;
+        padding: .75rem;
+        margin-bottom: .9rem;
+        box-shadow: 0 2px 10px rgba(31,56,100,.08);
+      }
+      #planejamento-rt td,
+      #rt-dia-dia td {
+        border: 0 !important;
+        padding: .45rem 0 !important;
+        text-align: left !important;
+      }
+      #planejamento-rt td::before,
+      #rt-dia-dia td::before {
+        content: attr(data-label);
+        display: block;
+        font-weight: 700;
+        color: var(--blue-dark);
+        margin-bottom: .2rem;
+      }
+      #planejamento-rt td[data-label="Ações"] .btn-group,
+      #rt-dia-dia td[data-label="Ações"] .btn-group {
+        flex-direction: column;
+        width: 100%;
+      }
+      #planejamento-rt td[data-label="Ações"] .btn,
+      #rt-dia-dia td[data-label="Ações"] .btn {
+        width: 100%;
+        justify-content: center;
+      }
+      #planejamento-rt .status-inline-select,
+      #rt-dia-dia .status-inline-select {
+        width: 100%;
+        min-width: 0;
+      }
+      #planejamento-rt .card,
+      #rt-dia-dia .card {
+        padding: 1rem;
+      }
+    }
+
+</style>
 </head>
 <body>
 
@@ -808,6 +892,7 @@
         <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
         <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
+        <button class="btn btn-danger" onclick="appRT.excluirTudoPlanejamento()">🗑️ Excluir todo planejamento</button>
       </div>
       <div class="filter-bar">
         <select id="rtMesFiltro" onchange="appRT.renderizar()">
@@ -3286,6 +3371,28 @@ const appRT = {
     app.mostrarAlerta('Planejamento RT excluído.', 'success');
   },
 
+  solicitarSenhaAdmin() {
+    const senha = prompt('Digite a senha para excluir todo o planejamento RT:');
+    if (senha === null) return null;
+    return senha;
+  },
+
+  async excluirTudoPlanejamento() {
+    if (!auth.pode('editar_planejamento_rt')) return app.mostrarAlerta('Seu perfil não pode excluir o planejamento RT.', 'error');
+    const senha = this.solicitarSenhaAdmin();
+    if (senha === null) return;
+    if (senha !== 'Admin@123') {
+      app.mostrarAlerta('Senha inválida para exclusão do planejamento RT.', 'error');
+      return;
+    }
+    if (!confirm('Tem certeza que deseja excluir TODO o planejamento RT? Esta ação não pode ser desfeita.')) return;
+    this.itens = [];
+    await this.salvarDados();
+    this.preencherFiltroTorres();
+    this.renderizar();
+    app.mostrarAlerta('Todo o planejamento RT foi excluído com sucesso.', 'success');
+  },
+
   itensFiltrados() {
     const mes = document.getElementById('rtMesFiltro')?.value || '';
     const status = document.getElementById('rtStatusFiltro')?.value || '';
@@ -3330,7 +3437,7 @@ const appRT = {
       .filter(i => i.mes === mes && this.prioridadeAutomatica(i) === 'Alta')
       .sort((a,b) => (a.dataRT || '').localeCompare(b.dataRT || '') || (a.dataServico || '').localeCompare(b.dataServico || ''));
     if (!container) return;
-    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Data RT</th><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.dataRT ? new Date(i.dataRT+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSelectHtml(i, 'planejamento')}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
+    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Data RT</th><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.dataRT ? new Date(i.dataRT+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Torre">${i.torre || '-'}</td><td data-label="Pavimento">${i.pavimento || '-'}</td><td>${i.servico}</td><td data-label="Material">${i.material}</td><td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Status">${this.statusSelectHtml(i, 'planejamento')}</td><td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
   },
 
 
@@ -3446,7 +3553,7 @@ const appRT = {
     const container = document.getElementById('rtDiaCriticas');
     if (!container) return;
     const lista = this.itensDiaDiaFiltrados().filter(i => this.prioridadeAutomatica(i) === 'Alta');
-    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 RTs Críticas do Dia a Dia</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Necessidade</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSelectHtml(i, 'dia')}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma RT crítica do dia a dia no momento.</p>`}</div>`;
+    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 RTs Críticas do Dia a Dia</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Necessidade</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td data-label="Torre">${i.torre || '-'}</td><td data-label="Pavimento">${i.pavimento || '-'}</td><td>${i.servico}</td><td data-label="Material">${i.material}</td><td data-label="Data necessidade">${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Status">${this.statusSelectHtml(i, 'dia')}</td><td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma RT crítica do dia a dia no momento.</p>`}</div>`;
   },
 
   renderizarDiaDia() {
@@ -3460,7 +3567,7 @@ const appRT = {
       container.innerHTML = '<p style="color:#6b7a99;">Nenhuma RT do Dia a Dia encontrada.</p>';
       return;
     }
-    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td>${i.material}</td><td>${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.leadTime || '-'} dia(s)</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSelectHtml(i, 'dia')}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td><div class="btn-group" style="margin:0;"><button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button></div></td></tr>`).join('')}</tbody></table></div>`;
+    container.innerHTML = `<div class="table-wrap"><table><thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data necessidade</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead><tbody>${lista.map(i => `<tr><td data-label="Torre">${i.torre || '-'}</td><td data-label="Pavimento">${i.pavimento || '-'}</td><td data-label="Serviço"><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td><td data-label="Material">${i.material}</td><td data-label="Data necessidade">${i.dataNecessidade ? new Date(i.dataNecessidade+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Lead time">${i.leadTime || '-'} dia(s)</td><td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td data-label="Status">${this.statusSelectHtml(i, 'dia')}</td><td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td><td data-label="Ações"><div class="btn-group" style="margin:0;"><button class="btn btn-secondary" onclick="appRT.abrirModalEditarDiaDia('${i.id}')">✏️ Editar</button><button class="btn btn-danger" onclick="appRT.excluirDiaDia('${i.id}')">🗑️ Excluir</button></div></td></tr>`).join('')}</tbody></table></div>`;
   },
 
   renderizar() {
@@ -3494,16 +3601,16 @@ const appRT = {
             <tbody>
               ${itens.map(i => `
                 <tr>
-                  <td>${i.torre || '-'}</td>
-                  <td>${i.pavimento || '-'}</td>
-                  <td><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td>
-                  <td>${i.material}</td>
-                  <td>${i.dataServico ? new Date(i.dataServico+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
-                  <td>${i.leadTime || '-'} dia(s)</td>
-                  <td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
-                  <td>${this.statusSelectHtml(i, 'planejamento')}</td>
-                  <td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td>
-                  <td>
+                  <td data-label="Torre">${i.torre || '-'}</td>
+                  <td data-label="Pavimento">${i.pavimento || '-'}</td>
+                  <td data-label="Serviço"><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td>
+                  <td data-label="Material">${i.material}</td>
+                  <td data-label="Início do serviço">${i.dataServico ? new Date(i.dataServico+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
+                  <td data-label="Lead time">${i.leadTime || '-'} dia(s)</td>
+                  <td data-label="Data ideal">${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
+                  <td data-label="Status">${this.statusSelectHtml(i, 'planejamento')}</td>
+                  <td data-label="Prioridade">${this.badgePrioridade(this.prioridadeAutomatica(i))}</td>
+                  <td data-label="Ações">
                     <div class="btn-group" style="margin:0;">
                       <button class="btn btn-secondary" onclick="appRT.abrirModalEditar('${i.id}')">✏️ Editar</button>
                       <button class="btn btn-danger" onclick="appRT.excluir('${i.id}')">🗑️ Excluir</button>
