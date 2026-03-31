@@ -806,7 +806,6 @@
       <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Acesso liberado somente para Admin e GO.</p>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
-        <button class="btn btn-success" onclick="appRT.importarPlanejamentoBase()">📥 Importar Planejamento Base</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
         <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
       </div>
@@ -1591,7 +1590,7 @@ const app = {
 
     const globalKpiGrid = document.getElementById('globalKpiGrid');
     if (globalKpiGrid) {
-      globalKpiGrid.style.display = ['planejamento-rt','rt-dia-dia'].includes(id) ? 'none' : 'grid';
+      globalKpiGrid.style.display = ['planejamento-rt','rt-dia-dia','materiais-obra','rastreabilidade'].includes(id) ? 'none' : 'grid';
     }
 
     if (id === 'relatorio') {
