@@ -1,0 +1,17 @@
+PACOTE V14 - PLANEJAMENTO RT COM BASE DA ESCADINHA
+
+Novidades:
+- Planejamento RT salvo no Firebase
+- Botão para importar a base da escadinha (CSV)
+- Importação automática do planejamento base ao abrir, se ainda não houver itens
+- Planejamento agrupado por Data da RT (quarta-feira)
+- Filtros por mês, status, torre e serviço
+- Colunas de Torre e Pavimento na tela de Planejamento RT
+- Campos de Torre e Pavimento no cadastro/edição do planejamento
+- Arquivos base incluídos: planejamento_rts_vila_ema.csv, planejamento_rts.md e planilha .xls
+
+Como atualizar o app:
+1) extraia este pacote
+2) abra o terminal na pasta do projeto
+3) rode: npx cap sync android
+4) rode: npx cap open android
