@@ -887,12 +887,13 @@
     <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📅 Voltar para início</button></div>
     <div class="card">
       <h2>📅 Planejamento RT da Escadinha</h2>
-      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Acesso liberado somente para Admin e GO.</p>
+      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Acesso liberado para Admin, GO e Almoxarife (somente entrega).</p>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
         <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
         <button class="btn btn-danger" onclick="appRT.excluirTudoPlanejamento()">🗑️ Excluir todo planejamento</button>
+        <button class="btn btn-success" onclick="appRT.gerarPdfPlanejamento()">📄 PDF dos Status</button>
       </div>
       <div class="filter-bar">
         <select id="rtMesFiltro" onchange="appRT.renderizar()">
@@ -904,8 +905,7 @@
           <option value="Pedir agora">Pedir agora</option>
           <option value="RT lançada">RT lançada</option>
           <option value="Em suprimentos">Em suprimentos</option>
-          <option value="Autorizado para compra">Autorizado para compra</option>
-          <option value="Aguardando entrega">Aguardando entrega</option>
+                    <option value="Aguardando entrega">Aguardando entrega</option>
           <option value="Entregue">Entregue</option>
           <option value="Concluído">Concluído</option>
         </select>
@@ -933,11 +933,12 @@
     <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📝 Voltar para início</button></div>
     <div class="card">
       <h2>📝 RT do Dia a Dia</h2>
-      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Use esta área para RTs avulsas, emergenciais e acompanhamentos fora da escadinha. Acesso liberado somente para Admin e GO.</p>
+      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Use esta área para RTs avulsas, emergenciais e acompanhamentos fora da escadinha. Acesso liberado para Admin, GO e Almoxarife (somente entrega).</p>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="appRT.abrirModalNovoDiaDia()">➕ Nova RT Dia a Dia</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDiaDia()">🚨 Ver RTs Críticas</button>
         <button class="btn btn-secondary" onclick="appRT.renderizarDiaDia()">🔄 Atualizar</button>
+        <button class="btn btn-success" onclick="appRT.gerarPdfDiaDia()">📄 PDF dos Status</button>
       </div>
       <div class="filter-bar">
         <select id="rtDiaStatusFiltro" onchange="appRT.renderizarDiaDia()">
@@ -946,8 +947,7 @@
           <option value="Pedir agora">Pedir agora</option>
           <option value="RT lançada">RT lançada</option>
           <option value="Em suprimentos">Em suprimentos</option>
-          <option value="Autorizado para compra">Autorizado para compra</option>
-          <option value="Aguardando entrega">Aguardando entrega</option>
+                    <option value="Aguardando entrega">Aguardando entrega</option>
           <option value="Entregue">Entregue</option>
           <option value="Concluído">Concluído</option>
         </select>
@@ -1502,7 +1502,7 @@ const auth = {
 
     const permitidas = {
       admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       go: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
@@ -2925,7 +2925,7 @@ const appRT = {
   _unsubDiaDia: null,
   meses: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
   servicos: ['Fachada','Estrutura de Concreto','Alvenaria Estrutural + Distribuição Elétrica','Gradil','Requadração de Caixilhos','Enfiação','Prumada Hidráulica + Aranha','Ramal Sanitário','Alvenaria dos Shafts','Contrapiso','Gesso Liso','Forro de Gesso','Impermeabilização','Cerâmica, Baguete, Soleira, Azulejo','Caixilhos','Bancada','Pintura (Aparelhamento)','Portas de Madeira','Interrupt, Tomadas, QDL','Louças e Metais','Limpeza Grossa','Arremates Gerais','Piso Laminado','Pintura Final','Limpeza Fina','Apto Pronto para Entrega','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
-  statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'],
+  statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Aguardando entrega','Entregue','Concluído'],
 
   podeSomenteEntregar() {
     return (window.currentUser?.role || '') === 'almoxarife';
@@ -3031,6 +3031,9 @@ const appRT = {
   },
 
   mesAtualNome() { return this.meses[new Date().getMonth()]; },
+  normalizarStatusRT(valor) {
+    return valor === 'Autorizado para compra' ? 'Aguardando entrega' : (valor || 'Planejado');
+  },
   mesPorData(dataIso) {
     if (!dataIso) return this.mesAtualNome();
     const dt = new Date(dataIso + 'T12:00:00');
