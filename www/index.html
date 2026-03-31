@@ -265,6 +265,29 @@
     button.btn-secondary:hover { background: #7f8c8d; }
     button.btn-warning { background: var(--warning); color: #fff; }
     button.btn-warning:hover { background: #e0941f; }
+    .status-inline-select {
+      width: 100%;
+      min-width: 170px;
+      padding: .55rem .75rem;
+      border: 1.5px solid #c8d6ea;
+      border-radius: 10px;
+      background: #fff;
+      color: var(--text);
+      font-weight: 600;
+      font-size: .9rem;
+      outline: none;
+    }
+    .status-inline-select:focus {
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 3px rgba(46,117,182,.12);
+    }
+    #planejamento-rt .card, #rt-dia-dia .card {
+      border: 1px solid #e6edf7;
+    }
+    #planejamento-rt .table-wrap table tbody tr:hover,
+    #rt-dia-dia .table-wrap table tbody tr:hover {
+      background: #f7fbff;
+    }
 
     /* ── Modal ── */
     .modal {
@@ -636,7 +659,7 @@
   <div id="alert" class="alert"></div>
 
   <!-- KPIs sempre visíveis -->
-  <div class="kpi-grid">
+  <div id="globalKpiGrid" class="kpi-grid">
     <div class="kpi">
       <div class="icon">📦</div>
       <div class="value" id="kpiTotal">0</div>
@@ -1549,11 +1572,27 @@ const app = {
   },
 
   showSection(id, btn) {
+    if (id === 'planejamento-rt' && !auth.pode('ver_planejamento_rt')) {
+      app.mostrarAlerta('Somente Admin e GO podem acessar o Planejamento RT.', 'error');
+      id = 'materiais-obra';
+      btn = document.querySelector('nav button[data-section="materiais-obra"]');
+    }
+    if (id === 'rt-dia-dia' && !auth.pode('ver_rt_dia_dia')) {
+      app.mostrarAlerta('Somente Admin e GO podem acessar RT do Dia a Dia.', 'error');
+      id = 'materiais-obra';
+      btn = document.querySelector('nav button[data-section="materiais-obra"]');
+    }
+
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
     const section = document.getElementById(id);
     if (section) section.classList.add('active');
     if (btn) btn.classList.add('active');
+
+    const globalKpiGrid = document.getElementById('globalKpiGrid');
+    if (globalKpiGrid) {
+      globalKpiGrid.style.display = ['planejamento-rt','rt-dia-dia'].includes(id) ? 'none' : 'grid';
+    }
 
     if (id === 'relatorio') {
       this.gerarRelatorioPDF();
@@ -1564,14 +1603,11 @@ const app = {
     if (id === 'rastreabilidade' && window.appMateriais && typeof window.appMateriais.renderizarRastreabilidadeCompleta === 'function') {
       window.appMateriais.renderizarRastreabilidadeCompleta();
     }
-    if (id === 'planejamento-rt') {
-      if (!auth.pode('ver_planejamento_rt')) {
-        app.mostrarAlerta('Somente Admin e GO podem acessar o Planejamento RT.', 'error');
-        id = 'materiais-obra';
-      }
-      if (window.appRT && typeof window.appRT.renderizar === 'function' && auth.pode('ver_planejamento_rt')) {
-        window.appRT.renderizar();
-      }
+    if (id === 'planejamento-rt' && window.appRT && typeof window.appRT.renderizar === 'function') {
+      window.appRT.renderizar();
+    }
+    if (id === 'rt-dia-dia' && window.appRT && typeof window.appRT.renderizarDiaDia === 'function') {
+      window.appRT.renderizarDiaDia();
     }
     atualizarBotaoMobile(id);
   },
@@ -2913,7 +2949,7 @@ const appRT = {
     const dataRT = this.parseBRDateToISO(item['Data da RT (Quarta)'] || item.dataRT || '');
     const mes = item.mes || this.mesPorData(dataServico);
     return {
-      id: item.id || `rt_${idx}_${Date.now()}`,
+      id: String(item.id || `rt_${idx}_${Date.now()}`),
       mes,
       servico: item['Serviço'] || item.servico || '',
       material: item['Nome na Planilha'] || item.material || item.nomePlanilha || '',
@@ -2941,7 +2977,7 @@ const appRT = {
     const dataNecessidade = item.dataNecessidade || item.dataServico || '';
     const leadTime = Number(item.leadTime || 20);
     return {
-      id: item.id || `rtdia_${idx}_${Date.now()}`,
+      id: String(item.id || `rtdia_${idx}_${Date.now()}`),
       servico: item.servico || '',
       material: item.material || '',
       torre: item.torre || '',
@@ -3124,7 +3160,7 @@ const appRT = {
 
   abrirModalEditar(id) {
     if (!auth.pode('editar_planejamento_rt')) return app.mostrarAlerta('Seu perfil não pode editar o planejamento RT.', 'error');
-    const item = this.itens.find(i => i.id === id);
+    const item = this.itens.find(i => String(i.id) === String(id));
     if (!item) return;
     this.editandoId = id;
     document.getElementById('modalPlanejamentoRTTitle').textContent = 'Editar Planejamento RT';
@@ -3183,23 +3219,25 @@ const appRT = {
   },
 
   async atualizarStatus(id, novoStatus) {
-    const idx = this.itens.findIndex(i => i.id === id);
+    const idx = this.itens.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
     const item = { ...this.itens[idx], status: novoStatus, updatedAt: new Date().toISOString() };
     this.aplicarDatasPorStatus(item, this.itens[idx]);
     this.itens[idx] = item;
     await this.salvarDados();
+    this.preencherFiltroTorres();
     this.renderizar();
     app.mostrarAlerta('Status do planejamento RT atualizado.', 'success');
   },
 
   async atualizarStatusDiaDia(id, novoStatus) {
-    const idx = this.itensDiaDia.findIndex(i => i.id === id);
+    const idx = this.itensDiaDia.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
     const item = { ...this.itensDiaDia[idx], status: novoStatus, updatedAt: new Date().toISOString() };
     this.aplicarDatasPorStatus(item, this.itensDiaDia[idx]);
     this.itensDiaDia[idx] = item;
     await this.salvarDadosDiaDia();
+    this.preencherFiltroTorresDiaDia();
     this.renderizarDiaDia();
     app.mostrarAlerta('Status da RT do Dia a Dia atualizado.', 'success');
   },
@@ -3213,7 +3251,7 @@ const appRT = {
   async salvar(event) {
     event.preventDefault();
     const item = {
-      id: this.editandoId || Date.now(),
+      id: String(this.editandoId || Date.now()),
       mes: document.getElementById('rtMes').value,
       servico: document.getElementById('rtServico').value,
       torre: document.getElementById('rtTorre').value.trim(),
@@ -3243,7 +3281,7 @@ const appRT = {
   async excluir(id) {
     if (!auth.pode('editar_planejamento_rt')) return app.mostrarAlerta('Seu perfil não pode excluir planejamentos RT.', 'error');
     if (!confirm('Deseja realmente excluir este item do planejamento RT?')) return;
-    this.itens = this.itens.filter(i => i.id !== id);
+    this.itens = this.itens.filter(i => String(i.id) !== String(id));
     await this.salvarDados();
     this.renderizar();
     app.mostrarAlerta('Planejamento RT excluído.', 'success');
@@ -3312,7 +3350,7 @@ const appRT = {
 
   abrirModalEditarDiaDia(id) {
     if (!auth.pode('editar_rt_dia_dia')) return app.mostrarAlerta('Seu perfil não pode editar RT do Dia a Dia.', 'error');
-    const item = this.itensDiaDia.find(i => i.id === id);
+    const item = this.itensDiaDia.find(i => String(i.id) === String(id));
     if (!item) return;
     this.editandoIdDiaDia = id;
     document.getElementById('modalRTDiaDiaTitle').textContent = 'Editar RT Dia a Dia';
@@ -3339,7 +3377,7 @@ const appRT = {
   async salvarDiaDia(event) {
     event.preventDefault();
     const item = this.normalizarDiaDia({
-      id: this.editandoIdDiaDia || Date.now(),
+      id: String(this.editandoIdDiaDia || Date.now()),
       servico: document.getElementById('rtDiaServico').value,
       material: document.getElementById('rtDiaMaterial').value.trim(),
       torre: document.getElementById('rtDiaTorre').value.trim(),
@@ -3370,7 +3408,7 @@ const appRT = {
   async excluirDiaDia(id) {
     if (!auth.pode('editar_rt_dia_dia')) return app.mostrarAlerta('Seu perfil não pode excluir RT do Dia a Dia.', 'error');
     if (!confirm('Deseja realmente excluir esta RT do Dia a Dia?')) return;
-    this.itensDiaDia = this.itensDiaDia.filter(i => i.id !== id);
+    this.itensDiaDia = this.itensDiaDia.filter(i => String(i.id) !== String(id));
     await this.salvarDadosDiaDia();
     this.renderizarDiaDia();
     app.mostrarAlerta('RT do Dia a Dia excluída.', 'success');
