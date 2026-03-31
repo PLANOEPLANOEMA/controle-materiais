@@ -779,8 +779,10 @@
     <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📅 Voltar para início</button></div>
     <div class="card">
       <h2>📅 Planejamento RT da Escadinha</h2>
+      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Acesso liberado somente para Admin e GO.</p>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
+        <button class="btn btn-success" onclick="appRT.importarPlanejamentoBase()">📥 Importar Planejamento Base</button>
         <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
         <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
       </div>
@@ -799,7 +801,13 @@
           <option value="Entregue">Entregue</option>
           <option value="Concluído">Concluído</option>
         </select>
-        <input type="text" id="rtBusca" placeholder="🔍 Buscar serviço ou material..." oninput="appRT.renderizar()" />
+        <select id="rtTorreFiltro" onchange="appRT.renderizar()">
+          <option value="">Todas as torres</option>
+        </select>
+        <select id="rtServicoFiltro" onchange="appRT.renderizar()">
+          <option value="">Todos os serviços</option>
+        </select>
+        <input type="text" id="rtBusca" placeholder="🔍 Buscar serviço, material ou pavimento..." oninput="appRT.renderizar()" />
       </div>
       <div id="rtResumo" class="kpi-grid" style="margin-top:1rem;"></div>
       <div id="rtPrioridadesMes" style="margin-top:1rem;"></div>
@@ -1058,7 +1066,17 @@
       </div>
       <div class="form-row">
         <div class="form-group">
-          <label for="rtMaterial">Material *</label>
+          <label for="rtTorre">Torre</label>
+          <input type="text" id="rtTorre" placeholder="Ex: Torre A" />
+        </div>
+        <div class="form-group">
+          <label for="rtPavimento">Pavimento</label>
+          <input type="text" id="rtPavimento" placeholder="Ex: 1º Pavto" />
+        </div>
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="rtMaterial">Material / Nome na planilha *</label>
           <input type="text" id="rtMaterial" required placeholder="Ex: Argamassa AC2" />
         </div>
         <div class="form-group">
@@ -1073,7 +1091,7 @@
         </div>
         <div class="form-group">
           <label for="rtLeadTime">Lead time (dias) *</label>
-          <input type="number" id="rtLeadTime" min="1" step="1" value="15" required />
+          <input type="number" id="rtLeadTime" min="1" step="1" value="20" required />
         </div>
       </div>
       <div class="form-row">
@@ -1267,9 +1285,9 @@ const auth = {
 
     const permitidas = {
       admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','rastreabilidade','relatorio','relatorio-dia'],
       go: ['materiais-obra','planejamento-rt','rastreabilidade','relatorio','relatorio-dia'],
-      engenharia: ['materiais-obra','planejamento-rt','relatorio','relatorio-dia']
+      engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
     document.querySelectorAll('nav button').forEach((btn) => {
@@ -1303,9 +1321,9 @@ const auth = {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
       admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
-      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
+      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt'],
-      engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt']
+      engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
     return (mapa[role] || []).includes(acao);
   }
@@ -1436,8 +1454,14 @@ const app = {
     if (id === 'rastreabilidade' && window.appMateriais && typeof window.appMateriais.renderizarRastreabilidadeCompleta === 'function') {
       window.appMateriais.renderizarRastreabilidadeCompleta();
     }
-    if (id === 'planejamento-rt' && window.appRT && typeof window.appRT.renderizar === 'function') {
-      window.appRT.renderizar();
+    if (id === 'planejamento-rt') {
+      if (!auth.pode('ver_planejamento_rt')) {
+        app.mostrarAlerta('Somente Admin e GO podem acessar o Planejamento RT.', 'error');
+        id = 'materiais-obra';
+      }
+      if (window.appRT && typeof window.appRT.renderizar === 'function' && auth.pode('ver_planejamento_rt')) {
+        window.appRT.renderizar();
+      }
     }
     atualizarBotaoMobile(id);
   },
@@ -2661,11 +2685,12 @@ const appMateriais = {
 
 const appRT = {
   STORAGE_KEY: 'planejamento_rt_dados',
+  BASE_FILE: 'planejamento_rts_vila_ema.csv',
   itens: [],
   editandoId: null,
   _unsub: null,
   meses: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  servicos: ['Contra piso','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
+  servicos: ['Contra piso','Contrapiso','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
   statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Autorizado para compra','Aguardando entrega','Entregue','Concluído'],
 
   init() {
@@ -2685,6 +2710,7 @@ const appRT = {
     const mesSel = document.getElementById('rtMes');
     const mesFiltro = document.getElementById('rtMesFiltro');
     const servSel = document.getElementById('rtServico');
+    const servFiltro = document.getElementById('rtServicoFiltro');
     const statusSel = document.getElementById('rtStatus');
     if (mesSel && !mesSel.dataset.ready) {
       mesSel.innerHTML = this.meses.map(m => `<option value="${m}">${m}</option>`).join('');
@@ -2699,13 +2725,112 @@ const appRT = {
       servSel.innerHTML = this.servicos.map(s => `<option value="${s}">${s}</option>`).join('');
       servSel.dataset.ready = '1';
     }
+    if (servFiltro && !servFiltro.dataset.ready) {
+      servFiltro.innerHTML = '<option value="">Todos os serviços</option>' + this.servicos.map(s => `<option value="${s}">${s}</option>`).join('');
+      servFiltro.dataset.ready = '1';
+    }
     if (statusSel && !statusSel.dataset.ready) {
       statusSel.innerHTML = this.statusList.map(s => `<option value="${s}">${s}</option>`).join('');
       statusSel.dataset.ready = '1';
     }
+    this.preencherFiltroTorres();
+  },
+
+  preencherFiltroTorres() {
+    const torreFiltro = document.getElementById('rtTorreFiltro');
+    if (!torreFiltro) return;
+    const torres = Array.from(new Set(this.itens.map(i => i.torre).filter(Boolean))).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+    const atual = torreFiltro.value || '';
+    torreFiltro.innerHTML = '<option value="">Todas as torres</option>' + torres.map(t => `<option value="${t}">${t}</option>`).join('');
+    torreFiltro.value = torres.includes(atual) ? atual : '';
   },
 
   mesAtualNome() { return this.meses[new Date().getMonth()]; },
+  mesPorData(dataIso) {
+    if (!dataIso) return this.mesAtualNome();
+    const dt = new Date(dataIso + 'T12:00:00');
+    return this.meses[dt.getMonth()] || this.mesAtualNome();
+  },
+
+  parseBRDateToISO(valor) {
+    if (!valor) return '';
+    if (/^\d{4}-\d{2}-\d{2}$/.test(valor)) return valor;
+    const partes = valor.split('/');
+    if (partes.length !== 3) return '';
+    const [dia, mes, ano] = partes;
+    return `${ano.padStart(4,'0')}-${mes.padStart(2,'0')}-${dia.padStart(2,'0')}`;
+  },
+
+  normalizarPlanejamentoImportado(item, idx = 0) {
+    const dataServico = this.parseBRDateToISO(item['Início Planejado'] || item.dataServico || item.inicioPlanejado || '');
+    const dataRT = this.parseBRDateToISO(item['Data da RT (Quarta)'] || item.dataRT || '');
+    const mes = item.mes || this.mesPorData(dataServico);
+    return {
+      id: item.id || `rt_${idx}_${Date.now()}`,
+      mes,
+      servico: item['Serviço'] || item.servico || '',
+      material: item['Nome na Planilha'] || item.material || item.nomePlanilha || '',
+      nomePlanilha: item['Nome na Planilha'] || item.nomePlanilha || '',
+      torre: item.Torre || item.torre || '',
+      pavimento: item.Pavimento || item.pavimento || '',
+      quantidade: Number(item.quantidade || 0),
+      dataServico,
+      leadTime: Number(item.leadTime || 20),
+      status: item.status || 'Planejado',
+      prioridadeManual: item.prioridadeManual || '',
+      dataRT,
+      dataAprovSupr: item.dataAprovSupr || '',
+      dataAutorizacao: item.dataAutorizacao || '',
+      dataEntrega: item.dataEntrega || '',
+      observacoes: item.observacoes || '',
+      origem: item.origem || 'escadinha',
+      updatedAt: item.updatedAt || new Date().toISOString(),
+      dataIdealPedido: this.calcularDataIdeal(dataServico, Number(item.leadTime || 20))
+    };
+  },
+
+  async importarPlanejamentoBase() {
+    try {
+      const res = await fetch(this.BASE_FILE);
+      if (!res.ok) throw new Error('Arquivo base não encontrado');
+      const texto = await res.text();
+      const linhas = texto.trim().split(/\r?\n/);
+      if (linhas.length < 2) throw new Error('Arquivo base vazio');
+      const headers = linhas[0].split(',').map(h => h.trim().replace(/^"|"$/g,''));
+      const valuesRe = /(".*?"|[^",]+)(?=,|$)/g;
+      const registros = linhas.slice(1).map((line, idx) => {
+        const values = line.match(valuesRe)?.map(v => v.replace(/^"|"$/g,'').trim()) || [];
+        const row = {};
+        headers.forEach((h, i) => row[h] = values[i] || '');
+        return this.normalizarPlanejamentoImportado(row, idx + 1);
+      }).filter(r => r.material && r.dataServico);
+
+      const manuais = this.itens.filter(i => i.origem !== 'escadinha');
+      registros.forEach((item) => {
+        const chave = `${item.torre}|${item.pavimento}|${item.servico}|${item.material}|${item.dataServico}`;
+        const antigo = this.itens.find(i => `${i.torre}|${i.pavimento}|${i.servico}|${i.material}|${i.dataServico}` === chave);
+        if (antigo) {
+          item.id = antigo.id;
+          item.status = antigo.status || item.status;
+          item.prioridadeManual = antigo.prioridadeManual || item.prioridadeManual;
+          item.dataAprovSupr = antigo.dataAprovSupr || item.dataAprovSupr;
+          item.dataAutorizacao = antigo.dataAutorizacao || item.dataAutorizacao;
+          item.dataEntrega = antigo.dataEntrega || item.dataEntrega;
+          item.observacoes = antigo.observacoes || item.observacoes;
+          item.quantidade = antigo.quantidade || item.quantidade;
+        }
+      });
+      this.itens = [...manuais, ...registros];
+      await this.salvarDados();
+      this.preencherFiltroTorres();
+      this.renderizar();
+      app.mostrarAlerta('Planejamento base da escadinha importado com sucesso!', 'success');
+    } catch (e) {
+      console.error('Erro ao importar planejamento base:', e);
+      app.mostrarAlerta('Não foi possível importar o planejamento base da escadinha.', 'error');
+    }
+  },
+
 
   async carregar() {
     try {
@@ -2719,6 +2844,9 @@ const appRT = {
       }
       const salvos = localStorage.getItem(this.STORAGE_KEY);
       this.itens = salvos ? JSON.parse(salvos) : [];
+      if (!this.itens.length) {
+        await this.importarPlanejamentoBase();
+      }
     } catch (e) {
       console.error('Erro ao carregar planejamento RT:', e);
       this.itens = [];
@@ -2750,7 +2878,9 @@ const appRT = {
     document.getElementById('formPlanejamentoRT').reset();
     document.getElementById('rtMes').value = document.getElementById('rtMesFiltro')?.value || this.mesAtualNome();
     document.getElementById('rtStatus').value = 'Planejado';
-    document.getElementById('rtLeadTime').value = 15;
+    document.getElementById('rtLeadTime').value = 20;
+    document.getElementById('rtTorre').value = '';
+    document.getElementById('rtPavimento').value = '';
     document.getElementById('modalPlanejamentoRT').classList.add('active');
     atualizarBotaoMobile();
   },
@@ -2763,6 +2893,8 @@ const appRT = {
     document.getElementById('modalPlanejamentoRTTitle').textContent = 'Editar Planejamento RT';
     document.getElementById('rtMes').value = item.mes || this.mesAtualNome();
     document.getElementById('rtServico').value = item.servico || this.servicos[0];
+    document.getElementById('rtTorre').value = item.torre || '';
+    document.getElementById('rtPavimento').value = item.pavimento || '';
     document.getElementById('rtMaterial').value = item.material || '';
     document.getElementById('rtQuantidade').value = item.quantidade || '';
     document.getElementById('rtDataServico').value = item.dataServico || '';
@@ -2820,6 +2952,8 @@ const appRT = {
       id: this.editandoId || Date.now(),
       mes: document.getElementById('rtMes').value,
       servico: document.getElementById('rtServico').value,
+      torre: document.getElementById('rtTorre').value.trim(),
+      pavimento: document.getElementById('rtPavimento').value.trim(),
       material: document.getElementById('rtMaterial').value.trim(),
       quantidade: Number(document.getElementById('rtQuantidade').value || 0),
       dataServico: document.getElementById('rtDataServico').value,
@@ -2854,14 +2988,21 @@ const appRT = {
   itensFiltrados() {
     const mes = document.getElementById('rtMesFiltro')?.value || '';
     const status = document.getElementById('rtStatusFiltro')?.value || '';
+    const torre = document.getElementById('rtTorreFiltro')?.value || '';
+    const servico = document.getElementById('rtServicoFiltro')?.value || '';
     const busca = (document.getElementById('rtBusca')?.value || '').toLowerCase();
     return this.itens.filter(item => {
       const okMes = !mes || item.mes === mes;
       const okStatus = !status || this.statusSugerido(item) === status || item.status === status;
-      const blob = `${item.servico} ${item.material} ${item.observacoes || ''}`.toLowerCase();
+      const okTorre = !torre || item.torre === torre;
+      const okServico = !servico || item.servico === servico;
+      const blob = `${item.servico} ${item.material} ${item.pavimento || ''} ${item.torre || ''} ${item.observacoes || ''}`.toLowerCase();
       const okBusca = !busca || blob.includes(busca);
-      return okMes && okStatus && okBusca;
+      return okMes && okStatus && okTorre && okServico && okBusca;
     }).sort((a,b) => {
+      const rtA = a.dataRT || '';
+      const rtB = b.dataRT || '';
+      if (rtA !== rtB) return rtA.localeCompare(rtB);
       const mi = this.meses.indexOf(a.mes) - this.meses.indexOf(b.mes);
       if (mi !== 0) return mi;
       return (a.dataServico || '').localeCompare(b.dataServico || '');
@@ -2884,14 +3025,17 @@ const appRT = {
   verPrioridadesDoMes() {
     const mes = document.getElementById('rtMesFiltro')?.value || this.mesAtualNome();
     const container = document.getElementById('rtPrioridadesMes');
-    const lista = this.itens.filter(i => i.mes === mes && this.prioridadeAutomatica(i) === 'Alta');
+    const lista = this.itens
+      .filter(i => i.mes === mes && this.prioridadeAutomatica(i) === 'Alta')
+      .sort((a,b) => (a.dataRT || '').localeCompare(b.dataRT || '') || (a.dataServico || '').localeCompare(b.dataServico || ''));
     if (!container) return;
-    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.servico}</td><td>${i.material}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
+    container.innerHTML = `<div class="card" style="margin-bottom:0;"><h2>🚨 Prioridades de ${mes}</h2>${lista.length ? `<div class="table-wrap"><table><thead><tr><th>Data RT</th><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Data ideal</th><th>Status</th><th>Prioridade</th></tr></thead><tbody>${lista.map(i => `<tr><td>${i.dataRT ? new Date(i.dataRT+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${i.torre || '-'}</td><td>${i.pavimento || '-'}</td><td>${i.servico}</td><td>${i.material}</td><td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td><td>${this.statusSugerido(i)}</td><td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma prioridade alta encontrada para ${mes}.</p>`}</div>`;
   },
 
   renderizar() {
     const container = document.getElementById('rtPlanejamentoContainer');
     if (!container) return;
+    this.preencherFiltroTorres();
     const lista = this.itensFiltrados();
     this.renderResumo(lista);
     this.verPrioridadesDoMes();
@@ -2900,19 +3044,29 @@ const appRT = {
       return;
     }
     const grupos = {};
-    for (const item of lista) { (grupos[item.mes] ||= []).push(item); }
-    container.innerHTML = Object.entries(grupos).map(([mes, itens]) => `
+    for (const item of lista) {
+      const chave = item.dataRT || `${item.mes}-sem-data`;
+      (grupos[chave] ||= []).push(item);
+    }
+    const chaves = Object.keys(grupos).sort((a,b) => a.localeCompare(b));
+    container.innerHTML = chaves.map((dataRT) => {
+      const itens = grupos[dataRT].sort((a,b) => (a.dataServico || '').localeCompare(b.dataServico || ''));
+      const titulo = dataRT && /^\d{4}-\d{2}-\d{2}$/.test(dataRT)
+        ? `🗓️ Reunião de RT - ${new Date(dataRT+'T12:00:00').toLocaleDateString('pt-BR')}`
+        : `🗓️ ${itens[0].mes}`;
+      return `
       <div class="card" style="margin-bottom:1rem;">
-        <h2>📅 ${mes}</h2>
+        <h2>${titulo}</h2>
         <div class="table-wrap">
           <table>
-            <thead><tr><th>Serviço</th><th>Material</th><th>Qtd.</th><th>Início do serviço</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead>
+            <thead><tr><th>Torre</th><th>Pavimento</th><th>Serviço</th><th>Material</th><th>Início do serviço</th><th>Lead time</th><th>Data ideal</th><th>Status</th><th>Prioridade</th><th>Ações</th></tr></thead>
             <tbody>
               ${itens.map(i => `
                 <tr>
+                  <td>${i.torre || '-'}</td>
+                  <td>${i.pavimento || '-'}</td>
                   <td><strong>${i.servico}</strong>${i.observacoes ? `<div style="color:#6b7a99;font-size:12px;margin-top:4px;">${i.observacoes}</div>` : ''}</td>
                   <td>${i.material}</td>
-                  <td>${i.quantidade || '-'}</td>
                   <td>${i.dataServico ? new Date(i.dataServico+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
                   <td>${i.leadTime || '-'} dia(s)</td>
                   <td>${i.dataIdealPedido ? new Date(i.dataIdealPedido+'T12:00:00').toLocaleDateString('pt-BR') : '-'}</td>
@@ -2920,18 +3074,17 @@ const appRT = {
                   <td>${this.badgePrioridade(this.prioridadeAutomatica(i))}</td>
                   <td>
                     <div class="btn-group" style="margin:0;">
-                      <button class="btn btn-secondary" onclick="appRT.abrirModalEditar(${i.id})">✏️ Editar</button>
-                      <button class="btn btn-danger" onclick="appRT.excluir(${i.id})">🗑️ Excluir</button>
+                      <button class="btn btn-secondary" onclick="appRT.abrirModalEditar('${i.id}')">✏️ Editar</button>
+                      <button class="btn btn-danger" onclick="appRT.excluir('${i.id}')">🗑️ Excluir</button>
                     </div>
                   </td>
                 </tr>`).join('')}
             </tbody>
           </table>
         </div>
-      </div>`).join('');
+      </div>`; }).join('');
   }
 };
-
 
 // ── Inicializar ao carregar a página ──
 document.addEventListener('DOMContentLoaded', () => {
