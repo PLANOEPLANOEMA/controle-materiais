@@ -1,0 +1,4 @@
+V22
+- Almoxarife pode acessar Planejamento RT e RT Dia a Dia
+- Almoxarife não pode criar, editar ou excluir
+- Almoxarife só pode alterar status de 'Aguardando entrega' para 'Entregue'

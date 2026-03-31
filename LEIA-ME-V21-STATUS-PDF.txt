@@ -1,0 +1,4 @@
+V21
+- removido status 'Autorizado para compra'
+- adicionado botão PDF dos Status em Planejamento RT
+- adicionado botão PDF dos Status em RT Dia a Dia
