@@ -26,6 +26,7 @@ const REF_EMPRESTIMOS = doc(db, "controle", "dados");
 const REF_MATERIAIS = doc(db, "controle", "materiais");
 const REF_MOVIMENTACOES = doc(db, "controle", "movimentacoes");
 const REF_PLANEJAMENTO_RT = doc(db, "controle", "planejamento_rt");
+const REF_RT_DIA_DIA = doc(db, "controle", "rt_dia_dia");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
@@ -92,6 +93,24 @@ export async function carregarPlanejamentoRTDaNuvem() {
 
 export function escutarMudancasPlanejamentoRT(callback) {
   return onSnapshot(REF_PLANEJAMENTO_RT, (snap) => {
+    if (!snap.exists()) return;
+    callback(snap.data().itens ?? []);
+  });
+}
+
+
+// ── RT DIA A DIA ──
+export async function salvarRTDiaDiaNaNuvem(itens) {
+  await setDoc(REF_RT_DIA_DIA, { itens, updatedAt: Date.now() }, { merge: true });
+}
+
+export async function carregarRTDiaDiaDaNuvem() {
+  const snap = await getDoc(REF_RT_DIA_DIA);
+  return snap.exists() ? (snap.data().itens ?? null) : null;
+}
+
+export function escutarMudancasRTDiaDia(callback) {
+  return onSnapshot(REF_RT_DIA_DIA, (snap) => {
     if (!snap.exists()) return;
     callback(snap.data().itens ?? []);
   });
