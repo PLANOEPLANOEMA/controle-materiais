@@ -1,0 +1,1010 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Demonstração - Prédio 3D Interativo | Planejamento RT</title>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark:  #1F3864;
+      --blue-mid:   #2E75B6;
+      --blue-light: #DDEEFF;
+      --accent:     #E84545;
+      --success:    #27AE60;
+      --warning:    #F5A623;
+      --bg:         #F0F4FA;
+      --card:       #FFFFFF;
+      --text:       #1a2340;
+      --muted:      #6b7a99;
+      --radius:     14px;
+      --shadow:     0 4px 24px rgba(31,56,100,.10);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(31,56,100,.15);
+    }
+    header h1 {
+      font-size: 2.2rem;
+      margin-bottom: 0.5rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+    header p {
+      font-size: 1rem;
+      opacity: 0.95;
+      margin-bottom: 1rem;
+    }
+    .header-badge {
+      display: inline-block;
+      background: rgba(255,255,255,0.2);
+      padding: 0.5rem 1rem;
+      border-radius: 50px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      backdrop-filter: blur(10px);
+    }
+
+    /* ── Main Layout ── */
+    main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem;
+    }
+
+    /* ── Container Grid ── */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2rem;
+      margin-bottom: 3rem;
+    }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 2rem;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(31,56,100,.15);
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      color: var(--blue-dark);
+      margin-bottom: 1.5rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--blue-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* ── 3D PRÉDIO ── */
+    .predio-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+      padding: 1rem;
+      background: #f7fbff;
+      border-radius: 12px;
+      border-left: 4px solid var(--blue-mid);
+    }
+    .predio-legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--text);
+    }
+    .predio-dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+    .predio-dot.verde { background: #27AE60; }
+    .predio-dot.amarelo { background: #F5A623; }
+    .predio-dot.vermelho { background: #E84545; }
+    .predio-dot.cinza { background: #95a5a6; }
+
+    .predio-real-wrap {
+      display: grid;
+      grid-template-columns: minmax(680px, 1fr) 360px;
+      gap: 1.25rem;
+      align-items: start;
+    }
+
+    .predio-real-stage {
+      position: relative;
+      min-height: 980px;
+      background:
+        radial-gradient(circle at 15% 15%, rgba(255,255,255,.55), transparent 28%),
+        linear-gradient(180deg, #b7d7ea 0%, #cae2ef 58%, #d7e5ee 100%);
+      border-radius: 24px;
+      border: 1px solid #d5e3ef;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      padding: 1.25rem;
+    }
+
+    .predio-real-toolbar {
+      display: flex;
+      align-items: end;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      position: relative;
+      z-index: 3;
+      margin-bottom: 1rem;
+    }
+
+    .predio-real-help {
+      color: #466178;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .predio-scene {
+      position: relative;
+      min-height: 860px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: center;
+      padding-bottom: 3rem;
+    }
+
+    .predio-shadow {
+      position: absolute;
+      bottom: 34px;
+      width: 420px;
+      height: 48px;
+      background: rgba(42,65,92,.22);
+      filter: blur(20px);
+      border-radius: 999px;
+    }
+
+    .predio-iso {
+      position: relative;
+      width: 360px;
+      transform: skewY(-7deg) rotate(-2deg);
+      transform-origin: bottom center;
+    }
+
+    .predio-roof {
+      position: relative;
+      height: 34px;
+      margin-left: 38px;
+      width: 286px;
+      background: linear-gradient(180deg, #a2a9b0 0%, #8f979f 100%);
+      border: 1px solid #737a82;
+      border-radius: 10px 10px 0 0;
+      box-shadow: 0 10px 16px rgba(39,53,71,.16);
+    }
+
+    .predio-roof::before {
+      content: '';
+      position: absolute;
+      right: -34px;
+      top: 6px;
+      width: 34px;
+      height: 28px;
+      background: linear-gradient(180deg, #9098a0 0%, #7f8891 100%);
+      border: 1px solid #727981;
+      border-left: none;
+      transform: skewY(26deg);
+      border-radius: 0 8px 0 0;
+    }
+
+    .predio-core {
+      position: absolute;
+      right: 8px;
+      top: -98px;
+      width: 64px;
+      height: 118px;
+      background: linear-gradient(180deg, #b5bbc2 0%, #a0a8b1 100%);
+      border: 1px solid #7a8188;
+      transform: skewY(10deg);
+      box-shadow: 0 8px 12px rgba(39,53,71,.12);
+    }
+
+    .predio-body {
+      position: relative;
+      width: 286px;
+      margin-left: 38px;
+      background: linear-gradient(180deg, #d9dde1 0%, #c7ccd1 100%);
+      border-left: 2px solid #8c9198;
+      border-bottom: 2px solid #8c9198;
+      border-right: 1px solid #9ca2aa;
+      box-shadow: 0 18px 28px rgba(42,52,67,.16);
+    }
+
+    .predio-side {
+      position: absolute;
+      top: 34px;
+      left: 323px;
+      width: 32px;
+      bottom: 92px;
+      background: linear-gradient(180deg, #b7bcc3 0%, #a2a9b1 100%);
+      border-right: 1px solid #7f868d;
+      border-bottom: 1px solid #7f868d;
+      transform: skewY(26deg);
+      transform-origin: top left;
+    }
+
+    .predio-floor {
+      position: relative;
+      height: 38px;
+      border-top: 2px solid #8e949c;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.15) 0%, rgba(255,255,255,0) 35%, rgba(0,0,0,.06) 100%),
+        linear-gradient(180deg, #d5d9de 0%, #c7ccd1 100%);
+      cursor: pointer;
+      transition: transform .15s ease, box-shadow .15s ease;
+      overflow: hidden;
+    }
+
+    .predio-floor:hover {
+      transform: translateX(-2px);
+      box-shadow: inset 0 0 0 2px rgba(31,56,100,.12);
+    }
+
+    .predio-floor.active {
+      box-shadow: inset 0 0 0 3px #1F3864;
+    }
+
+    .predio-floor::after {
+      content: '';
+      position: absolute;
+      right: -32px;
+      top: 0;
+      width: 32px;
+      height: 100%;
+      background: linear-gradient(180deg, #b7bcc3 0%, #a0a8b1 100%);
+      border-top: 2px solid #818890;
+      border-right: 1px solid #747b82;
+      transform: skewY(26deg);
+      transform-origin: top left;
+    }
+
+    .predio-floor-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.8rem;
+      height: 100%;
+      padding: 0 0.75rem;
+      position: relative;
+      z-index: 2;
+    }
+
+    .predio-floor-label {
+      font-size: 0.78rem;
+      font-weight: 800;
+      color: #3a4654;
+    }
+
+    .predio-floor .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      border-radius: 999px;
+      padding: 0.18rem 0.45rem;
+      font-size: 0.66rem;
+      font-weight: 700;
+      background: rgba(255,255,255,.58);
+      color: #344255;
+    }
+
+    .predio-progress {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 8px;
+      z-index: 2;
+    }
+
+    .predio-floor.verde .predio-progress { background: #27AE60; }
+    .predio-floor.amarelo .predio-progress { background: #F5A623; }
+    .predio-floor.vermelho .predio-progress { background: #E84545; }
+    .predio-floor.cinza .predio-progress { background: #95a5a6; }
+
+    .predio-floor.verde {
+      background:
+        linear-gradient(90deg, rgba(39,174,96,.18) 0%, rgba(255,255,255,0) 18%, rgba(0,0,0,.06) 100%),
+        linear-gradient(180deg, #d7e8dc 0%, #c8dacf 100%);
+    }
+
+    .predio-floor.amarelo {
+      background:
+        linear-gradient(90deg, rgba(245,166,35,.2) 0%, rgba(255,255,255,0) 18%, rgba(0,0,0,.06) 100%),
+        linear-gradient(180deg, #ebe1cb 0%, #dfd2b5 100%);
+    }
+
+    .predio-floor.vermelho {
+      background:
+        linear-gradient(90deg, rgba(232,69,69,.2) 0%, rgba(255,255,255,0) 18%, rgba(0,0,0,.06) 100%),
+        linear-gradient(180deg, #ead1d1 0%, #dfbcbc 100%);
+    }
+
+    .predio-floor.cinza {
+      background:
+        linear-gradient(90deg, rgba(149,165,166,.18) 0%, rgba(255,255,255,0) 18%, rgba(0,0,0,.06) 100%),
+        linear-gradient(180deg, #d9dde1 0%, #c7ccd1 100%);
+    }
+
+    .predio-window-grid {
+      position: absolute;
+      inset: 7px 78px 7px 54px;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 7px;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .predio-window {
+      border-radius: 3px;
+      background: rgba(238,244,250,.92);
+      border: 1px solid rgba(87,105,124,.14);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.65);
+    }
+
+    .predio-recess {
+      position: absolute;
+      left: 102px;
+      width: 58px;
+      background: linear-gradient(180deg, #bfc5cb 0%, #aeb5bc 100%);
+      border-left: 1px solid #8a9097;
+      border-right: 1px solid #8a9097;
+      z-index: 3;
+      pointer-events: none;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.15);
+    }
+
+    .predio-recess.small { top: 96px; height: 122px; }
+    .predio-recess.mid { top: 312px; height: 132px; }
+    .predio-recess.low { top: 548px; height: 122px; }
+
+    .predio-pilotis {
+      position: absolute;
+      left: 56px;
+      right: 62px;
+      bottom: -156px;
+      height: 156px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      padding: 0 8px;
+      z-index: 1;
+    }
+
+    .predio-pilar {
+      width: 8px;
+      height: 148px;
+      background: linear-gradient(180deg, #7e868e 0%, #676f78 100%);
+      border-radius: 6px;
+      box-shadow: inset -1px 0 0 rgba(255,255,255,.18);
+    }
+
+    .predio-right-panel .metric {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0,1fr));
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .predio-right-panel .metric-card {
+      background: #f7fbff;
+      border: 1px solid #dbe7f7;
+      border-radius: 14px;
+      padding: 0.85rem;
+    }
+
+    .predio-right-panel .metric-card .num {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+    }
+
+    .predio-right-panel .metric-card .label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-weight: 600;
+      margin-top: 0.25rem;
+    }
+
+    .predio-floor-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      max-height: 300px;
+      overflow-y: auto;
+      margin-bottom: 1rem;
+    }
+
+    .predio-floor-item {
+      background: #f7fbff;
+      border: 1px solid #dbe7f7;
+      border-radius: 10px;
+      padding: 0.75rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .predio-floor-item:hover {
+      background: #eef5ff;
+      border-color: var(--blue-mid);
+    }
+
+    .predio-floor-item.active {
+      background: var(--blue-light);
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 2px rgba(46,117,182,.1);
+    }
+
+    .predio-badge {
+      display: inline-block;
+      padding: 0.35rem 0.75rem;
+      border-radius: 50px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+    }
+
+    .predio-details-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .predio-details-item {
+      background: #f8fbff;
+      border: 1px solid #e3edf9;
+      border-radius: 12px;
+      padding: 0.75rem;
+      font-size: 0.85rem;
+    }
+
+    .predio-empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    /* ── Control Panel ── */
+    .control-panel {
+      background: #f7fbff;
+      border: 1px solid #dbe7f7;
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .control-panel h3 {
+      font-size: 1.1rem;
+      color: var(--blue-dark);
+      margin-bottom: 1rem;
+      font-weight: 700;
+    }
+
+    .control-group {
+      margin-bottom: 1.5rem;
+    }
+
+    .control-group label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--text);
+      font-size: 0.9rem;
+    }
+
+    .control-group select,
+    .control-group input {
+      width: 100%;
+      padding: 0.6rem 0.8rem;
+      border: 1.5px solid #c8d6ea;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .control-group select:focus,
+    .control-group input:focus {
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 3px rgba(46,117,182,.1);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    button {
+      padding: 0.6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    button.btn-primary {
+      background: var(--blue-mid);
+      color: #fff;
+    }
+
+    button.btn-primary:hover {
+      background: var(--blue-dark);
+      box-shadow: 0 4px 12px rgba(31,56,100,.3);
+    }
+
+    button.btn-success {
+      background: var(--success);
+      color: #fff;
+    }
+
+    button.btn-success:hover {
+      background: #1e8449;
+    }
+
+    button.btn-warning {
+      background: var(--warning);
+      color: #fff;
+    }
+
+    button.btn-warning:hover {
+      background: #e0941f;
+    }
+
+    button.btn-secondary {
+      background: #95a5a6;
+      color: #fff;
+    }
+
+    button.btn-secondary:hover {
+      background: #7f8c8d;
+    }
+
+    /* ── Info Box ── */
+    .info-box {
+      background: #e3f2fd;
+      border-left: 4px solid var(--blue-mid);
+      padding: 1rem;
+      border-radius: 8px;
+      margin-bottom: 1.5rem;
+    }
+
+    .info-box strong {
+      color: var(--blue-dark);
+    }
+
+    .info-box p {
+      margin: 0.5rem 0;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 1200px) {
+      .demo-grid { grid-template-columns: 1fr; }
+      .predio-real-wrap { grid-template-columns: 1fr; }
+      .predio-real-stage { min-height: 920px; }
+    }
+
+    @media (max-width: 760px) {
+      header h1 { font-size: 1.6rem; }
+      .predio-real-stage { padding: 0.8rem; min-height: 860px; }
+      .predio-iso { width: 300px; }
+      .predio-body { width: 240px; margin-left: 32px; }
+      .predio-roof { width: 240px; margin-left: 32px; }
+      .predio-side { left: 271px; }
+      .predio-window-grid { inset: 7px 60px 7px 46px; }
+      .predio-recess { left: 84px; width: 48px; }
+      .predio-pilotis { left: 46px; right: 52px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── HEADER ── -->
+<header>
+  <h1>🏢 Prédio 3D Interativo</h1>
+  <p>Demonstração da integração com Planejamento RT</p>
+  <span class="header-badge">Sistema de Cores Dinâmico</span>
+</header>
+
+<!-- ── MAIN ── -->
+<main>
+
+  <!-- ── INFO BOX ── -->
+  <div class="info-box">
+    <strong>ℹ️ Como funciona:</strong>
+    <p>Clique nos pavimentos para ver detalhes. Use o painel de controle para simular diferentes cenários de construção.</p>
+    <p><strong>Cores:</strong> Verde = Concluído | Amarelo = Em andamento | Vermelho = Bloqueado (anterior incompleto) | Cinza = Planejado</p>
+  </div>
+
+  <!-- ── DEMO GRID ── -->
+  <div class="demo-grid">
+
+    <!-- ── LEFT: 3D PRÉDIO ── -->
+    <div class="card">
+      <h2>🏗️ Visualização 3D</h2>
+      
+      <div class="predio-legend">
+        <div class="predio-legend-item"><span class="predio-dot verde"></span> Concluído</div>
+        <div class="predio-legend-item"><span class="predio-dot amarelo"></span> Em andamento</div>
+        <div class="predio-legend-item"><span class="predio-dot vermelho"></span> Bloqueado</div>
+        <div class="predio-legend-item"><span class="predio-dot cinza"></span> Planejado</div>
+      </div>
+
+      <div class="predio-real-wrap">
+        <div class="predio-real-stage">
+          <div class="predio-real-toolbar">
+            <div class="predio-real-help">Modelo 3D em perspectiva isométrica</div>
+          </div>
+          <div class="predio-scene">
+            <div class="predio-shadow"></div>
+            <div class="predio-iso">
+              <div class="predio-core"></div>
+              <div class="predio-roof"></div>
+              <div class="predio-side"></div>
+              <div class="predio-body" id="predioBody"></div>
+              <div class="predio-pilotis">
+                <div class="predio-pilar"></div><div class="predio-pilar"></div><div class="predio-pilar"></div>
+                <div class="predio-pilar"></div><div class="predio-pilar"></div><div class="predio-pilar"></div>
+                <div class="predio-pilar"></div><div class="predio-pilar"></div><div class="predio-pilar"></div>
+              </div>
+              <div class="predio-recess small"></div>
+              <div class="predio-recess mid"></div>
+              <div class="predio-recess low"></div>
+            </div>
+          </div>
+        </div>
+        <div class="card predio-right-panel" style="margin:0;">
+          <h2 style="margin-bottom:.9rem; font-size: 1.1rem;">Detalhes</h2>
+          <div class="metric">
+            <div class="metric-card"><div class="num" id="predioCountFloors">0</div><div class="label">Pavimentos</div></div>
+            <div class="metric-card"><div class="num" id="predioCountCritical">0</div><div class="label">Bloqueados</div></div>
+          </div>
+          <div class="predio-floor-list" id="predioFloorList"></div>
+          <div style="margin-top:1rem;">
+            <div class="predio-badge" id="predioSelectedLabel">Selecione um pavimento</div>
+            <div class="predio-details-list" id="predioDetails" style="margin-top:.85rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── RIGHT: CONTROL PANEL ── -->
+    <div class="card">
+      <h2>🎮 Painel de Controle</h2>
+      
+      <div class="control-panel">
+        <h3>Simulador de Construção</h3>
+        
+        <div class="control-group">
+          <label for="towerSelect">Torre</label>
+          <select id="towerSelect" onchange="demo.selectTower(this.value)">
+            <option value="Torre A">Torre A</option>
+            <option value="Torre B">Torre B</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="floorSelect">Selecionar Pavimento</label>
+          <select id="floorSelect" onchange="demo.selectFloor(this.value)">
+            <option value="">-- Escolha um pavimento --</option>
+          </select>
+        </div>
+
+        <div class="control-group">
+          <label for="statusSelect">Status do Pavimento</label>
+          <select id="statusSelect">
+            <option value="planejado">Planejado (Cinza)</option>
+            <option value="andamento">Em andamento (Amarelo)</option>
+            <option value="concluido">Concluído (Verde)</option>
+          </select>
+        </div>
+
+        <div class="btn-group">
+          <button class="btn-primary" onclick="demo.applyStatus()">✓ Aplicar Status</button>
+          <button class="btn-secondary" onclick="demo.resetAll()">🔄 Resetar Tudo</button>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <h3>Cenários Pré-configurados</h3>
+        
+        <div class="btn-group" style="flex-direction: column; gap: 0.5rem;">
+          <button class="btn-success" onclick="demo.loadScenario('inicio')">
+            📍 Cenário 1: Início da Obra
+          </button>
+          <button class="btn-warning" onclick="demo.loadScenario('progresso')">
+            🚀 Cenário 2: Em Progresso
+          </button>
+          <button class="btn-primary" onclick="demo.loadScenario('avancado')">
+            ⚡ Cenário 3: Avançado
+          </button>
+        </div>
+      </div>
+
+      <div class="control-panel">
+        <h3>Informações</h3>
+        <p style="font-size: 0.9rem; color: var(--muted); line-height: 1.6;">
+          <strong>Torre A:</strong> 18 pavimentos + Térreo<br>
+          <strong>Torre B:</strong> 20 pavimentos + Térreo<br><br>
+          Esta demonstração mostra como o prédio 3D se integra com o Planejamento RT, refletindo em tempo real o status de cada pavimento.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+<script>
+  // ── DEMO APPLICATION ──
+  const demo = {
+    state: {
+      tower: 'Torre A',
+      selectedKey: null,
+      floorStatuses: {}
+    },
+
+    towers() {
+      return {
+        'Torre A': ['Térreo', ...Array.from({length:18}, (_, i) => `${i+1}º Pavto`)],
+        'Torre B': ['Térreo', ...Array.from({length:20}, (_, i) => `${i+1}º Pavto`)]
+      };
+    },
+
+    parseDate(v) {
+      if (!v) return null;
+      try {
+        if (/^\d{4}-\d{2}-\d{2}/.test(v)) return new Date(v + 'T12:00:00');
+        if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) {
+          const [d,m,y] = v.split('/');
+          return new Date(`${y}-${m}-${d}T12:00:00`);
+        }
+      } catch (e) {}
+      return null;
+    },
+
+    statusLabel(status) {
+      return ({ verde: 'Concluído', amarelo: 'Em andamento', vermelho: 'Bloqueado', cinza: 'Planejado' })[status] || 'Planejado';
+    },
+
+    progress(status) {
+      const map = { verde: 100, amarelo: 60, vermelho: 0, cinza: 0 };
+      return map[status] || 0;
+    },
+
+    computeFloorStatus(floorIndex, allFloorsModel) {
+      const statusKey = `${this.state.tower}__${allFloorsModel[floorIndex].floor}`;
+      const customStatus = this.state.floorStatuses[statusKey];
+      
+      if (customStatus) {
+        if (customStatus === 'verde') return 'verde';
+        if (customStatus === 'andamento') {
+          if (floorIndex > 0) {
+            const prevFloor = allFloorsModel[floorIndex - 1];
+            const prevStatusKey = `${this.state.tower}__${prevFloor.floor}`;
+            const prevStatus = this.state.floorStatuses[prevStatusKey] || 'cinza';
+            if (prevStatus !== 'verde') return 'vermelho';
+          }
+          return 'amarelo';
+        }
+        if (customStatus === 'planejado') {
+          if (floorIndex > 0) {
+            const prevFloor = allFloorsModel[floorIndex - 1];
+            const prevStatusKey = `${this.state.tower}__${prevFloor.floor}`;
+            const prevStatus = this.state.floorStatuses[prevStatusKey] || 'cinza';
+            if (prevStatus !== 'verde') return 'vermelho';
+          }
+          return 'cinza';
+        }
+      }
+
+      if (floorIndex > 0) {
+        const prevFloor = allFloorsModel[floorIndex - 1];
+        const prevStatusKey = `${this.state.tower}__${prevFloor.floor}`;
+        const prevStatus = this.state.floorStatuses[prevStatusKey] || 'cinza';
+        if (prevStatus !== 'verde') return 'vermelho';
+      }
+
+      return 'cinza';
+    },
+
+    model() {
+      const tower = this.state.tower;
+      const floors = this.towers()[tower] || [];
+      
+      const model = [];
+      floors.forEach((floor, index) => {
+        const floorObj = {
+          tower,
+          floor,
+          key: `${tower}__${floor}`,
+          items: []
+        };
+        floorObj.status = this.computeFloorStatus(index, model.concat(floorObj));
+        floorObj.progress = this.progress(floorObj.status);
+        model.push(floorObj);
+      });
+      return model;
+    },
+
+    render() {
+      const body = document.getElementById('predioBody');
+      const floorList = document.getElementById('predioFloorList');
+      const details = document.getElementById('predioDetails');
+      const selectedLabel = document.getElementById('predioSelectedLabel');
+      const countFloors = document.getElementById('predioCountFloors');
+      const countCritical = document.getElementById('predioCountCritical');
+
+      const model = this.model();
+      if (!this.state.selectedKey) this.state.selectedKey = model[0]?.key || null;
+      if (this.state.selectedKey && !model.some(m => m.key === this.state.selectedKey)) {
+        this.state.selectedKey = model[0]?.key || null;
+      }
+
+      countFloors.textContent = String(model.length);
+      countCritical.textContent = String(model.filter(m => m.status === 'vermelho').length);
+
+      body.innerHTML = [...model].reverse().map(f => `
+        <div class="predio-floor ${f.status}${this.state.selectedKey === f.key ? ' active' : ''}" onclick="demo.selectFloor('${f.key}')">
+          <div class="predio-progress"></div>
+          <div class="predio-window-grid">
+            <div class="predio-window"></div><div class="predio-window"></div><div class="predio-window"></div><div class="predio-window"></div>
+          </div>
+          <div class="predio-floor-inner">
+            <span class="predio-floor-label">${f.floor}</span>
+            <span class="status-badge">${this.statusLabel(f.status)} • ${f.progress}%</span>
+          </div>
+        </div>
+      `).join('');
+
+      floorList.innerHTML = model.map(f => `
+        <div class="predio-floor-item ${this.state.selectedKey === f.key ? 'active' : ''}" onclick="demo.selectFloor('${f.key}')">
+          <div>
+            <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
+            <div style="font-size:.82rem;color:var(--muted)">${f.progress}% • ${this.statusLabel(f.status)}</div>
+          </div>
+          <span class="predio-badge">${this.statusLabel(f.status)}</span>
+        </div>
+      `).join('');
+
+      const selected = model.find(m => m.key === this.state.selectedKey);
+      if (!selected) {
+        selectedLabel.textContent = 'Selecione um pavimento';
+        details.innerHTML = '<div class="predio-empty">Clique em um pavimento para ver detalhes.</div>';
+      } else {
+        selectedLabel.textContent = `${selected.tower} • ${selected.floor} • ${this.statusLabel(selected.status)}`;
+        details.innerHTML = `
+          <div class="predio-details-item">
+            <strong>Status:</strong> ${this.statusLabel(selected.status)}<br>
+            <strong>Progresso:</strong> ${selected.progress}%<br>
+            <strong>Descrição:</strong> Pavimento ${selected.floor} da ${selected.tower}
+          </div>
+        `;
+      }
+
+      this.updateFloorSelect();
+    },
+
+    updateFloorSelect() {
+      const select = document.getElementById('floorSelect');
+      const model = this.model();
+      select.innerHTML = '<option value="">-- Escolha um pavimento --</option>' + 
+        model.map(f => `<option value="${f.key}">${f.floor}</option>`).join('');
+    },
+
+    selectTower(tower) {
+      this.state.tower = tower;
+      this.state.selectedKey = null;
+      this.render();
+    },
+
+    selectFloor(key) {
+      this.state.selectedKey = key;
+      this.render();
+    },
+
+    applyStatus() {
+      const floorSelect = document.getElementById('floorSelect');
+      const statusSelect = document.getElementById('statusSelect');
+      
+      if (!floorSelect.value) {
+        alert('Por favor, selecione um pavimento');
+        return;
+      }
+
+      const key = floorSelect.value;
+      const status = statusSelect.value;
+      const statusMap = { planejado: 'planejado', andamento: 'andamento', concluido: 'verde' };
+      
+      this.state.floorStatuses[key] = statusMap[status];
+      this.render();
+    },
+
+    resetAll() {
+      this.state.floorStatuses = {};
+      this.state.selectedKey = null;
+      this.render();
+    },
+
+    loadScenario(scenario) {
+      this.state.floorStatuses = {};
+
+      if (scenario === 'inicio') {
+        // Apenas Térreo em andamento
+        this.state.floorStatuses['Torre A__Térreo'] = 'andamento';
+        this.state.floorStatuses['Torre B__Térreo'] = 'andamento';
+      } else if (scenario === 'progresso') {
+        // Térreo concluído, 1º e 2º em andamento
+        this.state.floorStatuses['Torre A__Térreo'] = 'verde';
+        this.state.floorStatuses['Torre A__1º Pavto'] = 'andamento';
+        this.state.floorStatuses['Torre A__2º Pavto'] = 'andamento';
+        this.state.floorStatuses['Torre B__Térreo'] = 'verde';
+        this.state.floorStatuses['Torre B__1º Pavto'] = 'andamento';
+        this.state.floorStatuses['Torre B__2º Pavto'] = 'andamento';
+      } else if (scenario === 'avancado') {
+        // Vários pavimentos concluídos
+        this.state.floorStatuses['Torre A__Térreo'] = 'verde';
+        this.state.floorStatuses['Torre A__1º Pavto'] = 'verde';
+        this.state.floorStatuses['Torre A__2º Pavto'] = 'verde';
+        this.state.floorStatuses['Torre A__3º Pavto'] = 'andamento';
+        this.state.floorStatuses['Torre B__Térreo'] = 'verde';
+        this.state.floorStatuses['Torre B__1º Pavto'] = 'verde';
+        this.state.floorStatuses['Torre B__2º Pavto'] = 'andamento';
+        this.state.floorStatuses['Torre B__3º Pavto'] = 'andamento';
+      }
+
+      this.render();
+    },
+
+    init() {
+      this.render();
+    }
+  };
+
+  // ── INITIALIZE ──
+  document.addEventListener('DOMContentLoaded', () => {
+    demo.init();
+  });
+</script>
+
+</body>
+</html>
