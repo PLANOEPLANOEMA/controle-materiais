@@ -187,6 +187,128 @@
     }
 
 
+
+    /* ── TORRE VISUAL REALISTA ── */
+    .predio3d-stage {
+      background: linear-gradient(180deg, #edf4ff 0%, #dce9fb 65%, #d2e2f6 100%);
+    }
+    .predio3d-viewport {
+      padding: 2rem 1rem;
+      min-height: 760px;
+      align-items: flex-end;
+      cursor: default;
+      touch-action: auto;
+    }
+    .predio3d-building {
+      width: min(360px, 95%);
+      min-height: 680px;
+      height: auto !important;
+      transform: none !important;
+      transition: none !important;
+      display: flex;
+      flex-direction: column-reverse;
+      gap: 6px;
+      position: relative;
+    }
+    .predio3d-building::before {
+      content: '';
+      position: absolute;
+      inset: 22px 10px 0 10px;
+      background: linear-gradient(180deg, #f5f7fb 0%, #e7ebf2 100%);
+      border: 2px solid #c4cfde;
+      border-radius: 18px 18px 10px 10px;
+      box-shadow: 0 18px 30px rgba(31,56,100,.14);
+      z-index: 0;
+    }
+    .predio3d-building::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: -18px;
+      width: 82%;
+      height: 26px;
+      background: rgba(31,56,100,.12);
+      filter: blur(10px);
+      border-radius: 999px;
+      z-index: 0;
+    }
+    .predio3d-roof {
+      position: absolute;
+      top: 0;
+      left: 22px;
+      right: 22px;
+      height: 36px;
+      border-radius: 18px 18px 0 0;
+      background: linear-gradient(180deg, #5e6f89 0%, #46566d 100%);
+      z-index: 1;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#fff;
+      font-size:.82rem;
+      font-weight:700;
+      letter-spacing:.04em;
+    }
+    .tower-floor {
+      position: relative;
+      z-index: 2;
+      margin: 0 22px;
+      min-height: 28px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.7);
+      overflow: hidden;
+      cursor: pointer;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.3);
+    }
+    .tower-floor.active {
+      outline: 3px solid #1F3864;
+      transform: scale(1.01);
+    }
+    .tower-floor-header {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: .25rem .6rem;
+      font-size: .75rem;
+      font-weight: 700;
+      position: relative;
+      z-index: 3;
+    }
+    .tower-floor-grid {
+      display:grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      padding: 0 .6rem .45rem;
+      position: relative;
+      z-index: 3;
+    }
+    .tower-window {
+      height: 18px;
+      border-radius: 4px;
+      background: rgba(255,255,255,.78);
+      border: 1px solid rgba(31,56,100,.12);
+      box-shadow: inset 0 1px 2px rgba(255,255,255,.55);
+    }
+    .tower-floor.verde { background: linear-gradient(180deg, #50c77e 0%, #27AE60 100%); }
+    .tower-floor.amarelo { background: linear-gradient(180deg, #ffd77a 0%, #F5A623 100%); color:#1a2340; }
+    .tower-floor.vermelho { background: linear-gradient(180deg, #ff8484 0%, #E84545 100%); }
+    .tower-floor.cinza { background: linear-gradient(180deg, #c7d0d3 0%, #95a5a6 100%); }
+    .tower-status-pill {
+      display:inline-flex;
+      align-items:center;
+      gap:.35rem;
+      border-radius:999px;
+      padding:.15rem .45rem;
+      background: rgba(255,255,255,.22);
+      font-size:.68rem;
+    }
+    .predio3d-viewport.dragging { cursor: default; }
+    @media (max-width: 980px) {
+      .predio3d-viewport { min-height: 620px; }
+      .predio3d-building { min-height: 560px; }
+    }
+
     /* ── 3D PRÉDIO ── */
     .predio3d-toolbar { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin-bottom:1rem; }
     .predio3d-layout { display:grid; grid-template-columns:minmax(340px,1fr) 360px; gap:1.25rem; align-items:start; }
@@ -1634,7 +1756,7 @@ const auth = {
 
 // ── 3D PRÉDIO ──
 const predio3D = {
-  state: { rotateX: -16, rotateY: -28, scale: 1, selected: null, tower: 'all', dragging: false, startX: 0, startY: 0, baseRotateX: -16, baseRotateY: -28 },
+  state: { rotateX: -16, rotateY: -28, scale: 1, selected: null, tower: 'Torre A', dragging: false, startX: 0, startY: 0, baseRotateX: -16, baseRotateY: -28 },
   controlsBound: false,
 
   getItensBase() {
@@ -1644,8 +1766,9 @@ const predio3D = {
   },
 
   torresDisponiveis() {
-    const set = new Set(this.getItensBase().map(i => (i.torre || 'Sem torre')).filter(Boolean));
-    return ['all', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'))];
+    const base = ['Torre A', 'Torre B'];
+    const set = new Set([...base, ...this.getItensBase().map(i => (i.torre || '').trim()).filter(Boolean)]);
+    return Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'));
   },
 
   pavimentoOrder(label) {
@@ -1676,23 +1799,39 @@ const predio3D = {
   buildTowerSelect() {
     const sel = document.getElementById('predio3dTower');
     if (!sel) return;
-    const current = this.state.tower;
-    sel.innerHTML = this.torresDisponiveis().map(t => `<option value="${t}">${t === 'all' ? 'Todas as torres' : t}</option>`).join('');
-    sel.value = current;
-    this.state.tower = sel.value || 'all';
+    const torres = this.torresDisponiveis();
+    if (!this.state.tower || !torres.includes(this.state.tower)) this.state.tower = torres[0] || 'Torre A';
+    sel.innerHTML = torres.map(t => `<option value="${t}">${t}</option>`).join('');
+    sel.value = this.state.tower;
+    this.state.tower = sel.value || 'Torre A';
+  },
+
+  andarBasePorTorre() {
+    const torre = this.state.tower || 'Torre A';
+    const total = torre === 'Torre B' ? 20 : 18;
+    const lista = ['Térreo'];
+    for (let i = 1; i <= total; i++) lista.push(`${i}º Pavimento`);
+    return lista;
   },
 
   groupFloors() {
-    const items = this.getItensBase().filter(i => this.state.tower === 'all' ? true : (i.torre || 'Sem torre') === this.state.tower);
+    const items = this.getItensBase().filter(i => (i.torre || 'Sem torre') === this.state.tower);
     const map = {};
     items.forEach(item => {
       const floor = item.pavimento || 'Sem pavimento';
       if (!map[floor]) map[floor] = [];
       map[floor].push(item);
     });
-    return Object.keys(map)
-      .sort((a, b) => this.pavimentoOrder(a) - this.pavimentoOrder(b))
-      .map(floor => ({ floor, items: map[floor], status: this.computeFloorStatus(map[floor]) }));
+
+    const baseFloors = this.andarBasePorTorre();
+    const extras = Object.keys(map).filter(f => !baseFloors.includes(f)).sort((a, b) => this.pavimentoOrder(a) - this.pavimentoOrder(b));
+    const allFloors = [...baseFloors, ...extras];
+
+    return allFloors.map(floor => ({
+      floor,
+      items: map[floor] || [],
+      status: (map[floor] && map[floor].length) ? this.computeFloorStatus(map[floor]) : 'cinza'
+    }));
   },
 
   computeFloorStatus(items) {
@@ -1711,6 +1850,7 @@ const predio3D = {
     return 'cinza';
   },
 
+  
   render() {
     this.buildTowerSelect();
     const floors = this.groupFloors();
@@ -1725,35 +1865,31 @@ const predio3D = {
     countFloors.textContent = String(floors.length);
     countCritical.textContent = String(floors.filter(f => f.status === 'vermelho').length);
 
-    if (!this.state.selected && floors.length) this.state.selected = floors[floors.length - 1].floor;
-    if (this.state.selected && !floors.some(f => f.floor === this.state.selected)) this.state.selected = floors.length ? floors[floors.length - 1].floor : null;
+    if (!this.state.selected && floors.length) this.state.selected = floors[0].floor;
+    if (this.state.selected && !floors.some(f => f.floor === this.state.selected)) this.state.selected = floors[0]?.floor || null;
 
-    building.innerHTML = '';
-    const totalHeight = Math.max(560, floors.length * 38 + 50);
-    building.style.height = totalHeight + 'px';
-    building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
+    building.innerHTML = '<div class="predio3d-roof">' + (this.state.tower || 'TORRE') + '</div>';
 
-    floors.forEach((floorObj, idx) => {
-      const y = totalHeight - 70 - (idx * 38);
+    floors.forEach((floorObj) => {
       const floor = document.createElement('div');
-      floor.className = `predio3d-floor predio3d-${floorObj.status}${this.state.selected === floorObj.floor ? ' active' : ''}`;
-      floor.style.bottom = `${y - 14}px`;
+      floor.className = `tower-floor ${floorObj.status}${this.state.selected === floorObj.floor ? ' active' : ''}`;
+      floor.onclick = () => predio3D.selectFloor(floorObj.floor);
       floor.innerHTML = `
-        <div class="face front" onclick='predio3D.selectFloor(${JSON.stringify(floorObj.floor)})'>
+        <div class="tower-floor-header">
           <span>${floorObj.floor}</span>
-          <span>${predio3D.statusLabel(floorObj.status)}</span>
+          <span class="tower-status-pill">${predio3D.statusLabel(floorObj.status)}</span>
         </div>
-        <div class="face top"></div>
-        <div class="face side"></div>
+        <div class="tower-floor-grid">
+          <div class="tower-window"></div>
+          <div class="tower-window"></div>
+          <div class="tower-window"></div>
+          <div class="tower-window"></div>
+        </div>
       `;
       building.appendChild(floor);
     });
 
-    const base = document.createElement('div');
-    base.className = 'predio3d-base';
-    building.appendChild(base);
-
-    floorList.innerHTML = floors.length ? floors.slice().reverse().map(f => `
+    floorList.innerHTML = floors.length ? floors.map(f => `
       <div class="predio3d-floor-item ${this.state.selected === f.floor ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.floor)})'>
         <div>
           <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
@@ -1766,10 +1902,10 @@ const predio3D = {
     const selected = floors.find(f => f.floor === this.state.selected);
     if (!selected) {
       selectedLabel.textContent = 'Selecione um pavimento';
-      details.innerHTML = '<div class="predio3d-empty">Nenhum pavimento disponível.</div>';
+      details.innerHTML = '<div class="predio3d-empty">Selecione um pavimento para ver os detalhes.</div>';
     } else {
       selectedLabel.textContent = `${selected.floor} • ${this.statusLabel(selected.status)}`;
-      details.innerHTML = selected.items.map(item => `
+      details.innerHTML = selected.items.length ? selected.items.map(item => `
         <div class="predio3d-details-item">
           <div style="display:flex;justify-content:space-between;gap:.8rem;">
             <strong>${item.servico || 'Serviço não informado'}</strong>
@@ -1782,10 +1918,8 @@ const predio3D = {
             Material: ${item.material || '-'} • Início: ${item.dataServico || item["Início Planejado"] || item.dataNecessidade || '-'}
           </div>
         </div>
-      `).join('');
+      `).join('') : '<div class="predio3d-details-item">Ainda não há itens vinculados a este pavimento. Ele permanece em cinza até receber dados.</div>';
     }
-
-    this.ensureControls();
   },
 
   selectFloor(floor) {
@@ -1801,46 +1935,7 @@ const predio3D = {
   },
 
   ensureControls() {
-    if (this.controlsBound) return;
-    const viewport = document.getElementById('predio3dViewport');
-    if (!viewport) return;
-    this.controlsBound = true;
-
-    const onDown = (x, y) => {
-      this.state.dragging = true;
-      this.state.startX = x;
-      this.state.startY = y;
-      this.state.baseRotateX = this.state.rotateX;
-      this.state.baseRotateY = this.state.rotateY;
-      viewport.classList.add('dragging');
-    };
-    const onMove = (x, y) => {
-      if (!this.state.dragging) return;
-      const dx = x - this.state.startX;
-      const dy = y - this.state.startY;
-      this.state.rotateY = this.state.baseRotateY + dx * 0.35;
-      this.state.rotateX = Math.max(-65, Math.min(20, this.state.baseRotateX - dy * 0.25));
-      const building = document.getElementById('predio3dBuilding');
-      if (building) building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
-    };
-    const onUp = () => {
-      this.state.dragging = false;
-      viewport.classList.remove('dragging');
-    };
-
-    viewport.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY));
-    viewport.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
-    window.addEventListener('mouseup', onUp);
-    viewport.addEventListener('touchstart', (e) => { const t = e.touches[0]; onDown(t.clientX, t.clientY); }, { passive: true });
-    viewport.addEventListener('touchmove', (e) => { const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
-    window.addEventListener('touchend', onUp);
-    viewport.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      const next = this.state.scale + (e.deltaY < 0 ? 0.06 : -0.06);
-      this.state.scale = Math.max(0.7, Math.min(1.6, next));
-      const building = document.getElementById('predio3dBuilding');
-      if (building) building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
-    }, { passive: false });
+    return;
   },
 
   gerarPdf() {
