@@ -187,178 +187,47 @@
     }
 
 
-
-    
-    .torre-container{
-        display:flex;
-        gap:20px;
-        justify-content:center;
-        flex-wrap:wrap;
-    }
-    .torre-box{
-        width:320px;
-    }
-    
-/* ── TORRE VISUAL REALISTA ── */
-    .predio3d-stage {
-      background: linear-gradient(180deg, #edf4ff 0%, #dce9fb 65%, #d2e2f6 100%);
-    }
-    .predio3d-viewport {
-      padding: 2rem 1rem;
-      min-height: 760px;
-      align-items: flex-end;
-      cursor: default;
-      touch-action: auto;
-    }
-    .predio3d-building torre-layout {
-      width: min(360px, 95%);
-      min-height: 680px;
-      height: auto !important;
-      transform: none !important;
-      transition: none !important;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      position: relative;
-    }
-    .predio3d-building torre-layout::before {
-      content: '';
-      position: absolute;
-      inset: 22px 10px 0 10px;
-      background: linear-gradient(180deg, #f5f7fb 0%, #e7ebf2 100%);
-      border: 2px solid #c4cfde;
-      border-radius: 18px 18px 10px 10px;
-      box-shadow: 0 18px 30px rgba(31,56,100,.14);
-      z-index: 0;
-    }
-    .predio3d-building torre-layout::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: -18px;
-      width: 82%;
-      height: 26px;
-      background: rgba(31,56,100,.12);
-      filter: blur(10px);
-      border-radius: 999px;
-      z-index: 0;
-    }
-    .predio3d-roof {
-      position: absolute;
-      top: 0;
-      left: 22px;
-      right: 22px;
-      height: 36px;
-      border-radius: 18px 18px 0 0;
-      background: linear-gradient(180deg, #5e6f89 0%, #46566d 100%);
-      z-index: 1;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color:#fff;
-      font-size:.82rem;
-      font-weight:700;
-      letter-spacing:.04em;
-    }
-    .tower-floor {
-      position: relative;
-      z-index: 2;
-      margin: 0 22px;
-      min-height: 28px;
-      border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.7);
-      overflow: hidden;
-      cursor: pointer;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
-    }
-    .tower-floor.active {
-      outline: 3px solid #1F3864;
-      transform: scale(1.01);
-    }
-    .tower-floor-header {
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: .25rem .6rem;
-      font-size: .75rem;
-      font-weight: 700;
-      position: relative;
-      z-index: 3;
-    }
-    .tower-floor-grid {
-      display:grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-      padding: 0 .6rem .45rem;
-      position: relative;
-      z-index: 3;
-    }
-    .tower-window {
-      height: 18px;
-      border-radius: 4px;
-      background: rgba(255,255,255,.78);
-      border: 1px solid rgba(31,56,100,.12);
-      box-shadow: inset 0 1px 2px rgba(255,255,255,.55);
-    }
-    .tower-floor.verde { background: linear-gradient(180deg, #50c77e 0%, #27AE60 100%); }
-    .tower-floor.amarelo { background: linear-gradient(180deg, #ffd77a 0%, #F5A623 100%); color:#1a2340; }
-    .tower-floor.vermelho { background: linear-gradient(180deg, #ff8484 0%, #E84545 100%); }
-    .tower-floor.cinza { background: linear-gradient(180deg, #c7d0d3 0%, #95a5a6 100%); }
-    .tower-status-pill {
-      display:inline-flex;
-      align-items:center;
-      gap:.35rem;
-      border-radius:999px;
-      padding:.15rem .45rem;
-      background: rgba(255,255,255,.22);
-      font-size:.68rem;
-    }
-    .predio3d-viewport.dragging { cursor: default; }
-    @media (max-width: 980px) {
-      .predio3d-viewport { min-height: 620px; }
-      .predio3d-building torre-layout { min-height: 560px; }
-    }
-
-    /* ── 3D PRÉDIO ── */
-    .predio3d-toolbar { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin-bottom:1rem; }
-    .predio3d-layout { display:grid; grid-template-columns:minmax(340px,1fr) 360px; gap:1.25rem; align-items:start; }
-    .predio3d-stage { min-height:640px; background:linear-gradient(180deg,#eef4ff 0%,#f9fbff 100%); border-radius:18px; overflow:hidden; position:relative; box-shadow:var(--shadow); border:1px solid #dbe7f7; }
-    .predio3d-help { position:absolute; top:12px; left:12px; z-index:2; background:rgba(255,255,255,.92); border-radius:999px; padding:.45rem .8rem; font-size:.82rem; color:var(--muted); box-shadow:0 4px 14px rgba(31,56,100,.08); }
-    .predio3d-viewport { perspective:1200px; width:100%; min-height:640px; display:flex; align-items:center; justify-content:center; touch-action:none; cursor:grab; user-select:none; }
-    .predio3d-viewport.dragging { cursor:grabbing; }
-    .predio3d-building torre-layout { position:relative; width:240px; height:560px; transform-style:preserve-3d; transition:transform .08s linear; }
-    .predio3d-floor { position:absolute; left:0; width:240px; height:34px; transform-style:preserve-3d; }
-    .predio3d-floor .face { position:absolute; box-sizing:border-box; border:1px solid rgba(0,0,0,.08); }
-    .predio3d-floor .front { width:240px; height:34px; transform:translateZ(20px); border-radius:8px; display:flex; align-items:center; justify-content:space-between; padding:0 .8rem; color:#fff; font-weight:700; font-size:.88rem; box-shadow:0 8px 16px rgba(31,56,100,.16); cursor:pointer; position:absolute; left:0; top:0; overflow:hidden; }
-    .predio3d-floor .front::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 42%, rgba(0,0,0,.12) 100%); border-radius:8px; pointer-events:none; }
-    .predio3d-floor .top { width:240px; height:40px; transform:rotateX(90deg) translateZ(20px) translateY(-20px); opacity:.78; border-radius:8px 8px 0 0; position:absolute; left:0; top:0; }
-    .predio3d-floor .side { width:40px; height:34px; right:-20px; transform:rotateY(90deg) translateZ(220px); opacity:.65; position:absolute; top:0; }
-    .predio3d-floor.active .front { outline:3px solid rgba(255,255,255,.95); box-shadow:0 0 0 4px rgba(31,56,100,.18), 0 14px 22px rgba(31,56,100,.22); }
-    .predio3d-base { position:absolute; bottom:-18px; width:270px; height:26px; background:#c5d8f1; border-radius:999px; filter:blur(1px); transform:translateX(-15px); box-shadow:0 20px 30px rgba(31,56,100,.16); }
-    .predio3d-verde .front, .predio3d-dot.verde { background:#27AE60; }
-    .predio3d-verde .top, .predio3d-verde .side { background:#239a55; }
-    .predio3d-amarelo .front, .predio3d-dot.amarelo { background:#F5A623; color:#1a2340; }
-    .predio3d-amarelo .top, .predio3d-amarelo .side { background:#dc951f; }
-    .predio3d-vermelho .front, .predio3d-dot.vermelho { background:#E84545; }
-    .predio3d-vermelho .top, .predio3d-vermelho .side { background:#cf3d3d; }
-    .predio3d-cinza .front, .predio3d-dot.cinza { background:#95a5a6; }
-    .predio3d-cinza .top, .predio3d-cinza .side { background:#869798; }
-    .predio3d-legend { display:flex; flex-wrap:wrap; gap:.8rem; margin:.35rem 0 1rem; }
-    .predio3d-legend-item { display:flex; align-items:center; gap:.4rem; font-size:.85rem; color:var(--muted); }
-    .predio3d-dot { width:12px; height:12px; border-radius:999px; }
-    .predio3d-panel .metric { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; margin-bottom:1rem; }
-    .predio3d-panel .metric-card { background:#f7fbff; border:1px solid #dbe7f7; border-radius:14px; padding:.85rem; }
-    .predio3d-panel .metric-card .num { font-size:1.35rem; font-weight:800; color:var(--blue-dark); }
-    .predio3d-floor-list { max-height:260px; overflow:auto; border:1px solid #e3edf9; border-radius:14px; }
-    .predio3d-floor-item { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.8rem 1rem; border-bottom:1px solid #eef3fb; cursor:pointer; }
-    .predio3d-floor-item:last-child { border-bottom:none; }
-    .predio3d-floor-item.active { background:#eef5ff; }
-    .predio3d-badge { display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .55rem; border-radius:999px; font-size:.78rem; font-weight:700; background:#eef3fb; color:var(--blue-dark); }
-    .predio3d-details-list { display:grid; gap:.6rem; max-height:260px; overflow:auto; }
-    .predio3d-details-item { background:#f8fbff; border:1px solid #e3edf9; border-radius:12px; padding:.75rem; }
-    .predio3d-empty { padding:2rem; text-align:center; color:var(--muted); }
-    @media (max-width:980px) { .predio3d-layout { grid-template-columns:1fr; } .predio3d-stage, .predio3d-viewport { min-height:520px; } }
+    /* ── 3D PRÉDIO / TORRES ── */
+    .tower-legend{display:flex;flex-wrap:wrap;gap:.8rem;margin:.35rem 0 1rem}
+    .tower-legend-item{display:flex;align-items:center;gap:.4rem;font-size:.85rem;color:var(--muted)}
+    .tower-dot{width:12px;height:12px;border-radius:999px}
+    .tower-dot.verde{background:#27AE60}.tower-dot.amarelo{background:#F5A623}.tower-dot.vermelho{background:#E84545}.tower-dot.cinza{background:#95a5a6}
+    .tower-dashboard-wrap{display:grid;grid-template-columns:minmax(760px,1fr) 360px;gap:1.25rem;align-items:start}
+    .tower-stage{background:radial-gradient(circle at 20% 12%,rgba(255,255,255,.7),transparent 26%),linear-gradient(180deg,#eef5ff 0%,#dfeafb 68%,#d7e4f7 100%);border-radius:24px;border:1px solid #d8e4f5;box-shadow:var(--shadow);padding:1.25rem;min-height:860px;position:relative;overflow:hidden}
+    .tower-stage:after{content:'';position:absolute;left:50%;transform:translateX(-50%);bottom:24px;width:82%;height:36px;background:rgba(31,56,100,.16);filter:blur(18px);border-radius:999px;pointer-events:none}
+    .tower-toolbar{display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;margin-bottom:1rem;position:relative;z-index:2}
+    .tower-help{color:var(--muted);font-size:.88rem;font-weight:600}
+    .towers-scene{display:flex;align-items:flex-end;justify-content:center;gap:2rem;min-height:720px;padding:1rem 0 0;position:relative;z-index:2}
+    .tower{width:min(320px,42vw);position:relative;display:flex;flex-direction:column;gap:0;align-items:stretch}
+    .tower-roof{height:44px;border-radius:18px 18px 0 0;background:linear-gradient(180deg,#5f6f87 0%,#44556d 100%);box-shadow:0 10px 18px rgba(31,56,100,.18);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;letter-spacing:.04em;text-transform:uppercase;font-size:.88rem}
+    .tower-body{position:relative;background:linear-gradient(180deg,#f3f6fb 0%,#e9eef6 100%);border:2px solid #c9d4e4;border-radius:0 0 14px 14px;padding:.65rem;box-shadow:0 18px 28px rgba(31,56,100,.16)}
+    .tower-floor{position:relative;min-height:42px;border-radius:10px;margin-bottom:6px;overflow:hidden;border:1px solid rgba(255,255,255,.85);cursor:pointer;transform:skewX(-6deg);box-shadow:0 4px 10px rgba(0,0,0,.08);transition:transform .15s ease,box-shadow .15s ease}
+    .tower-floor:last-child{margin-bottom:0}
+    .tower-floor:hover{transform:skewX(-6deg) translateY(-1px);box-shadow:0 8px 16px rgba(31,56,100,.16)}
+    .tower-floor.active{outline:3px solid #1F3864;box-shadow:0 0 0 4px rgba(31,56,100,.12),0 12px 20px rgba(31,56,100,.18)}
+    .tower-floor.verde{background:linear-gradient(180deg,#55d086 0%,#27AE60 100%)}
+    .tower-floor.amarelo{background:linear-gradient(180deg,#ffd979 0%,#F5A623 100%);color:#1a2340}
+    .tower-floor.vermelho{background:linear-gradient(180deg,#ff8c8c 0%,#E84545 100%)}
+    .tower-floor.cinza{background:linear-gradient(180deg,#cad3d6 0%,#95a5a6 100%)}
+    .tower-floor:before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,rgba(255,255,255,.24) 0%,rgba(255,255,255,0) 40%,rgba(0,0,0,.09) 100%);pointer-events:none}
+    .tower-floor-topline{display:flex;align-items:center;justify-content:space-between;padding:.35rem .7rem .15rem;transform:skewX(6deg);position:relative;z-index:2;font-size:.78rem;font-weight:800;color:inherit}
+    .tower-floor-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;padding:0 .75rem .55rem;transform:skewX(6deg);position:relative;z-index:2}
+    .tower-window{height:16px;border-radius:4px;background:rgba(255,255,255,.88);border:1px solid rgba(31,56,100,.10);box-shadow:inset 0 1px 2px rgba(255,255,255,.55)}
+    .tower-progress{height:6px;margin:0 .75rem .5rem;background:rgba(255,255,255,.28);border-radius:999px;overflow:hidden;transform:skewX(6deg);position:relative;z-index:2}
+    .tower-progress>span{display:block;height:100%;background:#1F3864}
+    .tower-status-pill{display:inline-flex;align-items:center;gap:.35rem;background:rgba(255,255,255,.22);border-radius:999px;padding:.18rem .48rem;font-size:.68rem;font-weight:700}
+    .tower-right-panel .metric{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.75rem;margin-bottom:1rem}
+    .tower-right-panel .metric-card{background:#f7fbff;border:1px solid #dbe7f7;border-radius:14px;padding:.85rem}
+    .tower-right-panel .metric-card .num{font-size:1.35rem;font-weight:800;color:var(--blue-dark)}
+    .tower-floor-list{max-height:280px;overflow:auto;border:1px solid #e3edf9;border-radius:14px;background:#fff}
+    .tower-floor-item{display:flex;align-items:center;justify-content:space-between;gap:.75rem;padding:.8rem 1rem;border-bottom:1px solid #eef3fb;cursor:pointer}
+    .tower-floor-item:last-child{border-bottom:none}.tower-floor-item.active{background:#eef5ff}
+    .tower-badge{display:inline-flex;align-items:center;gap:.35rem;padding:.25rem .55rem;border-radius:999px;font-size:.78rem;font-weight:700;background:#eef3fb;color:var(--blue-dark)}
+    .tower-details-list{display:grid;gap:.6rem;max-height:320px;overflow:auto}
+    .tower-details-item{background:#f8fbff;border:1px solid #e3edf9;border-radius:12px;padding:.75rem}
+    .tower-empty{padding:2rem;text-align:center;color:var(--muted)}
+    @media (max-width:1200px){.tower-dashboard-wrap{grid-template-columns:1fr}.towers-scene{gap:1.2rem}.tower{width:min(320px,46vw)}}
+    @media (max-width:760px){.tower-stage{min-height:auto;padding:1rem}.towers-scene{flex-direction:column;align-items:center;min-height:auto}.tower{width:min(340px,100%)}.tower-floor-grid{grid-template-columns:repeat(3,1fr)}}
 
     /* ── Main layout ── */
     main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
@@ -1103,49 +972,43 @@
   </section>
 
 
-  <!-- ── RT DIA A DIA ── -->
 
   <!-- ── 3D PRÉDIO ── -->
   <section id="predio-3d">
+    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">🏢 Voltar para início</button></div>
     <div class="card">
       <h2>🏢 3D PRÉDIO</h2>
-      <div class="predio3d-legend">
-        <div class="predio3d-legend-item"><span class="predio3d-dot verde"></span> Concluído</div>
-        <div class="predio3d-legend-item"><span class="predio3d-dot amarelo"></span> Em andamento</div>
-        <div class="predio3d-legend-item"><span class="predio3d-dot vermelho"></span> Atrasado</div>
-        <div class="predio3d-legend-item"><span class="predio3d-dot cinza"></span> Sem dados</div>
+      <div class="tower-legend">
+        <div class="tower-legend-item"><span class="tower-dot verde"></span> Concluído</div>
+        <div class="tower-legend-item"><span class="tower-dot amarelo"></span> Em andamento</div>
+        <div class="tower-legend-item"><span class="tower-dot vermelho"></span> Atrasado</div>
+        <div class="tower-legend-item"><span class="tower-dot cinza"></span> Sem dados</div>
       </div>
-      <div class="predio3d-toolbar">
-        <div class="form-group" style="min-width:220px; margin:0;">
-          <label for="predio3dTower">Torre</label>
-          <select id="predio3dTower" onchange="predio3D.render()"></select>
-        </div>
-        <button class="btn btn-secondary" onclick="predio3D.resetView()">↺ Resetar visão</button>
-        <button class="btn btn-success" onclick="predio3D.gerarPdf()">📄 PDF do 3D PRÉDIO</button>
-      </div>
-      <div class="predio3d-layout">
-        <div class="predio3d-stage">
-          <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento</div>
-          <div id="predio3dViewport" class="predio3d-viewport">
-            <div id="predio3dBuilding" class="predio3d-building torre-layout"></div>
+      <div class="tower-dashboard-wrap">
+        <div class="tower-stage">
+          <div class="tower-toolbar">
+            <div class="tower-help">Duas torres lado a lado • leitura automática do Planejamento RT e RT Dia a Dia</div>
+            <button class="btn btn-success" onclick="torre3D.gerarPdf()">📄 PDF do 3D PRÉDIO</button>
           </div>
+          <div class="towers-scene" id="towersScene"></div>
         </div>
-        <div class="card predio3d-panel" style="margin:0;">
+        <div class="card tower-right-panel" style="margin:0;">
           <h2 style="margin-bottom:.9rem;">Detalhes do Pavimento</h2>
           <div class="metric">
-            <div class="metric-card"><div class="num" id="predio3dCountFloors">0</div><div class="label">Pavimentos</div></div>
-            <div class="metric-card"><div class="num" id="predio3dCountCritical">0</div><div class="label">Atrasados</div></div>
+            <div class="metric-card"><div class="num" id="towerCountFloors">0</div><div class="label">Pavimentos</div></div>
+            <div class="metric-card"><div class="num" id="towerCountCritical">0</div><div class="label">Atrasados</div></div>
           </div>
-          <div class="predio3d-floor-list" id="predio3dFloorList"></div>
+          <div class="tower-floor-list" id="towerFloorList"></div>
           <div style="margin-top:1rem;">
-            <div class="predio3d-badge" id="predio3dSelectedLabel">Selecione um pavimento</div>
-            <div class="predio3d-details-list" id="predio3dDetails" style="margin-top:.85rem;"></div>
+            <div class="tower-badge" id="towerSelectedLabel">Selecione um pavimento</div>
+            <div class="tower-details-list" id="towerDetails" style="margin-top:.85rem;"></div>
           </div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- ── RT DIA A DIA ── -->
   <section id="rt-dia-dia">
     <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📝 Voltar para início</button></div>
     <div class="card">
@@ -1748,7 +1611,7 @@ const auth = {
     app.init();
     appMateriais.init();
     appRT.init();
-    predio3D.render();
+    torre3D.render();
     setTimeout(() => atualizarBotaoMobile('visao-geral'), 50);
   },
 
@@ -1766,31 +1629,19 @@ const auth = {
 
 
 // ── 3D PRÉDIO ──
-const predio3D = {
-  state: { rotateX: -16, rotateY: -28, scale: 1, selected: null, tower: 'Torre A', dragging: false, startX: 0, startY: 0, baseRotateX: -16, baseRotateY: -28 },
-  controlsBound: false,
-
+const torre3D = {
+  state: { selectedKey: null },
   getItensBase() {
     const planejamento = (window.appRT?.itens || []).map(item => ({ ...item, origem: 'planejamento' }));
     const diaDia = (window.appRT?.itensDiaDia || []).map(item => ({ ...item, origem: 'dia-dia' }));
     return [...planejamento, ...diaDia];
   },
-
-  torresDisponiveis() {
-    const base = ['Torre A', 'Torre B'];
-    const set = new Set([...base, ...this.getItensBase().map(i => (i.torre || '').trim()).filter(Boolean)]);
-    return Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  torresFixas() {
+    return {
+      'Torre A': ['Térreo', ...Array.from({length:18}, (_, i) => `${i+1}º Pavimento`)],
+      'Torre B': ['Térreo', ...Array.from({length:20}, (_, i) => `${i+1}º Pavimento`)]
+    };
   },
-
-  pavimentoOrder(label) {
-    const txt = String(label || '').toLowerCase();
-    if (txt.includes('subsolo')) return -100;
-    if (txt.includes('térreo') || txt.includes('terreo')) return 0;
-    if (txt.includes('cobertura')) return 999;
-    const m = txt.match(/(\d+)/);
-    return m ? parseInt(m[1], 10) : 500;
-  },
-
   parseDate(v) {
     if (!v) return null;
     try {
@@ -1802,58 +1653,16 @@ const predio3D = {
     } catch (e) {}
     return null;
   },
-
-  
-  getProgress(items){
-    if(!items || !items.length) return 0;
-    let concluido = items.filter(i => i.status === 'Concluído').length;
-    return Math.round((concluido / items.length) * 100);
-  },
-
   statusLabel(status) {
     return ({ verde: 'Concluído', amarelo: 'Em andamento', vermelho: 'Atrasado', cinza: 'Sem dados' })[status] || 'Sem dados';
   },
-
-  buildTowerSelect() {
-    const sel = document.getElementById('predio3dTower');
-    if (!sel) return;
-    const torres = this.torresDisponiveis();
-    if (!this.state.tower || !torres.includes(this.state.tower)) this.state.tower = torres[0] || 'Torre A';
-    sel.innerHTML = torres.map(t => `<option value="${t}">${t}</option>`).join('');
-    sel.value = this.state.tower;
-    this.state.tower = sel.value || 'Torre A';
+  progress(items) {
+    if (!items || !items.length) return 0;
+    const concl = items.filter(i => String(i.status || '') === 'Concluído').length;
+    return Math.round((concl / items.length) * 100);
   },
-
-  andarBasePorTorre() {
-    const torre = this.state.tower || 'Torre A';
-    const total = torre === 'Torre B' ? 20 : 18;
-    const lista = ['Térreo'];
-    for (let i = 1; i <= total; i++) lista.push(`${i}º Pavimento`);
-    return lista;
-  },
-
-  groupFloors() {
-    const items = this.getItensBase().filter(i => (i.torre || 'Sem torre') === this.state.tower);
-    const map = {};
-    items.forEach(item => {
-      const floor = item.pavimento || 'Sem pavimento';
-      if (!map[floor]) map[floor] = [];
-      map[floor].push(item);
-    });
-
-    const baseFloors = this.andarBasePorTorre();
-    const extras = Object.keys(map).filter(f => !baseFloors.includes(f)).sort((a, b) => this.pavimentoOrder(a) - this.pavimentoOrder(b));
-    const allFloors = [...baseFloors, ...extras];
-
-    allFloors.sort((a,b)=>this.pavimentoOrder(a)-this.pavimentoOrder(b));
-    return allFloors.map(floor => ({
-      floor,
-      items: map[floor] || [],
-      status: (map[floor] && map[floor].length) ? this.computeFloorStatus(map[floor]) : 'cinza'
-    }));
-  },
-
   computeFloorStatus(items) {
+    if (!items || !items.length) return 'cinza';
     const statuses = items.map(i => String(i.status || '').trim());
     const today = new Date();
     const allConcluidos = statuses.length > 0 && statuses.every(s => s === 'Concluído');
@@ -1868,144 +1677,81 @@ const predio3D = {
     if (andamento) return 'amarelo';
     return 'cinza';
   },
-
-  
-  render() {
-    this.buildTowerSelect();
-    const floors = this.groupFloors();
-    const building = document.getElementById('predio3dBuilding');
-    const floorList = document.getElementById('predio3dFloorList');
-    const details = document.getElementById('predio3dDetails');
-    const selectedLabel = document.getElementById('predio3dSelectedLabel');
-    const countFloors = document.getElementById('predio3dCountFloors');
-    const countCritical = document.getElementById('predio3dCountCritical');
-    if (!building || !floorList || !details || !selectedLabel || !countFloors || !countCritical) return;
-
-    countFloors.textContent = String(floors.length);
-    countCritical.textContent = String(floors.filter(f => f.status === 'vermelho').length);
-
-    if (!this.state.selected && floors.length) this.state.selected = floors[0].floor;
-    if (this.state.selected && !floors.some(f => f.floor === this.state.selected)) this.state.selected = floors[0]?.floor || null;
-
-    building.innerHTML = '<div class="predio3d-roof">' + (this.state.tower || 'TORRE') + '</div>';
-
-    floors.forEach((floorObj) => {
-      const floor = document.createElement('div');
-      floor.className = `tower-floor ${floorObj.status}${this.state.selected === floorObj.floor ? ' active' : ''}`;
-      floor.onclick = () => predio3D.selectFloor(floorObj.floor);
-      floor.innerHTML = `
-        <div class="tower-floor-header">
-          <span>${floorObj.floor}</span>
-          <span class="tower-status-pill">${predio3D.statusLabel(floorObj.status)}</span>
-        </div>
-        
-        <div style="padding:4px 8px;">
-            <div style="height:6px;background:#eee;border-radius:4px;overflow:hidden;">
-                <div style="height:100%;width:${predio3D.getProgress(floorObj.items)}%;background:#1F3864;"></div>
-            </div>
-        </div>
-        <div class="tower-floor-grid">
-        
-          <div class="tower-window"></div>
-          <div class="tower-window"></div>
-          <div class="tower-window"></div>
-          <div class="tower-window"></div>
-        </div>
-      `;
-      building.appendChild(floor);
+  model() {
+    const base = this.getItensBase();
+    const torres = this.torresFixas();
+    const out = [];
+    Object.entries(torres).forEach(([torre, floors]) => {
+      floors.forEach((floor) => {
+        const items = base.filter(i => (i.torre || '').trim() === torre && (i.pavimento || '').trim() === floor);
+        out.push({ torre, floor, key: `${torre}__${floor}`, items, status: this.computeFloorStatus(items), progress: this.progress(items) });
+      });
     });
-
-    floorList.innerHTML = floors.length ? floors.map(f => `
-      <div class="predio3d-floor-item ${this.state.selected === f.floor ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.floor)})'>
-        <div>
-          <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
-          <div style="font-size:.82rem;color:var(--muted)">${f.items.length} item(ns)</div>
+    return out;
+  },
+  render() {
+    const scene = document.getElementById('towersScene');
+    const floorList = document.getElementById('towerFloorList');
+    const details = document.getElementById('towerDetails');
+    const selectedLabel = document.getElementById('towerSelectedLabel');
+    const countFloors = document.getElementById('towerCountFloors');
+    const countCritical = document.getElementById('towerCountCritical');
+    if (!scene || !floorList || !details || !selectedLabel || !countFloors || !countCritical) return;
+    const model = this.model();
+    const grouped = { 'Torre A': model.filter(m => m.torre === 'Torre A'), 'Torre B': model.filter(m => m.torre === 'Torre B') };
+    if (!this.state.selectedKey) this.state.selectedKey = model[0]?.key || null;
+    if (this.state.selectedKey && !model.some(m => m.key === this.state.selectedKey)) this.state.selectedKey = model[0]?.key || null;
+    countFloors.textContent = String(model.length);
+    countCritical.textContent = String(model.filter(m => m.status === 'vermelho').length);
+    scene.innerHTML = Object.entries(grouped).map(([torre, floors]) => `
+      <div class="tower">
+        <div class="tower-roof">${torre}</div>
+        <div class="tower-body">
+          ${floors.map(f => `
+            <div class="tower-floor ${f.status}${this.state.selectedKey === f.key ? ' active' : ''}" onclick="torre3D.selectFloor(${JSON.stringify(f.key)})">
+              <div class="tower-floor-topline">
+                <span>${f.floor}</span>
+                <span class="tower-status-pill">${torre3D.statusLabel(f.status)}</span>
+              </div>
+              <div class="tower-progress"><span style="width:${f.progress}%;"></span></div>
+              <div class="tower-floor-grid">
+                <div class="tower-window"></div><div class="tower-window"></div><div class="tower-window"></div><div class="tower-window"></div>
+              </div>
+            </div>`).join('')}
         </div>
-        <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
-      </div>
-    `).join('') : '<div class="predio3d-empty">Nenhum pavimento encontrado.</div>';
-
-    const selected = floors.find(f => f.floor === this.state.selected);
+      </div>`).join('');
+    floorList.innerHTML = model.map(f => `
+      <div class="tower-floor-item ${this.state.selectedKey === f.key ? 'active' : ''}" onclick="torre3D.selectFloor(${JSON.stringify(f.key)})">
+        <div><div style="font-weight:700;color:var(--blue-dark)">${f.torre} • ${f.floor}</div><div style="font-size:.82rem;color:var(--muted)">${f.items.length} item(ns) • ${f.progress}%</div></div>
+        <span class="tower-badge">${this.statusLabel(f.status)}</span>
+      </div>`).join('');
+    const selected = model.find(m => m.key === this.state.selectedKey);
     if (!selected) {
       selectedLabel.textContent = 'Selecione um pavimento';
-      details.innerHTML = '<div class="predio3d-empty">Selecione um pavimento para ver os detalhes.</div>';
+      details.innerHTML = '<div class="tower-empty">Selecione um pavimento para ver os detalhes.</div>';
     } else {
-      selectedLabel.textContent = `${selected.floor} • ${this.statusLabel(selected.status)}`;
+      selectedLabel.textContent = `${selected.torre} • ${selected.floor} • ${this.statusLabel(selected.status)}`;
       details.innerHTML = selected.items.length ? selected.items.map(item => `
-        <div class="predio3d-details-item">
-          <div style="display:flex;justify-content:space-between;gap:.8rem;">
-            <strong>${item.servico || 'Serviço não informado'}</strong>
-            <span class="predio3d-badge">${item.status || 'Planejado'}</span>
-          </div>
-          <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
-            Torre: ${item.torre || '-'} • Pavimento: ${item.pavimento || '-'}
-          </div>
-          <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
-            Material: ${item.material || '-'} • Início: ${item.dataServico || item["Início Planejado"] || item.dataNecessidade || '-'}
-          </div>
-        </div>
-      `).join('') : '<div class="predio3d-details-item">Ainda não há itens vinculados a este pavimento. Ele permanece em cinza até receber dados.</div>';
+        <div class="tower-details-item">
+          <div style="display:flex;justify-content:space-between;gap:.8rem;"><strong>${item.servico || 'Serviço não informado'}</strong><span class="tower-badge">${item.status || 'Planejado'}</span></div>
+          <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">Material: ${item.material || '-'}</div>
+          <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">Início: ${item.dataServico || item["Início Planejado"] || item.dataNecessidade || '-'}</div>
+        </div>`).join('') : '<div class="tower-details-item">Ainda não há itens vinculados a este pavimento. Ele permanece em cinza até receber dados.</div>';
     }
   },
-
-  selectFloor(floor) {
-    this.state.selected = floor;
+  selectFloor(key) {
+    this.state.selectedKey = key;
     this.render();
   },
-
-  resetView() {
-    this.state.rotateX = -16;
-    this.state.rotateY = -28;
-    this.state.scale = 1;
-    this.render();
-  },
-
-  ensureControls() {
-    return;
-  },
-
   gerarPdf() {
-    const floors = this.groupFloors();
-    const rows = floors.map(f => `
-      <tr>
-        <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.state.tower === 'all' ? '-' : this.state.tower}</td>
-        <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.floor}</td>
-        <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.statusLabel(f.status)}</td>
-        <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.items.length}</td>
-      </tr>
-    `).join('');
+    const model = this.model();
+    const rows = model.map(f => `<tr><td style="padding:.55rem;border:1px solid #d7e2f2;">${f.torre}</td><td style="padding:.55rem;border:1px solid #d7e2f2;">${f.floor}</td><td style="padding:.55rem;border:1px solid #d7e2f2;">${this.statusLabel(f.status)}</td><td style="padding:.55rem;border:1px solid #d7e2f2;">${f.progress}%</td><td style="padding:.55rem;border:1px solid #d7e2f2;">${f.items.length}</td></tr>`).join('');
     const wrapper = document.createElement('div');
-    wrapper.innerHTML = `
-      <div style="font-family:Segoe UI,Arial,sans-serif;padding:22px;color:#1a2340;">
-        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #2E75B6;padding-bottom:12px;margin-bottom:18px;">
-          <div>
-            <h1 style="margin:0;color:#1F3864;font-size:24px;">3D PRÉDIO</h1>
-            <p style="margin:6px 0 0 0;color:#6b7a99;">Gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
-          </div>
-          <div style="font-weight:700;color:#1F3864;">Plano & Plano</div>
-        </div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead>
-            <tr style="background:#1F3864;color:#fff;">
-              <th style="padding:.6rem;border:1px solid #d7e2f2;">Torre</th>
-              <th style="padding:.6rem;border:1px solid #d7e2f2;">Pavimento</th>
-              <th style="padding:.6rem;border:1px solid #d7e2f2;">Status</th>
-              <th style="padding:.6rem;border:1px solid #d7e2f2;">Itens</th>
-            </tr>
-          </thead>
-          <tbody>${rows || '<tr><td colspan="4" style="padding:.55rem;border:1px solid #d7e2f2;">Sem dados</td></tr>'}</tbody>
-        </table>
-      </div>
-    `;
-    html2pdf().set({
-      margin: 0.35,
-      filename: '3d-predio.pdf',
-      image: { type: 'jpeg', quality: 0.98 },
-      html2canvas: { scale: 2, useCORS: true },
-      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
-    }).from(wrapper).save();
+    wrapper.innerHTML = `<div style="font-family:Segoe UI,Arial,sans-serif;padding:22px;color:#1a2340;"><div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #2E75B6;padding-bottom:12px;margin-bottom:18px;"><div><h1 style="margin:0;color:#1F3864;font-size:24px;">3D PRÉDIO</h1><p style="margin:6px 0 0 0;color:#6b7a99;">Gerado em ${new Date().toLocaleDateString('pt-BR')}</p></div><div style="font-weight:700;color:#1F3864;">Plano & Plano</div></div><table style="width:100%;border-collapse:collapse;font-size:12px;"><thead><tr style="background:#1F3864;color:#fff;"><th style="padding:.6rem;border:1px solid #d7e2f2;">Torre</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Pavimento</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Status</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Progresso</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Itens</th></tr></thead><tbody>${rows || '<tr><td colspan="5" style="padding:.55rem;border:1px solid #d7e2f2;">Sem dados</td></tr>'}</tbody></table></div>`;
+    html2pdf().set({ margin: 0.35, filename: '3d-predio.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 2, useCORS: true }, jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' } }).from(wrapper).save();
   }
 };
+window.torre3D = torre3D;
 
 // ── Aplicação Principal (Empréstimos) ──
 const app = {
@@ -2159,8 +1905,8 @@ const app = {
     if (id === 'rt-dia-dia' && window.appRT && typeof window.appRT.renderizarDiaDia === 'function') {
       window.appRT.renderizarDiaDia();
     }
-    if (id === 'predio-3d' && window.predio3D && typeof window.predio3D.render === 'function') {
-      window.predio3D.render();
+    if (id === 'predio-3d' && window.torre3D && typeof window.torre3D.render === 'function') {
+      window.torre3D.render();
     }
     atualizarBotaoMobile(id);
   },
