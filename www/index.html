@@ -1616,7 +1616,6 @@ const auth = {
     appMateriais.init();
     appRT.init();
     predio3D.render();
-    predio3D.render();
     setTimeout(() => atualizarBotaoMobile('visao-geral'), 50);
   },
 
@@ -1629,6 +1628,261 @@ const auth = {
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
     return (mapa[role] || []).includes(acao);
+  }
+};
+
+
+// ── 3D PRÉDIO ──
+const predio3D = {
+  state: { rotateX: -16, rotateY: -28, scale: 1, selected: null, tower: 'all', dragging: false, startX: 0, startY: 0, baseRotateX: -16, baseRotateY: -28 },
+  controlsBound: false,
+
+  getItensBase() {
+    const planejamento = (window.appRT?.itens || []).map(item => ({ ...item, origem: 'planejamento' }));
+    const diaDia = (window.appRT?.itensDiaDia || []).map(item => ({ ...item, origem: 'dia-dia' }));
+    return [...planejamento, ...diaDia];
+  },
+
+  torresDisponiveis() {
+    const set = new Set(this.getItensBase().map(i => (i.torre || 'Sem torre')).filter(Boolean));
+    return ['all', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'))];
+  },
+
+  pavimentoOrder(label) {
+    const txt = String(label || '').toLowerCase();
+    if (txt.includes('subsolo')) return -100;
+    if (txt.includes('térreo') || txt.includes('terreo')) return 0;
+    if (txt.includes('cobertura')) return 999;
+    const m = txt.match(/(\d+)/);
+    return m ? parseInt(m[1], 10) : 500;
+  },
+
+  parseDate(v) {
+    if (!v) return null;
+    try {
+      if (/^\d{4}-\d{2}-\d{2}/.test(v)) return new Date(v + 'T12:00:00');
+      if (/^\d{2}\/\d{2}\/\d{4}$/.test(v)) {
+        const [d,m,y] = v.split('/');
+        return new Date(`${y}-${m}-${d}T12:00:00`);
+      }
+    } catch (e) {}
+    return null;
+  },
+
+  statusLabel(status) {
+    return ({ verde: 'Concluído', amarelo: 'Em andamento', vermelho: 'Atrasado', cinza: 'Sem dados' })[status] || 'Sem dados';
+  },
+
+  buildTowerSelect() {
+    const sel = document.getElementById('predio3dTower');
+    if (!sel) return;
+    const current = this.state.tower;
+    sel.innerHTML = this.torresDisponiveis().map(t => `<option value="${t}">${t === 'all' ? 'Todas as torres' : t}</option>`).join('');
+    sel.value = current;
+    this.state.tower = sel.value || 'all';
+  },
+
+  groupFloors() {
+    const items = this.getItensBase().filter(i => this.state.tower === 'all' ? true : (i.torre || 'Sem torre') === this.state.tower);
+    const map = {};
+    items.forEach(item => {
+      const floor = item.pavimento || 'Sem pavimento';
+      if (!map[floor]) map[floor] = [];
+      map[floor].push(item);
+    });
+    return Object.keys(map)
+      .sort((a, b) => this.pavimentoOrder(a) - this.pavimentoOrder(b))
+      .map(floor => ({ floor, items: map[floor], status: this.computeFloorStatus(map[floor]) }));
+  },
+
+  computeFloorStatus(items) {
+    const statuses = items.map(i => String(i.status || '').trim());
+    const today = new Date();
+    const allConcluidos = statuses.length > 0 && statuses.every(s => s === 'Concluído');
+    const andamento = statuses.some(s => ['Pedir agora','RT lançada','Em suprimentos','Aguardando entrega','Entregue'].includes(s));
+    const atrasado = items.some(i => {
+      const dt = this.parseDate(i.dataServico || i["Início Planejado"] || i.dataNecessidade || '');
+      const st = String(i.status || '');
+      return dt && dt < today && st !== 'Concluído';
+    });
+    if (allConcluidos) return 'verde';
+    if (atrasado) return 'vermelho';
+    if (andamento) return 'amarelo';
+    return 'cinza';
+  },
+
+  render() {
+    this.buildTowerSelect();
+    const floors = this.groupFloors();
+    const building = document.getElementById('predio3dBuilding');
+    const floorList = document.getElementById('predio3dFloorList');
+    const details = document.getElementById('predio3dDetails');
+    const selectedLabel = document.getElementById('predio3dSelectedLabel');
+    const countFloors = document.getElementById('predio3dCountFloors');
+    const countCritical = document.getElementById('predio3dCountCritical');
+    if (!building || !floorList || !details || !selectedLabel || !countFloors || !countCritical) return;
+
+    countFloors.textContent = String(floors.length);
+    countCritical.textContent = String(floors.filter(f => f.status === 'vermelho').length);
+
+    if (!this.state.selected && floors.length) this.state.selected = floors[floors.length - 1].floor;
+    if (this.state.selected && !floors.some(f => f.floor === this.state.selected)) this.state.selected = floors.length ? floors[floors.length - 1].floor : null;
+
+    building.innerHTML = '';
+    const totalHeight = Math.max(560, floors.length * 38 + 50);
+    building.style.height = totalHeight + 'px';
+    building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
+
+    floors.forEach((floorObj, idx) => {
+      const y = totalHeight - 70 - (idx * 38);
+      const floor = document.createElement('div');
+      floor.className = `predio3d-floor predio3d-${floorObj.status}${this.state.selected === floorObj.floor ? ' active' : ''}`;
+      floor.style.bottom = `${y - 14}px`;
+      floor.innerHTML = `
+        <div class="face front" onclick='predio3D.selectFloor(${JSON.stringify(floorObj.floor)})'>
+          <span>${floorObj.floor}</span>
+          <span>${predio3D.statusLabel(floorObj.status)}</span>
+        </div>
+        <div class="face top"></div>
+        <div class="face side"></div>
+      `;
+      building.appendChild(floor);
+    });
+
+    const base = document.createElement('div');
+    base.className = 'predio3d-base';
+    building.appendChild(base);
+
+    floorList.innerHTML = floors.length ? floors.slice().reverse().map(f => `
+      <div class="predio3d-floor-item ${this.state.selected === f.floor ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.floor)})'>
+        <div>
+          <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
+          <div style="font-size:.82rem;color:var(--muted)">${f.items.length} item(ns)</div>
+        </div>
+        <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
+      </div>
+    `).join('') : '<div class="predio3d-empty">Nenhum pavimento encontrado.</div>';
+
+    const selected = floors.find(f => f.floor === this.state.selected);
+    if (!selected) {
+      selectedLabel.textContent = 'Selecione um pavimento';
+      details.innerHTML = '<div class="predio3d-empty">Nenhum pavimento disponível.</div>';
+    } else {
+      selectedLabel.textContent = `${selected.floor} • ${this.statusLabel(selected.status)}`;
+      details.innerHTML = selected.items.map(item => `
+        <div class="predio3d-details-item">
+          <div style="display:flex;justify-content:space-between;gap:.8rem;">
+            <strong>${item.servico || 'Serviço não informado'}</strong>
+            <span class="predio3d-badge">${item.status || 'Planejado'}</span>
+          </div>
+          <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
+            Torre: ${item.torre || '-'} • Pavimento: ${item.pavimento || '-'}
+          </div>
+          <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
+            Material: ${item.material || '-'} • Início: ${item.dataServico || item["Início Planejado"] || item.dataNecessidade || '-'}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    this.ensureControls();
+  },
+
+  selectFloor(floor) {
+    this.state.selected = floor;
+    this.render();
+  },
+
+  resetView() {
+    this.state.rotateX = -16;
+    this.state.rotateY = -28;
+    this.state.scale = 1;
+    this.render();
+  },
+
+  ensureControls() {
+    if (this.controlsBound) return;
+    const viewport = document.getElementById('predio3dViewport');
+    if (!viewport) return;
+    this.controlsBound = true;
+
+    const onDown = (x, y) => {
+      this.state.dragging = true;
+      this.state.startX = x;
+      this.state.startY = y;
+      this.state.baseRotateX = this.state.rotateX;
+      this.state.baseRotateY = this.state.rotateY;
+      viewport.classList.add('dragging');
+    };
+    const onMove = (x, y) => {
+      if (!this.state.dragging) return;
+      const dx = x - this.state.startX;
+      const dy = y - this.state.startY;
+      this.state.rotateY = this.state.baseRotateY + dx * 0.35;
+      this.state.rotateX = Math.max(-65, Math.min(20, this.state.baseRotateX - dy * 0.25));
+      const building = document.getElementById('predio3dBuilding');
+      if (building) building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
+    };
+    const onUp = () => {
+      this.state.dragging = false;
+      viewport.classList.remove('dragging');
+    };
+
+    viewport.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY));
+    viewport.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
+    window.addEventListener('mouseup', onUp);
+    viewport.addEventListener('touchstart', (e) => { const t = e.touches[0]; onDown(t.clientX, t.clientY); }, { passive: true });
+    viewport.addEventListener('touchmove', (e) => { const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
+    window.addEventListener('touchend', onUp);
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const next = this.state.scale + (e.deltaY < 0 ? 0.06 : -0.06);
+      this.state.scale = Math.max(0.7, Math.min(1.6, next));
+      const building = document.getElementById('predio3dBuilding');
+      if (building) building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
+    }, { passive: false });
+  },
+
+  gerarPdf() {
+    const floors = this.groupFloors();
+    const rows = floors.map(f => `
+      <tr>
+        <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.state.tower === 'all' ? '-' : this.state.tower}</td>
+        <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.floor}</td>
+        <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.statusLabel(f.status)}</td>
+        <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.items.length}</td>
+      </tr>
+    `).join('');
+    const wrapper = document.createElement('div');
+    wrapper.innerHTML = `
+      <div style="font-family:Segoe UI,Arial,sans-serif;padding:22px;color:#1a2340;">
+        <div style="display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid #2E75B6;padding-bottom:12px;margin-bottom:18px;">
+          <div>
+            <h1 style="margin:0;color:#1F3864;font-size:24px;">3D PRÉDIO</h1>
+            <p style="margin:6px 0 0 0;color:#6b7a99;">Gerado em ${new Date().toLocaleDateString('pt-BR')}</p>
+          </div>
+          <div style="font-weight:700;color:#1F3864;">Plano & Plano</div>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:#1F3864;color:#fff;">
+              <th style="padding:.6rem;border:1px solid #d7e2f2;">Torre</th>
+              <th style="padding:.6rem;border:1px solid #d7e2f2;">Pavimento</th>
+              <th style="padding:.6rem;border:1px solid #d7e2f2;">Status</th>
+              <th style="padding:.6rem;border:1px solid #d7e2f2;">Itens</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="4" style="padding:.55rem;border:1px solid #d7e2f2;">Sem dados</td></tr>'}</tbody>
+        </table>
+      </div>
+    `;
+    html2pdf().set({
+      margin: 0.35,
+      filename: '3d-predio.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { scale: 2, useCORS: true },
+      jsPDF: { unit: 'in', format: 'a4', orientation: 'portrait' }
+    }).from(wrapper).save();
   }
 };
 
@@ -1783,6 +2037,9 @@ const app = {
     }
     if (id === 'rt-dia-dia' && window.appRT && typeof window.appRT.renderizarDiaDia === 'function') {
       window.appRT.renderizarDiaDia();
+    }
+    if (id === 'predio-3d' && window.predio3D && typeof window.predio3D.render === 'function') {
+      window.predio3D.render();
     }
     atualizarBotaoMobile(id);
   },
