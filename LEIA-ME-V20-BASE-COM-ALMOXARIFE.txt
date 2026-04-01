@@ -1,4 +1,7 @@
-Versão baseada no V20.
-Almoxarife pode ver Planejamento RT e RT Dia a Dia.
-Não pode criar, editar ou excluir.
-Pode alterar status apenas de 'Aguardando entrega' para 'Entregue'.
+V16 COMPLETO
+- Planejamento RT da escadinha
+- RT Dia a Dia separada
+- Status manual salvo no Firebase
+- Acesso somente Admin e GO
+- Serviços ampliados para todas as frentes da escadinha
+- Versão preparada para Capacitor
