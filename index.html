@@ -188,7 +188,18 @@
 
 
 
-    /* ── TORRE VISUAL REALISTA ── */
+    
+    .torre-container{
+        display:flex;
+        gap:20px;
+        justify-content:center;
+        flex-wrap:wrap;
+    }
+    .torre-box{
+        width:320px;
+    }
+    
+/* ── TORRE VISUAL REALISTA ── */
     .predio3d-stage {
       background: linear-gradient(180deg, #edf4ff 0%, #dce9fb 65%, #d2e2f6 100%);
     }
@@ -199,18 +210,18 @@
       cursor: default;
       touch-action: auto;
     }
-    .predio3d-building {
+    .predio3d-building torre-layout {
       width: min(360px, 95%);
       min-height: 680px;
       height: auto !important;
       transform: none !important;
       transition: none !important;
       display: flex;
-      flex-direction: column-reverse;
+      flex-direction: column;
       gap: 6px;
       position: relative;
     }
-    .predio3d-building::before {
+    .predio3d-building torre-layout::before {
       content: '';
       position: absolute;
       inset: 22px 10px 0 10px;
@@ -220,7 +231,7 @@
       box-shadow: 0 18px 30px rgba(31,56,100,.14);
       z-index: 0;
     }
-    .predio3d-building::after {
+    .predio3d-building torre-layout::after {
       content: '';
       position: absolute;
       left: 50%;
@@ -259,7 +270,7 @@
       border: 1px solid rgba(255,255,255,.7);
       overflow: hidden;
       cursor: pointer;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,.3);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
     }
     .tower-floor.active {
       outline: 3px solid #1F3864;
@@ -306,7 +317,7 @@
     .predio3d-viewport.dragging { cursor: default; }
     @media (max-width: 980px) {
       .predio3d-viewport { min-height: 620px; }
-      .predio3d-building { min-height: 560px; }
+      .predio3d-building torre-layout { min-height: 560px; }
     }
 
     /* ── 3D PRÉDIO ── */
@@ -316,7 +327,7 @@
     .predio3d-help { position:absolute; top:12px; left:12px; z-index:2; background:rgba(255,255,255,.92); border-radius:999px; padding:.45rem .8rem; font-size:.82rem; color:var(--muted); box-shadow:0 4px 14px rgba(31,56,100,.08); }
     .predio3d-viewport { perspective:1200px; width:100%; min-height:640px; display:flex; align-items:center; justify-content:center; touch-action:none; cursor:grab; user-select:none; }
     .predio3d-viewport.dragging { cursor:grabbing; }
-    .predio3d-building { position:relative; width:240px; height:560px; transform-style:preserve-3d; transition:transform .08s linear; }
+    .predio3d-building torre-layout { position:relative; width:240px; height:560px; transform-style:preserve-3d; transition:transform .08s linear; }
     .predio3d-floor { position:absolute; left:0; width:240px; height:34px; transform-style:preserve-3d; }
     .predio3d-floor .face { position:absolute; box-sizing:border-box; border:1px solid rgba(0,0,0,.08); }
     .predio3d-floor .front { width:240px; height:34px; transform:translateZ(20px); border-radius:8px; display:flex; align-items:center; justify-content:space-between; padding:0 .8rem; color:#fff; font-weight:700; font-size:.88rem; box-shadow:0 8px 16px rgba(31,56,100,.16); cursor:pointer; position:absolute; left:0; top:0; overflow:hidden; }
@@ -1116,7 +1127,7 @@
         <div class="predio3d-stage">
           <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento</div>
           <div id="predio3dViewport" class="predio3d-viewport">
-            <div id="predio3dBuilding" class="predio3d-building"></div>
+            <div id="predio3dBuilding" class="predio3d-building torre-layout"></div>
           </div>
         </div>
         <div class="card predio3d-panel" style="margin:0;">
@@ -1792,6 +1803,13 @@ const predio3D = {
     return null;
   },
 
+  
+  getProgress(items){
+    if(!items || !items.length) return 0;
+    let concluido = items.filter(i => i.status === 'Concluído').length;
+    return Math.round((concluido / items.length) * 100);
+  },
+
   statusLabel(status) {
     return ({ verde: 'Concluído', amarelo: 'Em andamento', vermelho: 'Atrasado', cinza: 'Sem dados' })[status] || 'Sem dados';
   },
@@ -1827,6 +1845,7 @@ const predio3D = {
     const extras = Object.keys(map).filter(f => !baseFloors.includes(f)).sort((a, b) => this.pavimentoOrder(a) - this.pavimentoOrder(b));
     const allFloors = [...baseFloors, ...extras];
 
+    allFloors.sort((a,b)=>this.pavimentoOrder(a)-this.pavimentoOrder(b));
     return allFloors.map(floor => ({
       floor,
       items: map[floor] || [],
@@ -1879,7 +1898,14 @@ const predio3D = {
           <span>${floorObj.floor}</span>
           <span class="tower-status-pill">${predio3D.statusLabel(floorObj.status)}</span>
         </div>
+        
+        <div style="padding:4px 8px;">
+            <div style="height:6px;background:#eee;border-radius:4px;overflow:hidden;">
+                <div style="height:100%;width:${predio3D.getProgress(floorObj.items)}%;background:#1F3864;"></div>
+            </div>
+        </div>
         <div class="tower-floor-grid">
+        
           <div class="tower-window"></div>
           <div class="tower-window"></div>
           <div class="tower-window"></div>
