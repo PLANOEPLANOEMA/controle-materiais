@@ -186,6 +186,47 @@
       box-shadow: 0 4px 12px rgba(46,117,182,.35);
     }
 
+
+    /* ── 3D PRÉDIO ── */
+    .predio3d-toolbar { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin-bottom:1rem; }
+    .predio3d-layout { display:grid; grid-template-columns:minmax(340px,1fr) 360px; gap:1.25rem; align-items:start; }
+    .predio3d-stage { min-height:640px; background:linear-gradient(180deg,#eef4ff 0%,#f9fbff 100%); border-radius:18px; overflow:hidden; position:relative; box-shadow:var(--shadow); border:1px solid #dbe7f7; }
+    .predio3d-help { position:absolute; top:12px; left:12px; z-index:2; background:rgba(255,255,255,.92); border-radius:999px; padding:.45rem .8rem; font-size:.82rem; color:var(--muted); box-shadow:0 4px 14px rgba(31,56,100,.08); }
+    .predio3d-viewport { perspective:1200px; width:100%; min-height:640px; display:flex; align-items:center; justify-content:center; touch-action:none; cursor:grab; user-select:none; }
+    .predio3d-viewport.dragging { cursor:grabbing; }
+    .predio3d-building { position:relative; width:240px; height:560px; transform-style:preserve-3d; transition:transform .08s linear; }
+    .predio3d-floor { position:absolute; left:0; width:240px; height:34px; transform-style:preserve-3d; }
+    .predio3d-floor .face { position:absolute; box-sizing:border-box; border:1px solid rgba(0,0,0,.08); }
+    .predio3d-floor .front { width:240px; height:34px; transform:translateZ(20px); border-radius:8px; display:flex; align-items:center; justify-content:space-between; padding:0 .8rem; color:#fff; font-weight:700; font-size:.88rem; box-shadow:0 8px 16px rgba(31,56,100,.16); cursor:pointer; position:absolute; left:0; top:0; overflow:hidden; }
+    .predio3d-floor .front::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 42%, rgba(0,0,0,.12) 100%); border-radius:8px; pointer-events:none; }
+    .predio3d-floor .top { width:240px; height:40px; transform:rotateX(90deg) translateZ(20px) translateY(-20px); opacity:.78; border-radius:8px 8px 0 0; position:absolute; left:0; top:0; }
+    .predio3d-floor .side { width:40px; height:34px; right:-20px; transform:rotateY(90deg) translateZ(220px); opacity:.65; position:absolute; top:0; }
+    .predio3d-floor.active .front { outline:3px solid rgba(255,255,255,.95); box-shadow:0 0 0 4px rgba(31,56,100,.18), 0 14px 22px rgba(31,56,100,.22); }
+    .predio3d-base { position:absolute; bottom:-18px; width:270px; height:26px; background:#c5d8f1; border-radius:999px; filter:blur(1px); transform:translateX(-15px); box-shadow:0 20px 30px rgba(31,56,100,.16); }
+    .predio3d-verde .front, .predio3d-dot.verde { background:#27AE60; }
+    .predio3d-verde .top, .predio3d-verde .side { background:#239a55; }
+    .predio3d-amarelo .front, .predio3d-dot.amarelo { background:#F5A623; color:#1a2340; }
+    .predio3d-amarelo .top, .predio3d-amarelo .side { background:#dc951f; }
+    .predio3d-vermelho .front, .predio3d-dot.vermelho { background:#E84545; }
+    .predio3d-vermelho .top, .predio3d-vermelho .side { background:#cf3d3d; }
+    .predio3d-cinza .front, .predio3d-dot.cinza { background:#95a5a6; }
+    .predio3d-cinza .top, .predio3d-cinza .side { background:#869798; }
+    .predio3d-legend { display:flex; flex-wrap:wrap; gap:.8rem; margin:.35rem 0 1rem; }
+    .predio3d-legend-item { display:flex; align-items:center; gap:.4rem; font-size:.85rem; color:var(--muted); }
+    .predio3d-dot { width:12px; height:12px; border-radius:999px; }
+    .predio3d-panel .metric { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; margin-bottom:1rem; }
+    .predio3d-panel .metric-card { background:#f7fbff; border:1px solid #dbe7f7; border-radius:14px; padding:.85rem; }
+    .predio3d-panel .metric-card .num { font-size:1.35rem; font-weight:800; color:var(--blue-dark); }
+    .predio3d-floor-list { max-height:260px; overflow:auto; border:1px solid #e3edf9; border-radius:14px; }
+    .predio3d-floor-item { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.8rem 1rem; border-bottom:1px solid #eef3fb; cursor:pointer; }
+    .predio3d-floor-item:last-child { border-bottom:none; }
+    .predio3d-floor-item.active { background:#eef5ff; }
+    .predio3d-badge { display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .55rem; border-radius:999px; font-size:.78rem; font-weight:700; background:#eef3fb; color:var(--blue-dark); }
+    .predio3d-details-list { display:grid; gap:.6rem; max-height:260px; overflow:auto; }
+    .predio3d-details-item { background:#f8fbff; border:1px solid #e3edf9; border-radius:12px; padding:.75rem; }
+    .predio3d-empty { padding:2rem; text-align:center; color:var(--muted); }
+    @media (max-width:980px) { .predio3d-layout { grid-template-columns:1fr; } .predio3d-stage, .predio3d-viewport { min-height:520px; } }
+
     /* ── Main layout ── */
     main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
 
@@ -729,6 +770,7 @@
   <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
   <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
   <button data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
+  <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
   <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
   <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
   <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
@@ -929,6 +971,48 @@
 
 
   <!-- ── RT DIA A DIA ── -->
+
+  <!-- ── 3D PRÉDIO ── -->
+  <section id="predio-3d">
+    <div class="card">
+      <h2>🏢 3D PRÉDIO</h2>
+      <div class="predio3d-legend">
+        <div class="predio3d-legend-item"><span class="predio3d-dot verde"></span> Concluído</div>
+        <div class="predio3d-legend-item"><span class="predio3d-dot amarelo"></span> Em andamento</div>
+        <div class="predio3d-legend-item"><span class="predio3d-dot vermelho"></span> Atrasado</div>
+        <div class="predio3d-legend-item"><span class="predio3d-dot cinza"></span> Sem dados</div>
+      </div>
+      <div class="predio3d-toolbar">
+        <div class="form-group" style="min-width:220px; margin:0;">
+          <label for="predio3dTower">Torre</label>
+          <select id="predio3dTower" onchange="predio3D.render()"></select>
+        </div>
+        <button class="btn btn-secondary" onclick="predio3D.resetView()">↺ Resetar visão</button>
+        <button class="btn btn-success" onclick="predio3D.gerarPdf()">📄 PDF do 3D PRÉDIO</button>
+      </div>
+      <div class="predio3d-layout">
+        <div class="predio3d-stage">
+          <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento</div>
+          <div id="predio3dViewport" class="predio3d-viewport">
+            <div id="predio3dBuilding" class="predio3d-building"></div>
+          </div>
+        </div>
+        <div class="card predio3d-panel" style="margin:0;">
+          <h2 style="margin-bottom:.9rem;">Detalhes do Pavimento</h2>
+          <div class="metric">
+            <div class="metric-card"><div class="num" id="predio3dCountFloors">0</div><div class="label">Pavimentos</div></div>
+            <div class="metric-card"><div class="num" id="predio3dCountCritical">0</div><div class="label">Atrasados</div></div>
+          </div>
+          <div class="predio3d-floor-list" id="predio3dFloorList"></div>
+          <div style="margin-top:1rem;">
+            <div class="predio3d-badge" id="predio3dSelectedLabel">Selecione um pavimento</div>
+            <div class="predio3d-details-list" id="predio3dDetails" style="margin-top:.85rem;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="rt-dia-dia">
     <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📝 Voltar para início</button></div>
     <div class="card">
@@ -1501,9 +1585,9 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       almoxarife: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      go: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      go: ['materiais-obra','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       engenharia: ['materiais-obra','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
@@ -1531,15 +1615,16 @@ const auth = {
     app.init();
     appMateriais.init();
     appRT.init();
+    predio3D.render();
     setTimeout(() => atualizarBotaoMobile('visao-geral'), 50);
   },
 
   pode(acao) {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
-      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
+      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
       almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia'],
-      go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_rt_dia_dia','editar_rt_dia_dia'],
+      go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
     };
     return (mapa[role] || []).includes(acao);
@@ -1666,6 +1751,11 @@ const app = {
       id = 'materiais-obra';
       btn = document.querySelector('nav button[data-section="materiais-obra"]');
     }
+    if (id === 'predio-3d' && !auth.pode('ver_predio_3d')) {
+      app.mostrarAlerta('Somente Admin e GO podem acessar o 3D PRÉDIO.', 'error');
+      id = 'materiais-obra';
+      btn = document.querySelector('nav button[data-section="materiais-obra"]');
+    }
 
     document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
     document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
@@ -1675,7 +1765,7 @@ const app = {
 
     const globalKpiGrid = document.getElementById('globalKpiGrid');
     if (globalKpiGrid) {
-      globalKpiGrid.style.display = ['planejamento-rt','rt-dia-dia','materiais-obra','rastreabilidade'].includes(id) ? 'none' : 'grid';
+      globalKpiGrid.style.display = ['planejamento-rt','predio-3d','rt-dia-dia','materiais-obra','rastreabilidade'].includes(id) ? 'none' : 'grid';
     }
 
     if (id === 'relatorio') {
