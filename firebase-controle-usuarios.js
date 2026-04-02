@@ -2084,9 +2084,11 @@ const app = {
     }
     if (id === 'planejamento-rt' && window.appRT && typeof window.appRT.renderizar === 'function') {
       window.appRT.renderizar();
+      if (window.predio3D) window.predio3D.render();
     }
     if (id === 'rt-dia-dia' && window.appRT && typeof window.appRT.renderizarDiaDia === 'function') {
       window.appRT.renderizarDiaDia();
+      if (window.predio3D) window.predio3D.render();
     }
     if (id === 'predio-3d' && window.predio3D && typeof window.predio3D.render === 'function') {
       window.predio3D.render();
@@ -3687,6 +3689,7 @@ const appRT = {
           this.itens = Array.isArray(itens) ? itens : [];
           try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens)); } catch(e) {}
           this.renderizar();
+          if (window.predio3D) window.predio3D.render();
         });
       }
       if (window.__fb?.escutarMudancasRTDiaDia) {
@@ -3695,6 +3698,7 @@ const appRT = {
           this.itensDiaDia = Array.isArray(itens) ? itens : [];
           try { localStorage.setItem(this.STORAGE_KEY_DIA_DIA, JSON.stringify(this.itensDiaDia)); } catch(e) {}
           this.renderizarDiaDia();
+          if (window.predio3D) window.predio3D.render();
         });
       }
     } catch (e) { console.warn('Sync ao vivo do planejamento indisponível:', e); }
@@ -3703,11 +3707,13 @@ const appRT = {
   async salvarDados() {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens));
     if (window.__fb?.salvarPlanejamentoRTNaNuvem) await window.__fb.salvarPlanejamentoRTNaNuvem(this.itens);
+    if (window.predio3D) window.predio3D.render();
   },
 
   async salvarDadosDiaDia() {
     localStorage.setItem(this.STORAGE_KEY_DIA_DIA, JSON.stringify(this.itensDiaDia));
     if (window.__fb?.salvarRTDiaDiaNaNuvem) await window.__fb.salvarRTDiaDiaNaNuvem(this.itensDiaDia);
+    if (window.predio3D) window.predio3D.render();
   },
 
   abrirModalNovo() {
