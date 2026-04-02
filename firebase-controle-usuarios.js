@@ -1727,7 +1727,9 @@ const predio3D = {
 
   getDisplayTowers() {
     const defs = this.getTowerDefinitions();
-    return this.state.tower === 'all' ? defs : defs.filter(d => d.torre === this.state.tower);
+    if (this.state.tower === 'all') return defs;
+    const filtered = defs.filter(d => d.torre === this.state.tower);
+    return filtered.length ? filtered : defs;
   },
 
   getItensBase() {
@@ -1747,14 +1749,24 @@ const predio3D = {
   computeFloorStatus(items) {
     if (!items.length) return 'cinza';
     const statuses = items.map(i => String(i.status || '').trim());
+    
+    // Se todos estiverem concluídos ou entregues -> Verde
+    if (statuses.every(s => ['Concluído', 'Entregue'].includes(s))) return 'verde';
+    
+    // Se houver algum em status de execução/aguardando -> Amarelo
+    if (statuses.some(s => ['RT lançada', 'Em suprimentos', 'Autorizado para compra', 'Aguardando entrega'].includes(s))) return 'amarelo';
+    
+    // Se houver algum atrasado (baseado na data) -> Vermelho
     const today = new Date();
+    today.setHours(0,0,0,0);
     const hasLate = items.some(i => {
       const dt = this.parseDate(i.dataServico || i['Início Planejado'] || i.dataNecessidade || '');
       const st = String(i.status || '').trim();
       return dt && dt < today && !['Concluído','Entregue'].includes(st);
     });
     if (hasLate) return 'vermelho';
-    if (statuses.every(s => ['Concluído','Entregue'].includes(s))) return 'verde';
+
+    // Padrão para itens planejados ou outros
     return 'amarelo';
   },
 
