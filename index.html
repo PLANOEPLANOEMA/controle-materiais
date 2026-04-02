@@ -925,12 +925,13 @@
 </header>
 
 <nav id="desktopNav">
-  <!-- Seção RT -->
+  <!-- Seção RT e Controle de Materiais -->
   <div class="nav-section">
-    <div class="nav-section-title">📋 RT</div>
+    <div class="nav-section-title">📋 RT & Materiais</div>
     <button class="active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
     <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
     <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
+    <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
   </div>
   
   <!-- Seção Controle de Romaneios -->
@@ -943,10 +944,9 @@
     <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
   </div>
   
-  <!-- Controle e Rastreabilidade OBRA -->
+  <!-- Rastreabilidade e Relatórios -->
   <div class="nav-section">
-    <div class="nav-section-title">📄 Controle e Rastreabilidade OBRA</div>
-    <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+    <div class="nav-section-title">📊 Rastreabilidade & Relatórios</div>
     <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
     <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
   </div>
@@ -1555,15 +1555,23 @@
         </div>
       </div>
       <div class="form-row">
-        <div class="form-group">
-          <label for="rtMaterial">Material / Nome na planilha *</label>
-          <input type="text" id="rtMaterial" required placeholder="Ex: Argamassa AC2" />
+        <div class="form-group" style="position:relative;">
+          <label for="rtCodigoMaterial">Codigo ou Nome do Material *</label>
+          <input type="text" id="rtCodigoMaterial" required placeholder="Ex: TQ0-1001 ou Tela Q138" oninput="appRT.buscarMaterialPorCodigoOuNome()" autocomplete="off" />
+          <div id="rtMaterialSugestoes" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:200px;overflow-y:auto;z-index:10;display:none;border-radius:0 0 8px 8px;"></div>
         </div>
         <div class="form-group">
           <label for="rtQuantidade">Quantidade</label>
           <input type="number" id="rtQuantidade" min="0" step="1" placeholder="Ex: 100" />
         </div>
       </div>
+      <div class="form-row" style="display:none;" id="rtMaterialInfoRow">
+        <div class="form-group">
+          <label>Material Selecionado</label>
+          <div id="rtMaterialInfo" style="padding:0.75rem;background:#f0f8ff;border-radius:8px;border:1px solid #cfe0fb;color:#1f3864;"></div>
+        </div>
+      </div>
+      <input type="hidden" id="rtMaterial" />
       <div class="form-row">
         <div class="form-group">
           <label for="rtDataServico">Data prevista do serviço *</label>
@@ -1801,6 +1809,7 @@ const auth = {
     app.init();
     appMateriais.init();
     appRT.init();
+    appRT.carregarMateriais();
     predio3D.render();
     setTimeout(() => atualizarBotaoMobile('visao-geral'), 50);
   },
@@ -3498,7 +3507,67 @@ const appRT = {
   editandoIdDiaDia: null,
   _unsub: null,
   _unsubDiaDia: null,
+  materiaisCatalogo: [],
   meses: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
+
+  // Carregar catálogo de materiais
+  carregarMateriais: async function() {
+    try {
+      const response = await fetch('./Materiais_Codificados.csv');
+      const csv = await response.text();
+      const linhas = csv.split('\n').slice(1);
+      this.materiaisCatalogo = linhas
+        .filter(l => l.trim())
+        .map(l => {
+          const [codigo, nome] = l.split(',').map(s => s.trim().replace(/^\"|\"$/g, ''));
+          return { codigo, nome };
+        });
+    } catch (e) {
+      console.warn('Catálogo de materiais não carregado:', e);
+    }
+  },
+
+  // Buscar material por código ou nome
+  buscarMaterialPorCodigoOuNome: function() {
+    const input = document.getElementById('rtCodigoMaterial')?.value?.trim() || '';
+    const sugestoes = document.getElementById('rtMaterialSugestoes');
+    
+    if (!input || input.length < 2) {
+      sugestoes.style.display = 'none';
+      return;
+    }
+    
+    const termo = input.toLowerCase();
+    const resultados = this.materiaisCatalogo.filter(m => 
+      m.codigo.toLowerCase().includes(termo) || 
+      m.nome.toLowerCase().includes(termo)
+    ).slice(0, 10);
+    
+    if (resultados.length === 0) {
+      sugestoes.style.display = 'none';
+      return;
+    }
+    
+    sugestoes.innerHTML = resultados.map(m => `
+      <div style="padding:0.75rem;border-bottom:1px solid #eee;cursor:pointer;" 
+           onmouseover="this.style.background='#f5f5f5'" 
+           onmouseout="this.style.background='transparent'"
+           onclick="appRT.selecionarMaterial('${m.codigo}', '${m.nome.replace(/'/g, "\\'")}')">  
+        <strong>${m.codigo}</strong> - ${m.nome}
+      </div>
+    `).join('');
+    
+    sugestoes.style.display = 'block';
+  },
+
+  // Selecionar material da lista
+  selecionarMaterial: function(codigo, nome) {
+    document.getElementById('rtCodigoMaterial').value = codigo;
+    document.getElementById('rtMaterial').value = nome;
+    document.getElementById('rtMaterialInfo').innerHTML = `<strong>${codigo}</strong><br>${nome}`;
+    document.getElementById('rtMaterialInfoRow').style.display = 'block';
+    document.getElementById('rtMaterialSugestoes').style.display = 'none';
+  },
   servicos: ['Fachada','Estrutura de Concreto','Alvenaria Estrutural + Distribuição Elétrica','Gradil','Requadração de Caixilhos','Enfiação','Prumada Hidráulica + Aranha','Ramal Sanitário','Alvenaria dos Shafts','Contrapiso','Gesso Liso','Forro de Gesso','Impermeabilização','Cerâmica, Baguete, Soleira, Azulejo','Caixilhos','Bancada','Pintura (Aparelhamento)','Portas de Madeira','Interrupt, Tomadas, QDL','Louças e Metais','Limpeza Grossa','Arremates Gerais','Piso Laminado','Pintura Final','Limpeza Fina','Apto Pronto para Entrega','Gesso','Revestimento','Pintura','Instalação de Porta','Acompanhamento'],
   statusList: ['Planejado','Pedir agora','RT lançada','Em suprimentos','Aguardando entrega','Entregue','Concluído'],
   torresFixas: ['Torre A', 'Torre B'],
@@ -4375,12 +4444,13 @@ window.addEventListener('resize', handleMediaChange);
 
 <!-- ── MOBILE MENU ── -->
 <nav class="mobile-menu" id="mobileMenu">
-  <!-- Seção RT -->
+  <!-- Seção RT e Controle de Materiais -->
   <div class="mobile-nav-section">
-    <div class="mobile-nav-section-title">📋 RT</div>
+    <div class="mobile-nav-section-title">📋 RT & Materiais</div>
     <button class="mobile-nav-button active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this); closeMobileMenu()">Planejamento RT</button>
     <button class="mobile-nav-button" data-section="predio-3d" onclick="app.showSection('predio-3d', this); closeMobileMenu()">3D PRÉDIO</button>
     <button class="mobile-nav-button" data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this); closeMobileMenu()">RT Dia a Dia</button>
+    <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
   </div>
   
   <!-- Seção Controle de Romaneios -->
@@ -4393,10 +4463,9 @@ window.addEventListener('resize', handleMediaChange);
     <button class="mobile-nav-button" data-section="relatorio" onclick="app.showSection('relatorio', this); closeMobileMenu()">Relatório Visual</button>
   </div>
   
-  <!-- Controle e Rastreabilidade OBRA -->
+  <!-- Rastreabilidade e Relatórios -->
   <div class="mobile-nav-section">
-    <div class="mobile-nav-section-title">📄 Controle e Rastreabilidade OBRA</div>
-    <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
+    <div class="mobile-nav-section-title">📊 Rastreabilidade & Relatórios</div>
     <button class="mobile-nav-button" data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this); closeMobileMenu()">Rastreabilidade</button>
     <button class="mobile-nav-button" data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this); closeMobileMenu()">Relatório do Dia</button>
   </div>
