@@ -189,49 +189,73 @@
 
     /* ── 3D PRÉDIO ── */
     .predio3d-toolbar { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin-bottom:1rem; }
-    .predio3d-layout { display:grid; grid-template-columns:minmax(340px,1fr) 360px; gap:1.25rem; align-items:start; }
-    .predio3d-stage { min-height:640px; background:linear-gradient(180deg,#eef4ff 0%,#f9fbff 100%); border-radius:18px; overflow:hidden; position:relative; box-shadow:var(--shadow); border:1px solid #dbe7f7; }
-    .predio3d-help { position:absolute; top:12px; left:12px; z-index:2; background:rgba(255,255,255,.92); border-radius:999px; padding:.45rem .8rem; font-size:.82rem; color:var(--muted); box-shadow:0 4px 14px rgba(31,56,100,.08); }
-    .predio3d-viewport { perspective:1600px; width:100%; min-height:640px; display:flex; align-items:center; justify-content:center; touch-action:none; cursor:grab; user-select:none; padding:2rem; }
+    .predio3d-layout { display:grid; grid-template-columns:minmax(360px,1fr) 360px; gap:1.25rem; align-items:start; }
+    .predio3d-stage { min-height:680px; background:linear-gradient(180deg,#edf3fb 0%,#f8fbff 54%,#f4f8fd 100%); border-radius:22px; overflow:hidden; position:relative; box-shadow:var(--shadow); border:1px solid #dbe7f7; }
+    .predio3d-help { position:absolute; top:12px; left:12px; z-index:3; background:rgba(255,255,255,.94); border-radius:999px; padding:.48rem .85rem; font-size:.82rem; color:var(--muted); box-shadow:0 4px 14px rgba(31,56,100,.08); }
+    .predio3d-viewport { perspective:1500px; perspective-origin:50% 42%; width:100%; min-height:680px; display:flex; align-items:center; justify-content:center; touch-action:none; cursor:grab; user-select:none; padding:2rem 1rem 2.25rem; }
     .predio3d-viewport.dragging { cursor:grabbing; }
-    .predio3d-building { position:relative; width:220px; height:620px; transform-style:preserve-3d; transition:transform .08s linear; }
-    .predio3d-floor { position:absolute; left:0; width:220px; height:26px; transform-style:preserve-3d; }
-    .predio3d-floor .face { position:absolute; box-sizing:border-box; border:1px solid rgba(20,35,70,.12); }
-    .predio3d-floor .front { width:220px; height:26px; transform:translateZ(34px); border-radius:4px; cursor:pointer; position:absolute; left:0; top:0; overflow:hidden; box-shadow:0 7px 14px rgba(31,56,100,.10); }
-    .predio3d-floor .front::before { content:''; position:absolute; inset:0; background:linear-gradient(90deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,0) 50%, rgba(0,0,0,.12) 100%); }
-    .predio3d-floor .front::after { content:''; position:absolute; inset:4px 14px; background-image:linear-gradient(90deg, rgba(173,224,255,.92) 0 16px, transparent 16px 30px); background-size:30px 100%; opacity:.72; }
-    .predio3d-floor .top { width:220px; height:68px; transform:rotateX(90deg) translateZ(34px) translateY(-34px); opacity:.9; position:absolute; left:0; top:0; }
-    .predio3d-floor .side { width:68px; height:26px; right:-34px; transform:rotateY(90deg) translateZ(186px); opacity:.82; position:absolute; top:0; }
-    .predio3d-floor-label { position:absolute; left:-62px; top:2px; width:52px; text-align:right; font-size:.8rem; font-weight:700; color:#345; pointer-events:none; }
-    .predio3d-floor.active .front { outline:3px solid rgba(255,255,255,.95); box-shadow:0 0 0 4px rgba(31,56,100,.18), 0 14px 22px rgba(31,56,100,.22); }
-    .predio3d-floor.active .predio3d-floor-label { color:#1F3864; }
-    .predio3d-floor-summary { position:absolute; top:16px; right:-110px; width:98px; background:rgba(255,255,255,.96); border:1px solid #dbe7f7; border-radius:12px; box-shadow:0 8px 20px rgba(31,56,100,.12); padding:.45rem .55rem; font-size:.74rem; color:#445; pointer-events:none; }
-    .predio3d-floor-summary strong { display:block; color:#1F3864; font-size:.78rem; margin-bottom:.15rem; }
-    .predio3d-base { position:absolute; bottom:-30px; left:-24px; width:290px; height:42px; background:linear-gradient(180deg,#d3e2f6 0%,#b9cfea 100%); border-radius:999px; box-shadow:0 24px 40px rgba(31,56,100,.18); }
-    .predio3d-stage-empty { color:var(--muted); background:#fff; border:1px dashed #dbe7f7; border-radius:16px; padding:1rem 1.2rem; }
-    .predio3d-verde .front, .predio3d-dot.verde { background:#27AE60; }
-    .predio3d-verde .top, .predio3d-verde .side { background:#239a55; }
-    .predio3d-amarelo .front, .predio3d-dot.amarelo { background:#F5A623; color:#1a2340; }
-    .predio3d-amarelo .top, .predio3d-amarelo .side { background:#dc951f; }
-    .predio3d-vermelho .front, .predio3d-dot.vermelho { background:#E84545; }
-    .predio3d-vermelho .top, .predio3d-vermelho .side { background:#cf3d3d; }
-    .predio3d-cinza .front, .predio3d-dot.cinza { background:#95a5a6; }
-    .predio3d-cinza .top, .predio3d-cinza .side { background:#869798; }
+    .predio3d-scene { position:relative; width:100%; min-height:620px; transform-style:preserve-3d; display:flex; align-items:flex-end; justify-content:center; }
+    .predio3d-building { position:relative; width:100%; max-width:860px; height:620px; transform-style:preserve-3d; transition:transform .08s linear; transform-origin:center bottom; }
+    .predio3d-podium { position:absolute; left:50%; bottom:44px; width:520px; height:26px; transform:translateX(-50%) translateZ(0); transform-style:preserve-3d; }
+    .predio3d-podium .face { position:absolute; box-sizing:border-box; border:1px solid rgba(50,66,92,.08); }
+    .predio3d-podium .top { inset:0; background:linear-gradient(180deg,#f7f9fc 0%,#e5edf7 100%); border-radius:10px; transform:translateZ(10px); box-shadow:0 18px 26px rgba(31,56,100,.1); }
+    .predio3d-podium .front { left:0; bottom:-10px; width:520px; height:10px; background:#d7e1ef; transform:rotateX(-90deg); transform-origin:top; }
+    .predio3d-podium .back { left:0; top:-10px; width:520px; height:10px; background:#c7d5e8; transform:rotateX(90deg); transform-origin:bottom; }
+    .predio3d-podium .left { left:-10px; top:0; width:10px; height:26px; background:#ced8e7; transform:rotateY(-90deg); transform-origin:right; }
+    .predio3d-podium .right { right:-10px; top:0; width:10px; height:26px; background:#c2cede; transform:rotateY(90deg); transform-origin:left; }
+    .predio3d-ground { position:absolute; left:50%; bottom:10px; width:620px; height:42px; transform:translateX(-50%); border-radius:999px; background:radial-gradient(circle at center, rgba(161,184,213,.42) 0%, rgba(161,184,213,.18) 48%, rgba(161,184,213,0) 78%); filter:blur(2px); }
+    .predio3d-tower { position:absolute; bottom:70px; width:188px; transform-style:preserve-3d; }
+    .predio3d-tower.tower-a { left:calc(50% - 205px); }
+    .predio3d-tower.tower-b { left:calc(50% + 17px); }
+    .predio3d-single .predio3d-tower { left:50% !important; transform:translateX(-50%); }
+    .predio3d-floor { position:absolute; left:0; width:188px; height:28px; transform-style:preserve-3d; }
+    .predio3d-floor .face { position:absolute; box-sizing:border-box; border:1px solid rgba(27,39,65,.08); overflow:hidden; }
+    .predio3d-floor .front, .predio3d-floor .back { width:188px; height:28px; display:flex; align-items:center; justify-content:space-between; padding:0 .72rem; font-weight:700; font-size:.8rem; }
+    .predio3d-floor .front { transform:translateZ(26px); border-radius:7px; box-shadow:0 9px 16px rgba(31,56,100,.12); cursor:pointer; }
+    .predio3d-floor .back { transform:rotateY(180deg) translateZ(26px); border-radius:7px; }
+    .predio3d-floor .left, .predio3d-floor .right { width:52px; height:28px; }
+    .predio3d-floor .left { left:-26px; transform:rotateY(-90deg); transform-origin:right center; }
+    .predio3d-floor .right { right:-26px; transform:rotateY(90deg); transform-origin:left center; }
+    .predio3d-floor .top { width:188px; height:52px; top:-26px; transform:rotateX(90deg); transform-origin:bottom center; }
+    .predio3d-floor .bottom { width:188px; height:52px; bottom:-26px; transform:rotateX(-90deg); transform-origin:top center; }
+    .predio3d-floor .label-back { opacity:.35; }
+    .predio3d-floor.active .front { outline:3px solid rgba(255,255,255,.95); box-shadow:0 0 0 4px rgba(31,56,100,.16), 0 12px 24px rgba(31,56,100,.18); }
+    .predio3d-windows { position:absolute; inset:4px 14px; background-size:28px 14px; opacity:.9; pointer-events:none; }
+    .predio3d-front-windows { background-image:linear-gradient(90deg, transparent 0 6px, rgba(66,196,255,.95) 6px 16px, transparent 16px 28px), linear-gradient(180deg, transparent 0 3px, rgba(255,255,255,.16) 3px 5px, transparent 5px 14px); }
+    .predio3d-side-windows { inset:4px 6px; background-size:18px 14px; background-image:linear-gradient(90deg, transparent 0 3px, rgba(66,196,255,.9) 3px 10px, transparent 10px 18px), linear-gradient(180deg, transparent 0 3px, rgba(255,255,255,.14) 3px 5px, transparent 5px 14px); }
+    .predio3d-verde .front, .predio3d-verde .back, .predio3d-dot.verde { background:linear-gradient(180deg,#35bf73 0%,#23985a 100%); color:#fff; }
+    .predio3d-verde .top { background:#45c67e; }
+    .predio3d-verde .left, .predio3d-verde .right { background:#229556; }
+    .predio3d-verde .bottom { background:#1f7f4a; }
+    .predio3d-amarelo .front, .predio3d-amarelo .back, .predio3d-dot.amarelo { background:linear-gradient(180deg,#f6b23a 0%,#e6941a 100%); color:#1a2340; }
+    .predio3d-amarelo .top { background:#ffc65c; }
+    .predio3d-amarelo .left, .predio3d-amarelo .right { background:#d48716; }
+    .predio3d-amarelo .bottom { background:#c47710; }
+    .predio3d-vermelho .front, .predio3d-vermelho .back, .predio3d-dot.vermelho { background:linear-gradient(180deg,#f06060 0%,#d43f3f 100%); color:#fff; }
+    .predio3d-vermelho .top { background:#f37676; }
+    .predio3d-vermelho .left, .predio3d-vermelho .right { background:#c43939; }
+    .predio3d-vermelho .bottom { background:#aa2f2f; }
+    .predio3d-cinza .front, .predio3d-cinza .back, .predio3d-dot.cinza { background:linear-gradient(180deg,#b0bcc2 0%,#8a9ba0 100%); color:#fff; }
+    .predio3d-cinza .top { background:#bcc7cc; }
+    .predio3d-cinza .left, .predio3d-cinza .right { background:#7f9096; }
+    .predio3d-cinza .bottom { background:#738388; }
+    .predio3d-floorlabel { display:flex; align-items:center; justify-content:space-between; gap:.5rem; width:100%; position:relative; z-index:2; }
     .predio3d-legend { display:flex; flex-wrap:wrap; gap:.8rem; margin:.35rem 0 1rem; }
     .predio3d-legend-item { display:flex; align-items:center; gap:.4rem; font-size:.85rem; color:var(--muted); }
     .predio3d-dot { width:12px; height:12px; border-radius:999px; }
     .predio3d-panel .metric { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.75rem; margin-bottom:1rem; }
     .predio3d-panel .metric-card { background:#f7fbff; border:1px solid #dbe7f7; border-radius:14px; padding:.85rem; }
     .predio3d-panel .metric-card .num { font-size:1.35rem; font-weight:800; color:var(--blue-dark); }
-    .predio3d-floor-list { max-height:260px; overflow:auto; border:1px solid #e3edf9; border-radius:14px; }
+    .predio3d-floor-list { max-height:300px; overflow:auto; border:1px solid #e3edf9; border-radius:14px; }
+    .predio3d-floor-group-title { padding:.6rem 1rem; background:#f4f8ff; color:var(--blue-dark); font-weight:800; font-size:.82rem; border-bottom:1px solid #eef3fb; position:sticky; top:0; z-index:1; }
     .predio3d-floor-item { display:flex; align-items:center; justify-content:space-between; gap:.75rem; padding:.8rem 1rem; border-bottom:1px solid #eef3fb; cursor:pointer; }
     .predio3d-floor-item:last-child { border-bottom:none; }
     .predio3d-floor-item.active { background:#eef5ff; }
     .predio3d-badge { display:inline-flex; align-items:center; gap:.35rem; padding:.25rem .55rem; border-radius:999px; font-size:.78rem; font-weight:700; background:#eef3fb; color:var(--blue-dark); }
-    .predio3d-details-list { display:grid; gap:.6rem; max-height:260px; overflow:auto; }
+    .predio3d-details-list { display:grid; gap:.6rem; max-height:300px; overflow:auto; }
     .predio3d-details-item { background:#f8fbff; border:1px solid #e3edf9; border-radius:12px; padding:.75rem; }
     .predio3d-empty { padding:2rem; text-align:center; color:var(--muted); }
-    @media (max-width:980px) { .predio3d-layout { grid-template-columns:1fr; } .predio3d-stage, .predio3d-viewport { min-height:520px; } }
+    @media (max-width:980px) { .predio3d-layout { grid-template-columns:1fr; } .predio3d-stage, .predio3d-viewport { min-height:560px; } .predio3d-building { max-width:100%; } .predio3d-podium { width:360px; } .predio3d-podium .front, .predio3d-podium .back { width:360px; } .predio3d-ground { width:430px; } .predio3d-tower { width:150px; } .predio3d-floor, .predio3d-floor .front, .predio3d-floor .back, .predio3d-floor .top, .predio3d-floor .bottom { width:150px; } .predio3d-floor .left, .predio3d-floor .right { width:42px; } .predio3d-tower.tower-a { left:calc(50% - 165px); } .predio3d-tower.tower-b { left:calc(50% + 15px); } }
 
     /* ── Main layout ── */
     main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
@@ -1000,7 +1024,9 @@
         <div class="predio3d-stage">
           <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento</div>
           <div id="predio3dViewport" class="predio3d-viewport">
-            <div id="predio3dBuilding" class="predio3d-building"></div>
+            <div class="predio3d-scene">
+              <div id="predio3dBuilding" class="predio3d-building"></div>
+            </div>
           </div>
         </div>
         <div class="card predio3d-panel" style="margin:0;">
@@ -1640,7 +1666,7 @@ const auth = {
 
 // ── 3D PRÉDIO ──
 const predio3D = {
-  state: { rotateX: -18, rotateY: -32, scale: 1, selected: null, tower: 'all', dragging: false, startX: 0, startY: 0, baseRotateX: -18, baseRotateY: -32 },
+  state: { rotateX: -18, rotateY: -34, scale: 1, selected: null, tower: 'all', dragging: false, startX: 0, startY: 0, baseRotateX: -18, baseRotateY: -34 },
   controlsBound: false,
 
   getItensBase() {
@@ -1649,14 +1675,29 @@ const predio3D = {
     return [...planejamento, ...diaDia];
   },
 
-  normalizarTorre(valor) {
-    const v = String(valor || '').trim();
-    return v || 'Sem torre';
+  getCanonicalTowerMap() {
+    const base = this.getItensBase();
+    const grouped = {};
+    const addFloor = (tower, floor) => {
+      if (!tower || !floor) return;
+      grouped[tower] = grouped[tower] || new Set();
+      grouped[tower].add(floor);
+    };
+    base.forEach(item => addFloor(item.torre || 'Sem torre', item.pavimento || 'Sem pavimento'));
+
+    const knownMax = { 'Torre A': 18, 'Torre B': 20 };
+    Object.entries(knownMax).forEach(([tower, maxFloor]) => {
+      grouped[tower] = grouped[tower] || new Set();
+      grouped[tower].add('Térreo');
+      for (let i = 1; i <= maxFloor; i++) grouped[tower].add(`${i}º Pavto`);
+    });
+
+    return Object.fromEntries(Object.entries(grouped).map(([tower, floors]) => [tower, Array.from(floors).sort((a, b) => this.pavimentoOrder(a) - this.pavimentoOrder(b))]));
   },
 
   torresDisponiveis() {
-    const set = new Set(this.getItensBase().map(i => this.normalizarTorre(i.torre)).filter(Boolean));
-    return ['all', ...Array.from(set).sort((a, b) => a.localeCompare(b, 'pt-BR'))];
+    const towers = Object.keys(this.getCanonicalTowerMap()).filter(Boolean).sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    return ['all', ...towers];
   },
 
   pavimentoOrder(label) {
@@ -1666,19 +1707,6 @@ const predio3D = {
     if (txt.includes('cobertura')) return 999;
     const m = txt.match(/(\d+)/);
     return m ? parseInt(m[1], 10) : 500;
-  },
-
-  pavimentoLabel(numero) {
-    return `${numero}º Pavto`;
-  },
-
-  extrairNumeroPavimento(label) {
-    const txt = String(label || '').toLowerCase();
-    if (txt.includes('subsolo')) return -1;
-    if (txt.includes('térreo') || txt.includes('terreo')) return 0;
-    if (txt.includes('cobertura')) return 999;
-    const m = txt.match(/(\d+)/);
-    return m ? parseInt(m[1], 10) : null;
   },
 
   parseDate(v) {
@@ -1706,47 +1734,43 @@ const predio3D = {
     this.state.tower = sel.value || 'all';
   },
 
-  getItensFiltrados() {
-    const sel = document.getElementById('predio3dTower');
-    if (sel) this.state.tower = sel.value || 'all';
-    return this.getItensBase().filter(i => this.state.tower === 'all' ? true : this.normalizarTorre(i.torre) === this.state.tower);
-  },
+  getTowerFloorsData() {
+    const items = this.getItensBase();
+    const towerMap = this.getCanonicalTowerMap();
+    const selectedTowers = this.state.tower === 'all' ? Object.keys(towerMap).filter(t => !['Outros', 'Sem torre'].includes(t)) : [this.state.tower];
+    const result = selectedTowers.map(tower => {
+      const floors = (towerMap[tower] || []).map(floor => {
+        const floorItems = items.filter(i => (i.torre || 'Sem torre') === tower && (i.pavimento || 'Sem pavimento') === floor);
+        return {
+          id: `${tower}|||${floor}`,
+          tower,
+          floor,
+          items: floorItems,
+          status: this.computeFloorStatus(floorItems)
+        };
+      });
+      return { tower, floors };
+    }).filter(group => group.floors.length);
 
-  inferirFaixaPavimentos(items) {
-    const nums = items.map(i => this.extrairNumeroPavimento(i.pavimento)).filter(n => Number.isFinite(n) && n > 0);
-    const max = nums.length ? Math.max(...nums) : 14;
-    return { min: 1, max: Math.max(1, max) };
-  },
-
-  groupFloors() {
-    const items = this.getItensFiltrados();
-    const map = {};
-    items.forEach(item => {
-      const floor = String(item.pavimento || 'Sem pavimento').trim() || 'Sem pavimento';
-      if (!map[floor]) map[floor] = [];
-      map[floor].push(item);
-    });
-
-    const range = this.inferirFaixaPavimentos(items);
-    for (let n = range.min; n <= range.max; n++) {
-      const label = this.pavimentoLabel(n);
-      if (!map[label]) map[label] = [];
+    if (this.state.tower === 'all' && !result.length) {
+      return Object.entries(towerMap).map(([tower, floors]) => ({
+        tower,
+        floors: floors.map(floor => ({ id: `${tower}|||${floor}`, tower, floor, items: [], status: 'cinza' }))
+      }));
     }
-
-    return Object.keys(map)
-      .sort((a, b) => this.pavimentoOrder(a) - this.pavimentoOrder(b))
-      .map(floor => ({ floor, items: map[floor], status: this.computeFloorStatus(map[floor]) }));
+    return result;
   },
 
   computeFloorStatus(items) {
-    if (!items.length) return 'cinza';
-    const statuses = items.map(i => String(i.status || '').trim());
+    const validItems = Array.isArray(items) ? items : [];
+    if (!validItems.length) return 'cinza';
+    const statuses = validItems.map(i => String(i.status || '').trim()).filter(Boolean);
     const today = new Date();
     const allConcluidos = statuses.length > 0 && statuses.every(s => s === 'Concluído');
-    const andamento = statuses.some(s => ['Pedir agora','RT lançada','Em suprimentos','Aguardando entrega','Entregue'].includes(s));
-    const atrasado = items.some(i => {
-      const dt = this.parseDate(i.dataServico || i["Início Planejado"] || i.dataNecessidade || '');
-      const st = String(i.status || '');
+    const andamento = validItems.some(i => ['Pedir agora','RT lançada','Em suprimentos','Aguardando entrega','Entregue'].includes(String(i.status || '').trim()));
+    const atrasado = validItems.some(i => {
+      const dt = this.parseDate(i.dataServico || i['Início Planejado'] || i.dataNecessidade || '');
+      const st = String(i.status || '').trim();
       return dt && dt < today && st !== 'Concluído';
     });
     if (allConcluidos) return 'verde';
@@ -1755,11 +1779,71 @@ const predio3D = {
     return 'cinza';
   },
 
+  ensureSelected(towersData) {
+    const allFloors = towersData.flatMap(group => group.floors);
+    if (!this.state.selected && allFloors.length) this.state.selected = allFloors[allFloors.length - 1].id;
+    if (this.state.selected && !allFloors.some(f => f.id === this.state.selected)) this.state.selected = allFloors.length ? allFloors[allFloors.length - 1].id : null;
+  },
+
+  floorLabelHtml(floorObj) {
+    return `<div class="predio3d-floorlabel"><span>${floorObj.floor}</span><span>${this.statusLabel(floorObj.status)}</span></div>`;
+  },
+
+  renderTower(building, towerGroup, index, total) {
+    const tower = document.createElement('div');
+    tower.className = `predio3d-tower tower-${towerGroup.tower.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+    if (total === 1) building.classList.add('predio3d-single');
+
+    const floors = towerGroup.floors;
+    const floorHeight = 28;
+    const gap = 2;
+    const maxY = 14;
+
+    floors.forEach((floorObj, idx) => {
+      const y = maxY + idx * (floorHeight + gap);
+      const floor = document.createElement('div');
+      const isActive = this.state.selected === floorObj.id;
+      floor.className = `predio3d-floor predio3d-${floorObj.status}${isActive ? ' active' : ''}`;
+      floor.style.bottom = `${y}px`;
+      floor.innerHTML = `
+        <div class="face front" onclick='predio3D.selectFloor(${JSON.stringify(floorObj.id)})'>
+          ${this.floorLabelHtml(floorObj)}
+          <div class="predio3d-windows predio3d-front-windows"></div>
+        </div>
+        <div class="face back">
+          <div class="predio3d-floorlabel label-back"><span>${floorObj.floor}</span><span>${towerGroup.tower}</span></div>
+          <div class="predio3d-windows predio3d-front-windows"></div>
+        </div>
+        <div class="face left"><div class="predio3d-windows predio3d-side-windows"></div></div>
+        <div class="face right"><div class="predio3d-windows predio3d-side-windows"></div></div>
+        <div class="face top"></div>
+        <div class="face bottom"></div>
+      `;
+      tower.appendChild(floor);
+    });
+
+    const crown = document.createElement('div');
+    crown.style.cssText = `position:absolute;left:18px;bottom:${maxY + floors.length * (floorHeight + gap) + 6}px;width:152px;height:18px;transform-style:preserve-3d;`;
+    crown.innerHTML = `
+      <div style="position:absolute;inset:0;background:linear-gradient(180deg,#8b4e2f 0%,#5a2b14 100%);border-radius:6px;transform:translateZ(26px);"></div>
+      <div style="position:absolute;left:50%;top:-38px;transform:translateX(-50%) translateZ(26px);width:0;height:0;border-left:18px solid transparent;border-right:18px solid transparent;border-bottom:38px solid #6f240f;"></div>
+    `;
+    tower.appendChild(crown);
+
+    const towerLabel = document.createElement('div');
+    towerLabel.style.cssText = 'position:absolute;left:50%;bottom:-28px;transform:translateX(-50%);background:rgba(255,255,255,.94);border:1px solid #dbe7f7;border-radius:999px;padding:.35rem .8rem;font-size:.82rem;font-weight:800;color:var(--blue-dark);box-shadow:0 8px 16px rgba(31,56,100,.08);';
+    towerLabel.textContent = towerGroup.tower;
+    tower.appendChild(towerLabel);
+
+    building.appendChild(tower);
+  },
+
   render() {
-    const sel = document.getElementById('predio3dTower');
-    if (sel && sel.options.length) this.state.tower = sel.value || 'all';
     this.buildTowerSelect();
-    const floors = this.groupFloors();
+    const towersData = this.getTowerFloorsData();
+    const allFloors = towersData.flatMap(group => group.floors);
+    this.ensureSelected(towersData);
+
     const building = document.getElementById('predio3dBuilding');
     const floorList = document.getElementById('predio3dFloorList');
     const details = document.getElementById('predio3dDetails');
@@ -1768,63 +1852,44 @@ const predio3D = {
     const countCritical = document.getElementById('predio3dCountCritical');
     if (!building || !floorList || !details || !selectedLabel || !countFloors || !countCritical) return;
 
-    countFloors.textContent = String(floors.length);
-    countCritical.textContent = String(floors.filter(f => f.status === 'vermelho').length);
+    countFloors.textContent = String(allFloors.length);
+    countCritical.textContent = String(allFloors.filter(f => f.status === 'vermelho').length);
 
-    const pavsComDados = floors.filter(f => f.items.length);
-    if (!this.state.selected && floors.length) this.state.selected = floors[floors.length - 1].floor;
-    if (this.state.selected && !floors.some(f => f.floor === this.state.selected)) this.state.selected = floors.length ? floors[floors.length - 1].floor : null;
+    building.classList.toggle('predio3d-single', towersData.length <= 1);
+    building.innerHTML = `
+      <div class="predio3d-ground"></div>
+      <div class="predio3d-podium">
+        <div class="face top"></div>
+        <div class="face front"></div>
+        <div class="face back"></div>
+        <div class="face left"></div>
+        <div class="face right"></div>
+      </div>
+    `;
+    building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
+    towersData.forEach((group, index) => this.renderTower(building, group, index, towersData.length));
 
-    building.innerHTML = '';
-    if (!floors.length) {
-      building.innerHTML = '<div class="predio3d-stage-empty">Nenhum pavimento encontrado para o filtro selecionado.</div>';
-    } else {
-      const floorHeight = Math.max(22, Math.min(30, Math.floor(520 / Math.max(floors.length, 1))));
-      const gap = 6;
-      const totalHeight = Math.max(520, floors.length * (floorHeight + gap) + 70);
-      building.style.height = totalHeight + 'px';
-      building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
-
-      floors.forEach((floorObj, idx) => {
-        const offset = 42 + idx * (floorHeight + gap);
-        const floor = document.createElement('div');
-        floor.className = `predio3d-floor predio3d-${floorObj.status}${this.state.selected === floorObj.floor ? ' active' : ''}`;
-        floor.style.height = `${floorHeight}px`;
-        floor.style.bottom = `${offset}px`;
-        floor.innerHTML = `
-          <div class="predio3d-floor-label">${floorObj.floor}</div>
-          <div class="face front" onclick='predio3D.selectFloor(${JSON.stringify(floorObj.floor)})' title='${floorObj.floor}'> </div>
-          <div class="face top"></div>
-          <div class="face side"></div>
-          ${this.state.selected === floorObj.floor ? `<div class="predio3d-floor-summary"><strong>${floorObj.floor}</strong>${this.statusLabel(floorObj.status)}<br>${floorObj.items.length} item(ns)</div>` : ''}
-        `;
-        floor.querySelector('.front').style.height = `${floorHeight}px`;
-        floor.querySelector('.top').style.height = `68px`;
-        floor.querySelector('.side').style.height = `${floorHeight}px`;
-        building.appendChild(floor);
-      });
-
-      const base = document.createElement('div');
-      base.className = 'predio3d-base';
-      building.appendChild(base);
-    }
-
-    floorList.innerHTML = floors.length ? floors.slice().reverse().map(f => `
-      <div class="predio3d-floor-item ${this.state.selected === f.floor ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.floor)})'>
-        <div>
-          <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
-          <div style="font-size:.82rem;color:var(--muted)">${f.items.length ? `${f.items.length} item(ns)` : 'Sem RT cadastrada'}</div>
-        </div>
-        <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
+    floorList.innerHTML = allFloors.length ? towersData.map(group => `
+      <div>
+        <div class="predio3d-floor-group-title">${group.tower}</div>
+        ${group.floors.slice().reverse().map(f => `
+          <div class="predio3d-floor-item ${this.state.selected === f.id ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.id)})'>
+            <div>
+              <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
+              <div style="font-size:.82rem;color:var(--muted)">${f.items.length} item(ns)</div>
+            </div>
+            <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
+          </div>
+        `).join('')}
       </div>
     `).join('') : '<div class="predio3d-empty">Nenhum pavimento encontrado.</div>';
 
-    const selected = floors.find(f => f.floor === this.state.selected);
+    const selected = allFloors.find(f => f.id === this.state.selected);
     if (!selected) {
       selectedLabel.textContent = 'Selecione um pavimento';
       details.innerHTML = '<div class="predio3d-empty">Nenhum pavimento disponível.</div>';
     } else {
-      selectedLabel.textContent = `${selected.floor} • ${this.statusLabel(selected.status)}`;
+      selectedLabel.textContent = `${selected.tower} • ${selected.floor} • ${this.statusLabel(selected.status)}`;
       details.innerHTML = selected.items.length ? selected.items.map(item => `
         <div class="predio3d-details-item">
           <div style="display:flex;justify-content:space-between;gap:.8rem;">
@@ -1832,26 +1897,26 @@ const predio3D = {
             <span class="predio3d-badge">${item.status || 'Planejado'}</span>
           </div>
           <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
-            Torre: ${item.torre || '-'} • Pavimento: ${item.pavimento || '-'}
+            Torre: ${item.torre || selected.tower} • Pavimento: ${item.pavimento || selected.floor}
           </div>
           <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
-            Material: ${item.material || '-'} • Início: ${item.dataServico || item["Início Planejado"] || item.dataNecessidade || '-'}
+            Material: ${item.material || '-'} • Início: ${item.dataServico || item['Início Planejado'] || item.dataNecessidade || '-'}
           </div>
         </div>
-      `).join('') : '<div class="predio3d-empty">Este pavimento ainda não possui RT cadastrada.</div>';
+      `).join('') : `<div class="predio3d-empty" style="padding:1.25rem;">${selected.tower} • ${selected.floor}<br><span style="font-size:.9rem;">Ainda não há RT cadastrada para este pavimento.</span></div>`;
     }
 
     this.ensureControls();
   },
 
-  selectFloor(floor) {
-    this.state.selected = floor;
+  selectFloor(floorId) {
+    this.state.selected = floorId;
     this.render();
   },
 
   resetView() {
     this.state.rotateX = -18;
-    this.state.rotateY = -32;
+    this.state.rotateY = -34;
     this.state.scale = 1;
     this.render();
   },
@@ -1874,8 +1939,8 @@ const predio3D = {
       if (!this.state.dragging) return;
       const dx = x - this.state.startX;
       const dy = y - this.state.startY;
-      this.state.rotateY = this.state.baseRotateY + dx * 0.28;
-      this.state.rotateX = Math.max(-55, Math.min(8, this.state.baseRotateX - dy * 0.16));
+      this.state.rotateY = this.state.baseRotateY + dx * 0.3;
+      this.state.rotateX = Math.max(-60, Math.min(8, this.state.baseRotateX - dy * 0.22));
       const building = document.getElementById('predio3dBuilding');
       if (building) building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
     };
@@ -1887,14 +1952,13 @@ const predio3D = {
     viewport.addEventListener('mousedown', (e) => onDown(e.clientX, e.clientY));
     viewport.addEventListener('mousemove', (e) => onMove(e.clientX, e.clientY));
     window.addEventListener('mouseup', onUp);
-    viewport.addEventListener('mouseleave', onUp);
     viewport.addEventListener('touchstart', (e) => { const t = e.touches[0]; onDown(t.clientX, t.clientY); }, { passive: true });
     viewport.addEventListener('touchmove', (e) => { const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
     window.addEventListener('touchend', onUp);
     viewport.addEventListener('wheel', (e) => {
       e.preventDefault();
-      const next = this.state.scale + (e.deltaY < 0 ? 0.05 : -0.05);
-      this.state.scale = Math.max(0.72, Math.min(1.45, next));
+      const next = this.state.scale + (e.deltaY < 0 ? 0.06 : -0.06);
+      this.state.scale = Math.max(0.72, Math.min(1.52, next));
       const building = document.getElementById('predio3dBuilding');
       if (building) building.style.transform = `scale(${this.state.scale}) rotateX(${this.state.rotateX}deg) rotateY(${this.state.rotateY}deg)`;
     }, { passive: false });
@@ -1904,7 +1968,7 @@ const predio3D = {
     const floors = this.groupFloors();
     const rows = floors.map(f => `
       <tr>
-        <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.state.tower === 'all' ? 'Todas' : this.state.tower}</td>
+        <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.state.tower === 'all' ? '-' : this.state.tower}</td>
         <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.floor}</td>
         <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.statusLabel(f.status)}</td>
         <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.items.length}</td>
