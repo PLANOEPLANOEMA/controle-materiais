@@ -1,0 +1,18 @@
+PACOTE V13 - PLANEJAMENTO RT INTEGRADO
+
+Principais ajustes:
+- nova aba Planejamento RT
+- visão por mês
+- botão Ver Prioridades do Mês
+- cadastro e edição de planejamento RT
+- cálculo automático de data ideal de pedido (data do serviço - lead time)
+- prioridade automática (Alta/Média/Baixa)
+- integração com Firebase em controle/planejamento_rt
+- arquivos prontos para Capacitor (webDir = www)
+
+Como atualizar o app Android:
+1) abra o terminal nesta pasta
+2) rode: npx cap sync android
+3) rode: npx cap open android
+
+O arquivo principal web também foi copiado para: www/index.html
