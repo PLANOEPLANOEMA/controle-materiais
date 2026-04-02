@@ -1,0 +1,215 @@
+/* ── PRÉDIO 3D MODERNO - ESTILO ENGENHARIA CIVIL ── */
+
+/* Melhorias visuais gerais */
+.predio3d-stage {
+  background: linear-gradient(180deg, #f5f7fa 0%, #e8ecf1 50%, #dfe5ed 100%) !important;
+  border: 2px solid #c5d3e8 !important;
+  box-shadow: inset 0 1px 3px rgba(255,255,255,.8), 0 8px 24px rgba(31,56,100,.12) !important;
+}
+
+.predio3d-viewport {
+  background: linear-gradient(135deg, #f9fafb 0%, #f0f4fa 100%);
+}
+
+/* Melhorias nos andares - com efeito de fachada profissional */
+.predio3d-floor .front {
+  background: linear-gradient(135deg, #e8f0f8 0%, #d4e4f7 50%, #c8ddf5 100%) !important;
+  border: 2px solid #a8c5e8 !important;
+  box-shadow: 
+    inset 0 1px 2px rgba(255,255,255,.6),
+    0 8px 16px rgba(31,56,100,.12),
+    0 0 0 1px rgba(168,197,232,.4) !important;
+  position: relative;
+}
+
+.predio3d-floor .front::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 7px;
+  background: 
+    repeating-linear-gradient(
+      90deg,
+      transparent,
+      transparent 8px,
+      rgba(168,197,232,.15) 8px,
+      rgba(168,197,232,.15) 9px
+    ),
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 6px,
+      rgba(168,197,232,.1) 6px,
+      rgba(168,197,232,.1) 7px
+    );
+  pointer-events: none;
+}
+
+/* Cores mais vibrantes e profissionais */
+.predio3d-verde .front {
+  background: linear-gradient(135deg, #4caf50 0%, #45a049 50%, #3d9142 100%) !important;
+  border-color: #2e7d32 !important;
+  color: #fff;
+}
+
+.predio3d-verde .roof,
+.predio3d-verde .side {
+  background: #2e7d32 !important;
+}
+
+.predio3d-amarelo .front {
+  background: linear-gradient(135deg, #ffc107 0%, #ffb300 50%, #ffa500 100%) !important;
+  border-color: #ff8f00 !important;
+  color: #1a2340;
+}
+
+.predio3d-amarelo .roof,
+.predio3d-amarelo .side {
+  background: #ff8f00 !important;
+}
+
+.predio3d-vermelho .front {
+  background: linear-gradient(135deg, #f44336 0%, #e53935 50%, #d32f2f 100%) !important;
+  border-color: #c62828 !important;
+  color: #fff;
+}
+
+.predio3d-vermelho .roof,
+.predio3d-vermelho .side {
+  background: #c62828 !important;
+}
+
+.predio3d-cinza .front {
+  background: linear-gradient(135deg, #9e9e9e 0%, #757575 50%, #616161 100%) !important;
+  border-color: #424242 !important;
+  color: #fff;
+}
+
+.predio3d-cinza .roof,
+.predio3d-cinza .side {
+  background: #424242 !important;
+}
+
+/* Efeito de vidro/transparência nas janelas */
+.predio3d-floor .front::before {
+  background: linear-gradient(90deg, 
+    rgba(255,255,255,.25), 
+    rgba(255,255,255,0) 48%, 
+    rgba(0,0,0,.08)) !important;
+}
+
+/* Melhorias na base e sombra */
+.predio3d-base {
+  background: linear-gradient(180deg, #c5d3e8 0%, #a8c5e8 100%) !important;
+  box-shadow: 
+    0 24px 48px rgba(31,56,100,.16),
+    inset 0 1px 2px rgba(255,255,255,.4) !important;
+  border-radius: 32px !important;
+}
+
+.predio3d-ground {
+  background: radial-gradient(circle at center, 
+    rgba(168,197,232,.4) 0%, 
+    rgba(168,197,232,.2) 55%, 
+    rgba(168,197,232,0) 75%) !important;
+  filter: blur(2px);
+}
+
+/* Melhorias no painel lateral */
+.predio3d-panel .metric-card {
+  background: linear-gradient(135deg, #f7fbff 0%, #eef5ff 100%) !important;
+  border: 2px solid #c5d3e8 !important;
+  box-shadow: 0 4px 12px rgba(31,56,100,.08) !important;
+  border-radius: 16px !important;
+}
+
+.predio3d-panel .metric-card .num {
+  color: #1f3864 !important;
+  font-weight: 900;
+}
+
+/* Melhorias na lista de andares */
+.predio3d-floor-list {
+  border: 2px solid #dbe7f7 !important;
+  border-radius: 16px !important;
+  box-shadow: inset 0 2px 4px rgba(31,56,100,.04);
+}
+
+.predio3d-floor-item {
+  border-bottom: 1px solid #eef3fb !important;
+  transition: all .2s ease;
+  padding: 1rem !important;
+}
+
+.predio3d-floor-item:hover {
+  background: #f0f7ff !important;
+}
+
+.predio3d-floor-item.active {
+  background: linear-gradient(90deg, #eef5ff 0%, #e3efff 100%) !important;
+  border-left: 4px solid #2e75b6 !important;
+  padding-left: calc(1rem - 4px) !important;
+}
+
+/* Melhorias no badge de status */
+.predio3d-badge {
+  font-weight: 800 !important;
+  padding: .35rem .7rem !important;
+  border-radius: 12px !important;
+  font-size: .8rem !important;
+  box-shadow: 0 2px 6px rgba(31,56,100,.12);
+}
+
+/* Melhorias na lista de detalhes */
+.predio3d-details-item {
+  background: linear-gradient(135deg, #f8fbff 0%, #f0f7ff 100%) !important;
+  border: 2px solid #dbe7f7 !important;
+  border-radius: 14px !important;
+  padding: 1rem !important;
+  box-shadow: 0 2px 8px rgba(31,56,100,.06) !important;
+  transition: all .2s ease;
+}
+
+.predio3d-details-item:hover {
+  box-shadow: 0 4px 12px rgba(31,56,100,.12) !important;
+  transform: translateY(-2px);
+}
+
+/* Melhorias no título da torre */
+.predio3d-tower-title {
+  background: linear-gradient(135deg, rgba(255,255,255,.96) 0%, rgba(248,251,255,.96) 100%) !important;
+  border: 2px solid #dbe7f7 !important;
+  box-shadow: 0 12px 24px rgba(31,56,100,.12) !important;
+  font-weight: 900 !important;
+  font-size: .95rem !important;
+  padding: .6rem 1.2rem !important;
+}
+
+/* Melhorias no help text */
+.predio3d-help {
+  background: rgba(255,255,255,.96) !important;
+  border: 1px solid #dbe7f7 !important;
+  box-shadow: 0 6px 16px rgba(31,56,100,.12) !important;
+  font-weight: 600;
+  padding: .6rem 1rem !important;
+}
+
+/* Efeito de ativo no andar */
+.predio3d-floor.active .front,
+.predio3d-floor.active .back,
+.predio3d-floor.active .side,
+.predio3d-floor.active .roof {
+  outline: 3px solid rgba(46,117,182,.8) !important;
+  box-shadow: 
+    0 0 0 6px rgba(46,117,182,.16),
+    0 16px 28px rgba(46,117,182,.24) !important;
+}
+
+/* Melhorias responsivas */
+@media (max-width: 980px) {
+  .predio3d-floor .front,
+  .predio3d-floor .back,
+  .predio3d-floor .roof {
+    border-width: 1.5px !important;
+  }
+}

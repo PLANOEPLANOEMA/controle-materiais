@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Controle de Materiais de Empréstimo - Plano & Plano</title>
+  <link rel="stylesheet" href="./predio3d-modern.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
@@ -163,14 +164,29 @@
 
     /* ── Nav pills ── */
     nav {
-      display: flex; justify-content: center; gap: .75rem;
-      padding: 1.25rem 1rem;
+      display: flex; justify-content: center; gap: 2rem;
+      padding: 1.5rem 1.5rem;
       background: var(--card);
       box-shadow: 0 2px 8px rgba(31,56,100,.08);
       flex-wrap: wrap;
       position: sticky;
       top: 0;
       z-index: 50;
+    }
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      align-items: flex-start;
+    }
+    .nav-section-title {
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: .25rem;
+      padding: 0 .5rem;
     }
     nav button {
       background: var(--blue-light);
@@ -179,11 +195,20 @@
       padding: .5rem 1.4rem;
       font-size: .92rem; font-weight: 600;
       cursor: pointer; transition: all .2s;
+      white-space: nowrap;
     }
     nav button:hover, nav button.active {
       background: var(--blue-mid);
       color: #fff;
       box-shadow: 0 4px 12px rgba(46,117,182,.35);
+    }
+    @media (max-width: 1024px) {
+      nav { gap: 1.5rem; }
+    }
+    @media (max-width: 768px) {
+      nav { flex-direction: column; gap: 1rem; }
+      .nav-section { flex-direction: row; flex-wrap: wrap; gap: .5rem; align-items: center; }
+      .nav-section-title { margin-bottom: 0; }
     }
 
 
@@ -784,17 +809,31 @@
 </header>
 
 <nav>
-  <button class="active" data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
-  <button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button>
-  <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
-  <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
-  <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
-  <button data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
-  <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
-  <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
-  <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
-  <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
-  <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
+  <!-- Seção RT -->
+  <div class="nav-section">
+    <div class="nav-section-title">📋 RT</div>
+    <button class="active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
+    <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
+    <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
+  </div>
+  
+  <!-- Seção Controle de Romaneios -->
+  <div class="nav-section">
+    <div class="nav-section-title">📦 Controle de Romaneios</div>
+    <button data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
+    <button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button>
+    <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
+    <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
+    <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
+  </div>
+  
+  <!-- Outras seções -->
+  <div class="nav-section">
+    <div class="nav-section-title">⚙️ Outros</div>
+    <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+    <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
+    <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
+  </div>
 </nav>
 
 <button id="mobileHomeBtn" class="mobile-home-btn" onclick="voltarParaInicio()">← Voltar ao início</button>
