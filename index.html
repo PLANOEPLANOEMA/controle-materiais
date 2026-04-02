@@ -136,7 +136,7 @@
     header {
       background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
       color: #fff;
-      padding: 1.5rem 2rem;
+      padding: 1.5rem 2rem 1.5rem 5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -602,7 +602,7 @@
     .menu-toggle {
       position: fixed;
       top: 20px;
-      right: 20px;
+      left: 20px;
       width: 50px;
       height: 50px;
       background: var(--blue-mid);
@@ -643,20 +643,20 @@
     .mobile-menu {
       position: fixed;
       top: 0;
-      right: -100%;
+      left: -100%;
       width: 100%;
       max-width: 320px;
       height: 100vh;
       background: var(--card);
-      box-shadow: -4px 0 20px rgba(31,56,100,.2);
+      box-shadow: 4px 0 20px rgba(31,56,100,.2);
       z-index: 150;
-      transition: right 0.3s ease;
+      transition: left 0.3s ease;
       overflow-y: auto;
       padding-top: 80px;
       padding-bottom: 20px;
     }
     .mobile-menu.active {
-      right: 0;
+      left: 0;
     }
     .mobile-menu-overlay {
       position: fixed;
@@ -674,6 +674,8 @@
       display: block;
       opacity: 1;
     }
+
+
     .mobile-nav-section {
       padding: 1rem;
       border-bottom: 1px solid #e8edf5;
@@ -726,7 +728,7 @@
 
     /* ── Responsive ── */
     @media (max-width: 768px) {
-      header { flex-direction: column; text-align: center; }
+      header { flex-direction: column; text-align: center; padding-left: 5rem; }
       .header-content { flex-direction: column; gap: 1rem; }
       .header-text h1 { font-size: 1.4rem; }
       .kpi .value { font-size: 1.7rem; }
@@ -1761,12 +1763,23 @@ const auth = {
       admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       almoxarife: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       go: ['materiais-obra','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      engenharia: ['materiais-obra','relatorio','relatorio-dia']
+      engenharia: ['materiais-obra','predio-3d','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
     document.querySelectorAll('nav button').forEach((btn) => {
       const section = btn.dataset.section;
       btn.style.display = permitidas.includes(section) ? 'inline-flex' : 'none';
+    });
+
+    // Aplicar permissões também no menu mobile
+    document.querySelectorAll('.mobile-nav-button').forEach((btn) => {
+      const section = btn.dataset.section;
+      btn.style.display = permitidas.includes(section) ? 'block' : 'none';
+    });
+    // Ocultar seções do menu mobile que ficaram sem botões visíveis
+    document.querySelectorAll('.mobile-nav-section').forEach((sec) => {
+      const visivel = [...sec.querySelectorAll('.mobile-nav-button')].some(b => b.style.display !== 'none');
+      sec.style.display = visivel ? 'block' : 'none';
     });
 
     document.querySelector('.kpi-grid').style.display = (role === 'admin') ? 'grid' : 'none';
@@ -1798,7 +1811,7 @@ const auth = {
       admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
       almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
-      engenharia: ['ver_relatorio_dia','ver_relatorio_completo']
+      engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_predio_3d']
     };
     return (mapa[role] || []).includes(acao);
   }
@@ -2219,7 +2232,7 @@ const app = {
       btn = document.querySelector('nav button[data-section="materiais-obra"]');
     }
     if (id === 'predio-3d' && !auth.pode('ver_predio_3d')) {
-      app.mostrarAlerta('Somente Admin e GO podem acessar o 3D PRÉDIO.', 'error');
+      app.mostrarAlerta('Somente Admin, GO e Engenharia podem acessar o 3D PRÉDIO.', 'error');
       id = 'materiais-obra';
       btn = document.querySelector('nav button[data-section="materiais-obra"]');
     }
