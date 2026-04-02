@@ -941,9 +941,9 @@
     <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
   </div>
   
-  <!-- Outras seções -->
+  <!-- Controle e Rastreabilidade OBRA -->
   <div class="nav-section">
-    <div class="nav-section-title">⚙️ Outros</div>
+    <div class="nav-section-title">📄 Controle e Rastreabilidade OBRA</div>
     <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
     <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
     <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
@@ -4344,14 +4344,10 @@ function handleMediaChange() {
   
   if (!menuToggle || !desktopNav) return;
   
-  if (window.innerWidth <= 768) {
-    menuToggle.style.display = 'flex';
-    desktopNav.style.display = 'none';
-  } else {
-    menuToggle.style.display = 'none';
-    desktopNav.style.display = 'flex';
-    closeMobileMenu();
-  }
+  // Mostrar menu hambúrguer em TODOS os dispositivos
+  menuToggle.style.display = 'flex';
+  desktopNav.style.display = 'none';
+  closeMobileMenu();
 }
 
 window.addEventListener('resize', handleMediaChange);
@@ -4384,9 +4380,9 @@ window.addEventListener('resize', handleMediaChange);
     <button class="mobile-nav-button" data-section="relatorio" onclick="app.showSection('relatorio', this); closeMobileMenu()">Relatório Visual</button>
   </div>
   
-  <!-- Outras seções -->
+  <!-- Controle e Rastreabilidade OBRA -->
   <div class="mobile-nav-section">
-    <div class="mobile-nav-section-title">⚙️ Outros</div>
+    <div class="mobile-nav-section-title">📄 Controle e Rastreabilidade OBRA</div>
     <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
     <button class="mobile-nav-button" data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this); closeMobileMenu()">Rastreabilidade</button>
     <button class="mobile-nav-button" data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this); closeMobileMenu()">Relatório do Dia</button>
