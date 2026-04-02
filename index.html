@@ -172,6 +172,21 @@
       top: 0;
       z-index: 50;
     }
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      align-items: flex-start;
+    }
+    .nav-section-title {
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: .25rem;
+      padding: 0 .5rem;
+    }
     nav button {
       background: var(--blue-light);
       color: var(--blue-dark);
@@ -179,11 +194,20 @@
       padding: .5rem 1.4rem;
       font-size: .92rem; font-weight: 600;
       cursor: pointer; transition: all .2s;
+      white-space: nowrap;
     }
     nav button:hover, nav button.active {
       background: var(--blue-mid);
       color: #fff;
       box-shadow: 0 4px 12px rgba(46,117,182,.35);
+    }
+    @media (max-width: 1024px) {
+      nav { gap: 1.5rem; }
+    }
+    @media (max-width: 768px) {
+      nav { flex-direction: column; gap: 1rem; }
+      .nav-section { flex-direction: row; flex-wrap: wrap; gap: .5rem; align-items: center; }
+      .nav-section-title { margin-bottom: 0; }
     }
 
 
@@ -574,6 +598,121 @@
       object-fit: cover;
     }
 
+    /* ── MENU HAMBÚRGUER ── */
+    .menu-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: var(--blue-mid);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      z-index: 200;
+      box-shadow: 0 4px 12px rgba(46,117,182,.35);
+      transition: all 0.3s;
+    }
+    .menu-toggle:hover {
+      background: var(--blue-dark);
+      transform: scale(1.1);
+    }
+    .menu-toggle span {
+      width: 24px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(8px, 8px);
+    }
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(8px, -8px);
+    }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 320px;
+      height: 100vh;
+      background: var(--card);
+      box-shadow: -4px 0 20px rgba(31,56,100,.2);
+      z-index: 150;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      padding-top: 80px;
+      padding-bottom: 20px;
+    }
+    .mobile-menu.active {
+      right: 0;
+    }
+    .mobile-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 140;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .mobile-menu.active ~ .mobile-menu-overlay {
+      display: block;
+      opacity: 1;
+    }
+    .mobile-nav-section {
+      padding: 1rem;
+      border-bottom: 1px solid #e8edf5;
+    }
+    .mobile-nav-section-title {
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: .75rem;
+      padding: 0 .5rem;
+    }
+    .mobile-nav-button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border: none;
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      margin-bottom: .5rem;
+    }
+    .mobile-nav-button:hover, .mobile-nav-button.active {
+      background: var(--blue-mid);
+      color: #fff;
+    }
+
+    /* ── NAVEGAÇÃO INTELIGENTE ── */
+    nav.hidden-on-scroll {
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+
     /* ── Footer ── */
     footer { text-align: center; padding: 1.5rem; color: var(--muted); font-size: .82rem; border-top: 1px solid #dde4f0; margin-top: 2rem; }
 
@@ -783,18 +922,32 @@
 
 </header>
 
-<nav>
-  <button class="active" data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
-  <button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button>
-  <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
-  <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
-  <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
-  <button data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
-  <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
-  <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
-  <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
-  <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
-  <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
+<nav id="desktopNav">
+  <!-- Seção RT -->
+  <div class="nav-section">
+    <div class="nav-section-title">📋 RT</div>
+    <button class="active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
+    <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
+    <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
+  </div>
+  
+  <!-- Seção Controle de Romaneios -->
+  <div class="nav-section">
+    <div class="nav-section-title">📦 Controle de Romaneios</div>
+    <button data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
+    <button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button>
+    <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
+    <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
+    <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
+  </div>
+  
+  <!-- Outras seções -->
+  <div class="nav-section">
+    <div class="nav-section-title">⚙️ Outros</div>
+    <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+    <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
+    <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
+  </div>
 </nav>
 
 <button id="mobileHomeBtn" class="mobile-home-btn" onclick="voltarParaInicio()">← Voltar ao início</button>
@@ -4145,7 +4298,101 @@ window.app = app;
 window.appMateriais = appMateriais;
 window.appRT = appRT;
 auth.verificarSessao();
+handleMediaChange();
 });
+
+// ── MENU HAMBÚRGUER ──
+function toggleMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const toggle = document.getElementById('menuToggle');
+  if (menu && toggle) {
+    menu.classList.toggle('active');
+    toggle.classList.toggle('active');
+  }
+}
+
+function closeMobileMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const toggle = document.getElementById('menuToggle');
+  if (menu && toggle) {
+    menu.classList.remove('active');
+    toggle.classList.remove('active');
+  }
+}
+
+// ── NAVEGAÇÃO INTELIGENTE (Scroll) ──
+let lastScrollTop = 0;
+const desktopNav = document.getElementById('desktopNav');
+
+window.addEventListener('scroll', () => {
+  if (!desktopNav) return;
+  let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+  
+  if (currentScroll > lastScrollTop && currentScroll > 100) {
+    desktopNav.classList.add('hidden-on-scroll');
+  } else {
+    desktopNav.classList.remove('hidden-on-scroll');
+  }
+  
+  lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+});
+
+// ── RESPONSIVE MEDIA QUERY ──
+function handleMediaChange() {
+  const menuToggle = document.getElementById('menuToggle');
+  const desktopNav = document.getElementById('desktopNav');
+  
+  if (!menuToggle || !desktopNav) return;
+  
+  if (window.innerWidth <= 768) {
+    menuToggle.style.display = 'flex';
+    desktopNav.style.display = 'none';
+  } else {
+    menuToggle.style.display = 'none';
+    desktopNav.style.display = 'flex';
+    closeMobileMenu();
+  }
+}
+
+window.addEventListener('resize', handleMediaChange);
 </script>
+
+<!-- ── MENU HAMBÚRGUER (Mobile) ── -->
+<button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- ── MOBILE MENU ── -->
+<nav class="mobile-menu" id="mobileMenu">
+  <!-- Seção RT -->
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">📋 RT</div>
+    <button class="mobile-nav-button active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this); closeMobileMenu()">Planejamento RT</button>
+    <button class="mobile-nav-button" data-section="predio-3d" onclick="app.showSection('predio-3d', this); closeMobileMenu()">3D PRÉDIO</button>
+    <button class="mobile-nav-button" data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this); closeMobileMenu()">RT Dia a Dia</button>
+  </div>
+  
+  <!-- Seção Controle de Romaneios -->
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">📦 Controle de Romaneios</div>
+    <button class="mobile-nav-button" data-section="visao-geral" onclick="app.showSection('visao-geral', this); closeMobileMenu()">Visão Geral</button>
+    <button class="mobile-nav-button" data-section="por-empresa" onclick="app.showSection('por-empresa', this); closeMobileMenu()">Por Empresa</button>
+    <button class="mobile-nav-button" data-section="por-material" onclick="app.showSection('por-material', this); closeMobileMenu()">Por Material</button>
+    <button class="mobile-nav-button" data-section="registros" onclick="app.showSection('registros', this); closeMobileMenu()">Gerenciar Registros</button>
+    <button class="mobile-nav-button" data-section="relatorio" onclick="app.showSection('relatorio', this); closeMobileMenu()">Relatório Visual</button>
+  </div>
+  
+  <!-- Outras seções -->
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">⚙️ Outros</div>
+    <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
+    <button class="mobile-nav-button" data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this); closeMobileMenu()">Rastreabilidade</button>
+    <button class="mobile-nav-button" data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this); closeMobileMenu()">Relatório do Dia</button>
+  </div>
+</nav>
+<div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+
 </body>
 </html>
