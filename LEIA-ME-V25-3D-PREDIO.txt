@@ -1,5 +1,5 @@
-V24
-- Almoxarife volta a enxergar Planejamento RT e RT Dia a Dia
-- Almoxarife só altera de Aguardando entrega para Entregue
-- Removido status Autorizado para compra
-- Adicionado PDF dos Status nas duas abas
+V25
+- 3D PRÉDIO integrado na base V24
+- ligado diretamente ao Planejamento RT e RT Dia a Dia
+- filtro por torre
+- rotação, zoom, clique no pavimento e PDF
