@@ -200,7 +200,7 @@
     .predio3d-building { position:relative; width:190px; transform-style:preserve-3d; transition:transform .08s linear; }
     .predio3d-floor { position:absolute; left:0; width:190px; height:24px; transform-style:preserve-3d; }
     .predio3d-floor .face { position:absolute; box-sizing:border-box; border:1px solid rgba(16,36,79,.14); backface-visibility:visible; }
-    .predio3d-floor .front, .predio3d-floor .back { width:190px; height:24px; display:flex; align-items:center; justify-content:space-between; padding:0 .7rem; font-weight:700; font-size:.78rem; color:#fff; }
+    .predio3d-floor .front, .predio3d-floor .back { width:190px; height:24px; display:flex; align-items:center; justify-content:space-between; padding:0 .7rem; font-weight:700; font-size:.78rem; color:#fff; overflow:hidden; }
     .predio3d-floor .front { transform:translateZ(28px); border-radius:7px; box-shadow:0 10px 18px rgba(31,56,100,.14); cursor:pointer; }
     .predio3d-floor .front::before { content:''; position:absolute; inset:0; border-radius:7px; background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,0) 48%, rgba(0,0,0,.10)); pointer-events:none; }
     .predio3d-floor .back { transform:rotateY(180deg) translateZ(28px); border-radius:7px; }
@@ -220,7 +220,16 @@
     .predio3d-vermelho .roof, .predio3d-vermelho .side { background:#cf3d3d; }
     .predio3d-cinza .front, .predio3d-cinza .back, .predio3d-dot.cinza { background:#95a5a6; }
     .predio3d-cinza .roof, .predio3d-cinza .side { background:#869798; }
-    .predio3d-floor-item small { color:var(--muted); display:block; margin-top:.2rem; }
+    
+    .predio3d-floor .front::after { content:''; position:absolute; left:14px; right:14px; top:6px; height:12px; border-radius:4px; background:repeating-linear-gradient(90deg, rgba(255,255,255,.78) 0 12px, rgba(28,53,79,.18) 12px 18px); opacity:.55; }
+    .predio3d-floor .front > span { position:relative; z-index:2; }
+    .predio3d-floor .back { opacity:.98; }
+    .predio3d-floor .side::after { content:''; position:absolute; inset:3px 7px; border-radius:4px; background:linear-gradient(180deg, rgba(255,255,255,.18), rgba(0,0,0,.08)); }
+    .predio3d-floor .roof::after { content:''; position:absolute; inset:8px 14px; border-radius:6px; background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(0,0,0,.06)); }
+    .predio3d-building::before { content:''; position:absolute; left:50%; top:0; width:26px; height:100%; transform:translateX(-50%) translateZ(30px); background:linear-gradient(180deg, rgba(92,70,56,.95), rgba(124,94,72,.96)); border-radius:10px; box-shadow:0 0 0 1px rgba(16,36,79,.10); }
+    .predio3d-building::after { content:''; position:absolute; left:50%; bottom:calc(100% - 10px); width:154px; height:26px; transform:translateX(-50%) translateZ(28px); background:linear-gradient(180deg,#6f4b38 0%, #3aa7e2 100%); border-radius:12px 12px 4px 4px; box-shadow:0 10px 18px rgba(31,56,100,.16); }
+    .predio3d-tower-wrap:first-child .predio3d-building, .predio3d-tower-wrap:last-child .predio3d-building { filter:drop-shadow(0 24px 24px rgba(31,56,100,.16)); }
+.predio3d-floor-item small { color:var(--muted); display:block; margin-top:.2rem; }
     .predio3d-empty { padding:2rem; text-align:center; color:var(--muted); }
     @media (max-width:980px) { .predio3d-layout { grid-template-columns:1fr; } .predio3d-stage, .predio3d-viewport { min-height:620px; } .predio3d-scene { gap:42px; padding:120px 18px 54px; } .predio3d-building { width:150px; } .predio3d-floor, .predio3d-floor .front, .predio3d-floor .back, .predio3d-floor .roof { width:150px; } }
     .predio3d-verde .front, .predio3d-dot.verde { background:#27AE60; }
@@ -1661,7 +1670,7 @@ const predio3D = {
   getTowerDefinitions() {
     const mk = (torre, total) => {
       const floors = ['Térreo'];
-      for (let i = 1; i <= total; i++) floors.push(`${i}º Pavimento`);
+      for (let i = 1; i <= total; i++) floors.push(`${i}º Pavto`);
       return { torre, floors };
     };
     return [mk('Torre A', this.towerConfig['Torre A']), mk('Torre B', this.towerConfig['Torre B'])];
@@ -1690,7 +1699,7 @@ const predio3D = {
     if (low.includes('térreo') || low.includes('terreo')) return 'Térreo';
     const n = this.floorNumber(txt);
     if (n === null) return txt;
-    return `${n}º Pavimento`;
+    return `${n}º Pavto`;
   },
 
   floorOrder(label) {
@@ -1826,7 +1835,7 @@ const predio3D = {
     }).map(f => `
       <div class="predio3d-floor-item ${this.state.selectedKey === f.key ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.key)})'>
         <div>
-          <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
+          <div style="font-weight:700;color:var(--blue-dark)">${f.torre}</div><small style="margin-top:2px;display:block;">${f.floor}</small>
           <small>${f.torre} • ${f.items.length ? `${f.items.length} RT(s)` : 'Sem RT'}</small>
         </div>
         <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
@@ -3331,7 +3340,7 @@ const appRT = {
     const t = this.normalizarNomeTorre(torre);
     const limite = this.limitesPavimentos[t] || 0;
     const lista = ['Térreo'];
-    for (let i = 1; i <= limite; i++) lista.push(`${i}º Pavimento`);
+    for (let i = 1; i <= limite; i++) lista.push(`${i}º Pavto`);
     return lista;
   },
 
@@ -3351,7 +3360,7 @@ const appRT = {
     const m = low.match(/(\d+)/);
     if (!m) return txt;
     const n = Number(m[1]);
-    return `${n}º Pavimento`;
+    return `${n}º Pavto`;
   },
 
   preencherSelectTorresPavimentos() {
