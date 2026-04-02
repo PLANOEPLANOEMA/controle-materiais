@@ -1,142 +1,18 @@
-# Demonstração Interativa - Prédio 3D com Planejamento RT
+PACOTE V13 - PLANEJAMENTO RT INTEGRADO
 
-## 📍 Acesso à Demonstração
+Principais ajustes:
+- nova aba Planejamento RT
+- visão por mês
+- botão Ver Prioridades do Mês
+- cadastro e edição de planejamento RT
+- cálculo automático de data ideal de pedido (data do serviço - lead time)
+- prioridade automática (Alta/Média/Baixa)
+- integração com Firebase em controle/planejamento_rt
+- arquivos prontos para Capacitor (webDir = www)
 
-A página de demonstração está disponível em:
-**https://8080-iojq7jvaw5wbepc4pzko8-a5698158.us2.manus.computer/predio-3d-demo.html**
+Como atualizar o app Android:
+1) abra o terminal nesta pasta
+2) rode: npx cap sync android
+3) rode: npx cap open android
 
-## 🎯 O que você pode fazer
-
-### 1. Explorar o Prédio 3D
-- **Clique em qualquer pavimento** para ver detalhes
-- **Observe as cores** que indicam o status de cada pavimento
-- **Alterne entre Torres** usando o seletor no painel de controle
-
-### 2. Entender o Sistema de Cores
-
-| Cor | Status | Significado |
-|-----|--------|-------------|
-| 🟢 Verde | Concluído | Todos os itens do pavimento foram finalizados |
-| 🟡 Amarelo | Em andamento | Pavimento anterior concluído, este tem trabalhos em progresso |
-| 🔴 Vermelho | Bloqueado | Pavimento anterior não foi concluído, este está bloqueado |
-| ⚫ Cinza | Planejado | Sem dados ou apenas planejado, sem início efetivo |
-
-### 3. Simular Cenários
-
-#### Cenário 1: Início da Obra
-- Apenas o Térreo está em andamento
-- Todos os outros pavimentos estão planejados (cinza)
-- Clique em **"📍 Cenário 1: Início da Obra"**
-
-#### Cenário 2: Em Progresso
-- Térreo concluído (verde)
-- 1º e 2º pavimentos em andamento (amarelo)
-- Pavimentos superiores bloqueados (vermelho) ou planejados (cinza)
-- Clique em **"🚀 Cenário 2: Em Progresso"**
-
-#### Cenário 3: Avançado
-- Vários pavimentos concluídos (verde)
-- Alguns em andamento (amarelo)
-- Demonstra a cascata de bloqueios
-- Clique em **"⚡ Cenário 3: Avançado"**
-
-### 4. Controlar Manualmente
-
-1. **Selecione um Pavimento** no dropdown "Selecionar Pavimento"
-2. **Escolha um Status** no dropdown "Status do Pavimento"
-3. **Clique em "✓ Aplicar Status"** para aplicar a mudança
-4. Observe como o prédio 3D se atualiza em tempo real
-
-### 5. Resetar Tudo
-- Clique em **"🔄 Resetar Tudo"** para voltar ao estado inicial
-- Todos os pavimentos voltarão para cinza (planejado)
-
-## 🏗️ Estrutura das Torres
-
-### Torre A
-- **Térreo** + 18 pavimentos
-- Total: 19 níveis
-
-### Torre B
-- **Térreo** + 20 pavimentos
-- Total: 21 níveis
-
-## 💡 Exemplos de Uso
-
-### Exemplo 1: Progressão Natural
-1. Carregue o "Cenário 1: Início da Obra"
-2. Observe que apenas o Térreo está em andamento
-3. Manualmente, marque o Térreo como "Concluído"
-4. Veja o 1º Pavimento mudar de vermelho para cinza (agora pode ser iniciado)
-5. Marque o 1º Pavimento como "Em andamento"
-6. Observe que fica amarelo (pois o anterior está concluído)
-
-### Exemplo 2: Dependência em Cascata
-1. Carregue o "Cenário 3: Avançado"
-2. Observe que o 4º Pavimento está vermelho (bloqueado)
-3. Isso ocorre porque o 3º Pavimento não está concluído
-4. Marque o 3º Pavimento como "Concluído"
-5. Veja o 4º Pavimento mudar para cinza (agora pode ser iniciado)
-
-### Exemplo 3: Comparar Torres
-1. Selecione "Torre A" e observe o estado
-2. Mude para "Torre B" e observe as diferenças
-3. Cada torre tem seu próprio estado independente
-
-## 🔧 Recursos Técnicos
-
-### Responsividade
-- A página se adapta a diferentes tamanhos de tela
-- Desktop: Layout completo com 2 colunas
-- Tablet: Layout adaptado
-- Mobile: Layout em coluna única
-
-### Performance
-- Renderização em tempo real
-- Sem dependências externas (vanilla JavaScript)
-- Totalmente funcional offline
-
-### Integração com Planejamento RT
-A demonstração usa a mesma lógica que será implementada no sistema real:
-- Mesma estrutura de dados
-- Mesmos cálculos de status
-- Mesmas cores e estilos
-- Mesma interatividade
-
-## 📱 Compatibilidade
-
-- ✅ Chrome/Chromium
-- ✅ Firefox
-- ✅ Safari
-- ✅ Edge
-- ✅ Mobile browsers
-
-## 🎨 Customizações Possíveis
-
-Você pode personalizar:
-- **Cores:** Altere as variáveis CSS em `:root`
-- **Nomes dos Pavimentos:** Modifique a função `towers()`
-- **Cenários:** Adicione novos cenários na função `loadScenario()`
-- **Interatividade:** Estenda as funções do objeto `demo`
-
-## 📞 Suporte
-
-Se encontrar algum problema:
-1. Verifique se o navegador está atualizado
-2. Limpe o cache do navegador
-3. Tente em outro navegador
-4. Verifique o console (F12) para mensagens de erro
-
-## 🚀 Próximos Passos
-
-Após validar a demonstração:
-1. Integre o código ao seu site principal
-2. Conecte com dados reais do Planejamento RT
-3. Configure sincronização em tempo real com Firebase
-4. Adicione mais funcionalidades conforme necessário
-
----
-
-**Versão:** 1.0  
-**Data:** Abril 2026  
-**Status:** Pronto para demonstração e validação
+O arquivo principal web também foi copiado para: www/index.html

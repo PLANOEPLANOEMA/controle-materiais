@@ -1,4 +1,5 @@
-Versão baseada no V20.
-Almoxarife pode ver Planejamento RT e RT Dia a Dia.
-Não pode criar, editar ou excluir.
-Pode alterar status apenas de 'Aguardando entrega' para 'Entregue'.
+V24
+- Almoxarife volta a enxergar Planejamento RT e RT Dia a Dia
+- Almoxarife só altera de Aguardando entrega para Entregue
+- Removido status Autorizado para compra
+- Adicionado PDF dos Status nas duas abas
