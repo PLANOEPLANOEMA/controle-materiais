@@ -1479,7 +1479,7 @@
     salvarRTDiaDiaNaNuvem,
     carregarRTDiaDiaDaNuvem,
     escutarMudancasRTDiaDia
-  } from "./firebase-controle-usuarios.js";
+  } from "./firebase-controle-usuarios.js?v=1.0.1";
 
   window.__fb = {
     salvarNaNuvem,
