@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatório de Materiais - Plano & Plano</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark:  #1F3864;
+      --blue-mid:   #2E75B6;
+      --blue-light: #DDEEFF;
+      --accent:     #E84545;
+      --success:    #27AE60;
+      --warning:    #F5A623;
+      --bg:         #F0F4FA;
+      --card:       #FFFFFF;
+      --text:       #1a2340;
+      --muted:      #6b7a99;
+      --radius:     14px;
+      --shadow:     0 4px 24px rgba(31,56,100,.10);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      position: relative;
+      z-index: 1;
+      flex: 1;
+    }
+    .logo-container { flex-shrink: 0; }
+    .logo-container img { height: 60px; width: auto; object-fit: contain; }
+    .header-text h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: .5px; margin: 0; }
+    .header-text p { margin: 0.25rem 0 0 0; opacity: .85; font-size: 0.95rem; }
+
+    /* ── Main ── */
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    /* ── Card ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 1.75rem;
+      margin-bottom: 2rem;
+    }
+    .card h2 {
+      font-size: 1.15rem; font-weight: 700;
+      color: var(--blue-dark);
+      margin-bottom: 1.25rem;
+      padding-bottom: .6rem;
+      border-bottom: 2px solid var(--blue-light);
+      display: flex; align-items: center; gap: .5rem;
+    }
+
+    /* ── Buttons ── */
+    .btn-group {
+      display: flex; gap: .75rem; flex-wrap: wrap;
+      margin-bottom: 1.5rem;
+    }
+    button.btn {
+      padding: .6rem 1.2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      display: flex; align-items: center; gap: .4rem;
+    }
+    button.btn-primary { background: var(--blue-mid); color: #fff; }
+    button.btn-primary:hover { background: var(--blue-dark); box-shadow: 0 4px 12px rgba(31,56,100,.3); }
+    button.btn-success { background: var(--success); color: #fff; }
+    button.btn-success:hover { background: #1e8449; }
+    button.btn-secondary { background: #95a5a6; color: #fff; }
+    button.btn-secondary:hover { background: #7f8c8d; }
+
+    /* ── PDF Report ── */
+    .pdf-report {
+      background: #fff;
+      padding: 2rem;
+      border-radius: var(--radius);
+      margin-top: 2rem;
+    }
+    .pdf-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      padding-bottom: 1rem;
+      border-bottom: 3px solid var(--blue-mid);
+    }
+    .pdf-header img { height: 50px; width: auto; }
+    .pdf-header-text { flex: 1; margin-left: 1rem; }
+    .pdf-header-text h2 { margin: 0; color: var(--blue-dark); font-size: 1.5rem; }
+    .pdf-header-text p { margin: 0.25rem 0 0 0; color: var(--muted); font-size: 0.9rem; }
+
+    /* ── Stats ── */
+    .pdf-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .pdf-stat-box {
+      background: var(--blue-light);
+      padding: 1.5rem;
+      border-radius: 12px;
+      border-left: 4px solid var(--blue-mid);
+      text-align: center;
+    }
+    .pdf-stat-box .value {
+      font-size: 2.5rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    .pdf-stat-box .label {
+      font-size: 0.9rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* ── Section ── */
+    .pdf-section { margin-bottom: 2rem; }
+    .pdf-section h3 {
+      color: var(--blue-dark);
+      font-size: 1.2rem;
+      margin-bottom: 1rem;
+      padding-bottom: 0.5rem;
+      border-bottom: 2px solid var(--blue-light);
+    }
+
+    /* ── Materiais Grid ── */
+    .materiais-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+    }
+    .material-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      border: 2px solid var(--blue-light);
+      transition: all 0.2s;
+    }
+    .material-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 8px 32px rgba(31,56,100,.15);
+      border-color: var(--blue-mid);
+    }
+    .material-card-image {
+      width: 100%;
+      height: 220px;
+      background: var(--blue-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+      overflow: hidden;
+    }
+    .material-card-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .material-card-content {
+      padding: 1.5rem;
+    }
+    .material-card-content h3 {
+      font-size: 1.2rem;
+      color: var(--blue-dark);
+      margin-bottom: 0.75rem;
+      font-weight: 700;
+    }
+    .material-card-content p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-bottom: 1rem;
+      line-height: 1.5;
+    }
+    .material-qty {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+      padding-bottom: 1rem;
+      border-bottom: 2px solid var(--blue-light);
+    }
+    .material-qty-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      color: var(--blue-mid);
+    }
+    .material-qty-label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .material-date {
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-bottom: 0.5rem;
+    }
+
+    /* ── Table ── */
+    .table-wrap { overflow-x: auto; margin-top: 1.5rem; }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .93rem;
+    }
+    thead tr { background: var(--blue-dark); color: #fff; }
+    thead th {
+      padding: .85rem 1rem;
+      text-align: left;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+    tbody tr { border-bottom: 1px solid #e8edf5; transition: background .15s; }
+    tbody tr:hover { background: var(--blue-light); }
+    tbody td { padding: .75rem 1rem; }
+    .material-img-cell {
+      width: 60px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .material-img-cell img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 4px;
+    }
+
+    /* ── Alert ── */
+    .alert {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .alert.show { display: block; }
+    .alert-info {
+      background: #d1ecf1;
+      color: #0c5460;
+      border: 1px solid #bee5eb;
+    }
+
+    /* ── Footer ── */
+    footer {
+      text-align: center;
+      padding: 1.5rem;
+      color: var(--muted);
+      font-size: .82rem;
+      border-top: 1px solid #dde4f0;
+      margin-top: 2rem;
+    }
+
+    /* ── Print ── */
+    @media print {
+      header, .btn-group { display: none !important; }
+      .pdf-report { box-shadow: none; border: none; }
+      .materiais-grid { grid-template-columns: repeat(2, 1fr); }
+      .material-card { page-break-inside: avoid; }
+      body { background: #fff; }
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      header { flex-direction: column; text-align: center; }
+      .header-content { flex-direction: column; gap: 1rem; }
+      .header-text h1 { font-size: 1.4rem; }
+      .pdf-header { flex-direction: column; text-align: center; }
+      .pdf-header-text { margin-left: 0; margin-top: 1rem; }
+      .materiais-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-content">
+    <div class="logo-container">
+      <img src="./logo.png" alt="Plano & Plano" />
+    </div>
+    <div class="header-text">
+      <h1>Relatório de Materiais da Obra</h1>
+      <p>Gestão profissional de estoque e materiais - Plano & Plano</p>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div id="alert" class="alert alert-info"></div>
+
+  <div class="card">
+    <h2>📋 Relatório de Materiais</h2>
+    <div class="btn-group">
+      <button class="btn btn-success" onclick="relatorio.exportarPDF()">📥 Baixar como PDF</button>
+      <button class="btn btn-primary" onclick="window.print()">🖨️ Imprimir</button>
+      <button class="btn btn-secondary" onclick="window.close()">❌ Fechar</button>
+    </div>
+
+    <div class="pdf-report">
+      <div class="pdf-header">
+        <img src="./logo.png" alt="Plano & Plano" />
+        <div class="pdf-header-text">
+          <h2>Relatório de Materiais da Obra</h2>
+          <p id="dataRelatorio">Gerado em: <span id="dataAtual"></span></p>
+        </div>
+      </div>
+
+      <div class="pdf-stats">
+        <div class="pdf-stat-box">
+          <span class="value" id="totalMateriais">0</span>
+          <span class="label">Total de Materiais</span>
+        </div>
+        <div class="pdf-stat-box">
+          <span class="value" id="totalItens">0</span>
+          <span class="label">Total de Itens</span>
+        </div>
+        <div class="pdf-stat-box">
+          <span class="value" id="materiaisHoje">0</span>
+          <span class="label">Cadastrados Hoje</span>
+        </div>
+      </div>
+
+      <div class="pdf-section">
+        <h3>📦 Materiais Cadastrados</h3>
+        <div class="materiais-grid" id="materiaisGrid"></div>
+      </div>
+
+      <div class="pdf-section">
+        <h3>📋 Tabela Detalhada</h3>
+        <div class="table-wrap">
+          <table id="tabelaMateriais">
+            <thead>
+              <tr>
+                <th>Foto</th>
+                <th>Nome</th>
+                <th>Quantidade</th>
+                <th>Especificações</th>
+                <th>Data de Atualização</th>
+              </tr>
+            </thead>
+            <tbody id="tabelaMaterialisBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<footer>Relatório de Materiais — Plano & Plano</footer>
+
+<script type="module">
+  import { carregarMateriaisDaNuvem, escutarMudancasMateriais } from "./firebase.js";
+  window.__fb = { carregarMateriaisDaNuvem, escutarMudancasMateriais };
+</script>
+
+<script>
+const relatorio = {
+  STORAGE_KEY: 'controle_materiais_obra_dados',
+  materiais: [],
+
+  async init() {
+    this.carregarMateriais();
+    this.atualizarDataAtual();
+    this.renderizarRelatorio();
+  },
+
+  async carregarMateriais() {
+    if (window.__fb?.carregarMateriaisDaNuvem) {
+      const cloud = await window.__fb.carregarMateriaisDaNuvem();
+      if (Array.isArray(cloud) && cloud.length) { this.materiais = cloud; }
+    }
+    if (!this.materiais.length) {
+      const salvos = localStorage.getItem(this.STORAGE_KEY);
+      this.materiais = salvos ? JSON.parse(salvos) : [];
+    }
+    this.renderizarRelatorio();
+  },
+
+  atualizarDataAtual() {
+    const hoje = new Date();
+    const opcoes = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
+    document.getElementById('dataAtual').textContent = hoje.toLocaleDateString('pt-BR', opcoes);
+  },
+
+  renderizarRelatorio() {
+    const hoje = new Date().toISOString().split('T')[0];
+    const materiaisHoje = this.materiais.filter(m => m.dataAtualizacao?.split('T')[0] === hoje);
+
+    // Atualizar KPIs
+    document.getElementById('totalMateriais').textContent = this.materiais.length;
+    document.getElementById('totalItens').textContent = this.materiais.reduce((sum, m) => sum + m.quantidade, 0);
+    document.getElementById('materiaisHoje').textContent = materiaisHoje.length;
+
+    // Renderizar grid de materiais
+    const grid = document.getElementById('materiaisGrid');
+    grid.innerHTML = this.materiais.map(m => `
+      <div class="material-card">
+        <div class="material-card-image">${m.foto ? `<img src="${m.foto}" />` : '📦'}</div>
+        <div class="material-card-content">
+          <h3>${m.nome}</h3>
+          <p>${m.especificacoes || 'Sem especificações'}</p>
+          <div class="material-qty">
+            <span class="material-qty-value">${m.quantidade}</span>
+            <span class="material-qty-label">Unidades</span>
+          </div>
+          <div class="material-date">📅 ${this.formatarData(m.dataAtualizacao)}</div>
+        </div>
+      </div>
+    `).join('');
+
+    // Renderizar tabela
+    const tbody = document.getElementById('tabelaMaterialisBody');
+    tbody.innerHTML = this.materiais.map(m => `
+      <tr>
+        <td>
+          <div class="material-img-cell">
+            ${m.foto ? `<img src="${m.foto}" />` : '📦'}
+          </div>
+        </td>
+        <td>${m.nome}</td>
+        <td>${m.quantidade}</td>
+        <td>${m.especificacoes || '-'}</td>
+        <td>${this.formatarData(m.dataAtualizacao)}</td>
+      </tr>
+    `).join('');
+  },
+
+  formatarData(dataISO) {
+    if (!dataISO) return '-';
+    const data = new Date(dataISO);
+    return data.toLocaleDateString('pt-BR') + ' ' + data.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+  },
+
+  exportarPDF() {
+    alert('Função de exportação PDF em desenvolvimento. Use o botão "Imprimir" para salvar como PDF.');
+  }
+};
+
+document.addEventListener('DOMContentLoaded', () => relatorio.init());
+</script>
+</body>
+</html>
