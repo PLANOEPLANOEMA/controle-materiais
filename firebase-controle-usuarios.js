@@ -115,23 +115,3 @@ export function escutarMudancasRTDiaDia(callback) {
     callback(snap.data().itens ?? []);
   });
 }
-
-
-// ── SERVIÇOS DE PAVIMENTOS (NOVO) ──
-const REF_SERVICOS_PAVIMENTOS = doc(db, "controle", "servicos_pavimentos");
-
-export async function salvarServicosPavimentosNaNuvem(servicos) {
-  await setDoc(REF_SERVICOS_PAVIMENTOS, { servicos, updatedAt: Date.now() }, { merge: true });
-}
-
-export async function carregarServicosPavimentosDaNuvem() {
-  const snap = await getDoc(REF_SERVICOS_PAVIMENTOS);
-  return snap.exists() ? (snap.data().servicos ?? null) : null;
-}
-
-export function escutarMudancasServicosPavimentos(callback) {
-  return onSnapshot(REF_SERVICOS_PAVIMENTOS, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().servicos ?? []);
-  });
-}
