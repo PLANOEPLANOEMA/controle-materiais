@@ -1300,7 +1300,7 @@
       </div>
       <div class="predio3d-layout">
         <div class="predio3d-stage">
-          <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento</div>
+          <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento para abrir o interior</div>
           <div id="predio3dViewport" class="predio3d-viewport">
             <div id="predio3dBuilding" class="predio3d-building"></div>
           </div>
@@ -1309,11 +1309,11 @@
           <h2 style="margin-bottom:.9rem;">Detalhes do Pavimento</h2>
           <div class="metric">
             <div class="metric-card"><div class="num" id="predio3dCountFloors">0</div><div class="label">Pavimentos</div></div>
-            <div class="metric-card"><div class="num" id="predio3dCountCritical">0</div><div class="label">Atrasados</div></div>
+            <div class="metric-card"><div class="num" id="predio3dCountCritical">0</div><div class="label">Serviços atrasados</div></div>
           </div>
           <div class="predio3d-floor-list" id="predio3dFloorList"></div>
           <div style="margin-top:1rem;">
-            <div class="predio3d-badge" id="predio3dSelectedLabel">Selecione um pavimento</div>
+            <div class="predio3d-badge" id="predio3dSelectedLabel">Selecione um pavimento para ver o interior</div>
             <div class="predio3d-details-list" id="predio3dDetails" style="margin-top:.85rem;"></div>
           </div>
         </div>
@@ -2041,38 +2041,61 @@ const predio3D = {
   },
 
   getItensBase() {
-    const planejamento = (window.appRT?.itens || []).map(item => ({ ...item, origem: 'planejamento' }));
-    const diaDia = (window.appRT?.itensDiaDia || []).map(item => ({ ...item, origem: 'dia-dia' }));
-    return [...planejamento, ...diaDia].map(item => ({
-      ...item,
-      torre: this.normalizeTower(item.torre),
-      pavimento: this.normalizeFloor(item.pavimento)
-    })).filter(item => item.torre && item.pavimento);
+    return [];
+  },
+
+  ensureFloorServices(torre, floor) {
+    const key = this.makeFloorKey(torre, floor);
+    if (!this.dadosServicos[key]) this.dadosServicos[key] = {};
+    this.servicosLista.forEach((srv) => {
+      if (!this.dadosServicos[key][srv]) {
+        this.dadosServicos[key][srv] = {
+          servico: srv,
+          servicoIniciado: false,
+          concluido: false,
+          dataInicio: '',
+          dataPrevista: '',
+          dataConclusao: '',
+          fotos: [],
+          observacoes: ''
+        };
+      } else {
+        this.dadosServicos[key][srv].servico = srv;
+        this.dadosServicos[key][srv].fotos = Array.isArray(this.dadosServicos[key][srv].fotos) ? this.dadosServicos[key][srv].fotos : [];
+      }
+    });
+    return Object.keys(this.dadosServicos[key])
+      .filter(nome => this.servicosLista.includes(nome))
+      .map((nome) => ({
+        ...this.dadosServicos[key][nome],
+        servico: nome,
+        torre,
+        pavimento: floor,
+        status: this.dadosServicos[key][nome].concluido
+          ? 'Concluído'
+          : (this.dadosServicos[key][nome].servicoIniciado ? 'Em andamento' : 'Planejado')
+      }));
   },
 
   getItemsForFloor(torre, floor) {
-    return this.getItensBase().filter(item => item.torre === torre && item.pavimento === floor);
+    return this.ensureFloorServices(torre, floor);
   },
 
   computeFloorStatus(items) {
     if (!items.length) return 'cinza';
-    const statuses = items.map(i => String(i.status || '').trim());
-    
-    // Se todos estiverem concluídos ou entregues -> Verde
-    if (statuses.every(s => ['Concluído', 'Entregue'].includes(s))) return 'verde';
-    
-    // Se houver algum atrasado (baseado na data) -> Vermelho
+    if (items.every(i => i.concluido)) return 'verde';
+
     const today = new Date();
     today.setHours(0,0,0,0);
-    const hasLate = items.some(i => {
-      const dt = this.parseDate(i.dataServico || i['Início Planejado'] || i.dataNecessidade || '');
-      const st = String(i.status || '').trim();
-      return dt && dt < today && !['Concluído','Entregue'].includes(st);
+    const hasLate = items.some((i) => {
+      if (i.concluido || !i.dataPrevista) return false;
+      const dt = this.parseDate(i.dataPrevista);
+      return dt && dt < today;
     });
     if (hasLate) return 'vermelho';
 
-    // Se houver algum em status de execução/aguardando ou planejado -> Amarelo
-    return 'amarelo';
+    const hasProgress = items.some(i => i.servicoIniciado || i.dataInicio || i.dataPrevista || (i.fotos && i.fotos.length));
+    return hasProgress ? 'amarelo' : 'cinza';
   },
 
   buildFloors() {
@@ -2144,7 +2167,7 @@ const predio3D = {
       <div class="predio3d-floor-item ${this.state.selectedKey === f.key ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.key)})'>
         <div>
           <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
-          <small>${f.torre} • ${f.items.length ? `${f.items.length} RT(s)` : 'Sem RT'}</small>
+          <small>${f.torre} • ${f.items.filter(item => item.concluido).length}/${f.items.length} serviço(s) concluído(s)</small>
         </div>
         <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
       </div>`).join('') : '<div class="predio3d-empty">Nenhum pavimento encontrado.</div>';
@@ -2154,7 +2177,8 @@ const predio3D = {
       selectedLabel.textContent = 'Selecione um pavimento';
       details.innerHTML = '<div class="predio3d-empty">Nenhum pavimento disponível.</div>';
     } else {
-      selectedLabel.textContent = `${selected.torre} • ${selected.floor} • ${this.statusLabel(selected.status)}`;
+      const concluidos = selected.items.filter(item => item.concluido).length;
+      selectedLabel.textContent = `${selected.torre} • ${selected.floor} • ${concluidos}/${selected.items.length} serviço(s) concluído(s)`;
       details.innerHTML = selected.items.length ? selected.items.map(item => `
         <div class="predio3d-details-item">
           <div style="display:flex;justify-content:space-between;gap:.8rem;align-items:start;">
@@ -2162,13 +2186,15 @@ const predio3D = {
             <span class="predio3d-badge">${item.status || 'Planejado'}</span>
           </div>
           <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
-            Torre: ${item.torre || '-'} • Pavimento: ${item.pavimento || '-'}
+            Início: ${item.dataInicio ? new Date(item.dataInicio+'T12:00:00').toLocaleDateString('pt-BR') : '-'} • Previsto: ${item.dataPrevista ? new Date(item.dataPrevista+'T12:00:00').toLocaleDateString('pt-BR') : '-'}
           </div>
           <div style="margin-top:.35rem;font-size:.88rem;color:var(--muted);">
-            Material: ${item.material || '-'} • Data: ${item.dataServico || item['Início Planejado'] || item.dataNecessidade || '-'}
+            Fotos: ${(item.fotos || []).length} • ${item.concluido ? 'Checklist concluído' : (item.servicoIniciado ? 'Serviço iniciado' : 'Aguardando início')}
           </div>
-        </div>`).join('') : '<div class="predio3d-empty">Nenhuma RT criada neste pavimento ainda.</div>';
+        </div>`).join('') : '<div class="predio3d-empty">Nenhum serviço configurado neste pavimento ainda.</div>';
     }
+
+    this.ensureControls();
 
     this.ensureControls();
   },
@@ -2178,8 +2204,12 @@ const predio3D = {
   dadosServicos: {},
 
   initServicos() {
-    const stored = localStorage.getItem('predio3d_servicos_v2');
-    if (stored) this.dadosServicos = JSON.parse(stored);
+    try {
+      const stored = localStorage.getItem('predio3d_servicos_v2');
+      if (stored) this.dadosServicos = JSON.parse(stored) || {};
+    } catch (e) {
+      this.dadosServicos = {};
+    }
   },
 
   salvarServicos() {
@@ -2206,12 +2236,14 @@ const predio3D = {
     this.servicosLista.forEach(srv => {
       if (!this.dadosServicos[key][srv]) {
         this.dadosServicos[key][srv] = {
-          materialEntregue: false,
+          servico: srv,
           servicoIniciado: false,
-          finalizado: false,
+          concluido: false,
           dataInicio: '',
           dataPrevista: '',
-          fotos: []
+          dataConclusao: '',
+          fotos: [],
+          observacoes: ''
         };
       }
     });
@@ -2226,56 +2258,61 @@ const predio3D = {
     
     content.innerHTML = this.servicosLista.map(srv => {
       const d = dadosPav[srv];
-      const fotoId = `input-foto-${srv.replace(/\\s+/g, '-')}`;
+      const fotoId = `input-foto-${srv.replace(/\s+/g, '-')}`;
+      const statusTexto = d.concluido ? '✅ Concluído' : (d.servicoIniciado ? '🟡 Em andamento' : '⚪ Não iniciado');
       return `
         <div class="servico-card">
           <div class="servico-header">
-            <h3>${srv}</h3>
-            <span style="color:#a0aec0;">▼</span>
+            <div>
+              <h3>${srv}</h3>
+              <small style="display:block;margin-top:.35rem;color:#6b7a99;">${statusTexto}</small>
+            </div>
+            <span class="predio3d-badge">${(d.fotos || []).length} foto(s)</span>
           </div>
           <div class="servico-body">
             <div class="checklist-group">
               <label class="checklist-item">
-                <input type="checkbox" ${d.materialEntregue ? 'checked' : ''} onchange="predio3D.updateSrv('${key}', '${srv}', 'materialEntregue', this.checked)">
-                Material Entregue
-              </label>
-              <label class="checklist-item">
                 <input type="checkbox" ${d.servicoIniciado ? 'checked' : ''} onchange="predio3D.updateSrv('${key}', '${srv}', 'servicoIniciado', this.checked)">
-                Serviço Iniciado
+                Serviço iniciado
               </label>
               <label class="checklist-item">
-                <input type="checkbox" ${d.finalizado ? 'checked' : ''} onchange="predio3D.updateSrv('${key}', '${srv}', 'finalizado', this.checked)">
-                Finalizado
+                <input type="checkbox" ${d.concluido ? 'checked' : ''} onchange="predio3D.updateSrv('${key}', '${srv}', 'concluido', this.checked)">
+                Checklist concluído
               </label>
             </div>
             
             <div class="dates-group">
               <div class="date-field">
-                <label>📅 Data de Início</label>
-                <input type="date" value="${d.dataInicio}" onchange="predio3D.updateSrv('${key}', '${srv}', 'dataInicio', this.value)">
+                <label>📅 Início do serviço</label>
+                <input type="date" value="${d.dataInicio || ''}" onchange="predio3D.updateSrv('${key}', '${srv}', 'dataInicio', this.value)">
               </div>
               <div class="date-field">
-                <label>📅 Data Prevista</label>
-                <input type="date" value="${d.dataPrevista}" onchange="predio3D.updateSrv('${key}', '${srv}', 'dataPrevista', this.value)">
+                <label>📅 Previsão de finalização</label>
+                <input type="date" value="${d.dataPrevista || ''}" onchange="predio3D.updateSrv('${key}', '${srv}', 'dataPrevista', this.value)">
               </div>
             </div>
             
             <div class="photos-section">
               <div class="photos-header">
-                <label>Fotos do Serviço</label>
+                <label>Fotos do serviço</label>
                 <label class="btn-upload" for="${fotoId}">
-                  📷 Enviar Fotos
+                  📷 Adicionar imagem
                   <input type="file" id="${fotoId}" style="display:none" accept="image/*" multiple onchange="predio3D.handleUpload('${key}', '${srv}', this.files)">
                 </label>
               </div>
               <div class="photos-grid">
-                ${(d.fotos || []).map((f, idx) => `
+                ${(d.fotos || []).length ? (d.fotos || []).map((f, idx) => `
                   <div style="position:relative;">
-                    <img src="${f}" class="photo-thumb">
+                    <img src="${f}" class="photo-thumb" style="cursor:pointer;" onclick="predio3D.abrirFoto('${f}')">
                     <button class="photo-remove" onclick="predio3D.removePhoto('${key}', '${srv}', ${idx})">✕</button>
                   </div>
-                `).join('')}
+                `).join('') : '<span style="color:#6b7a99;">Nenhuma imagem adicionada.</span>'}
               </div>
+            </div>
+
+            <div style="margin-top:1rem;">
+              <label style="display:block;font-size:.85rem;font-weight:700;color:#718096;margin-bottom:.35rem;">📝 Observações do serviço</label>
+              <textarea style="width:100%;padding:.7rem;border:1px solid #e2e8f0;border-radius:8px;min-height:90px;resize:vertical;" onchange="predio3D.updateSrv('${key}', '${srv}', 'observacoes', this.value)">${d.observacoes || ''}</textarea>
             </div>
           </div>
         </div>
@@ -2283,10 +2320,28 @@ const predio3D = {
     }).join('');
   },
 
+  updateSrv
+  },
+
   updateSrv(key, srv, campo, valor) {
+    if (!this.dadosServicos[key] || !this.dadosServicos[key][srv]) return;
     this.dadosServicos[key][srv][campo] = valor;
+    if (campo === 'concluido') {
+      this.dadosServicos[key][srv].dataConclusao = valor ? new Date().toISOString() : '';
+      if (valor) this.dadosServicos[key][srv].servicoIniciado = true;
+    }
+    if (campo === 'servicoIniciado' && !valor && this.dadosServicos[key][srv].concluido) {
+      this.dadosServicos[key][srv].concluido = false;
+      this.dadosServicos[key][srv].dataConclusao = '';
+    }
     this.salvarServicos();
-    if (campo === 'finalizado') this.render();
+    this.render();
+  },
+
+  abrirFoto(src) {
+    const win = window.open('', '_blank');
+    if (!win) return;
+    win.document.write(`<img src="${src}" style="max-width:100%;height:auto;display:block;margin:0 auto;">`);
   },
 
   handleUpload(key, srv, files) {
@@ -3090,6 +3145,78 @@ const appMateriais = {
     }
   },
 
+  normalizarTexto(valor) {
+    return String(valor || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLowerCase();
+  },
+
+  localizarMaterialPorNome(nome) {
+    const alvo = this.normalizarTexto(nome);
+    return this.materiais.find((m) => this.normalizarTexto(m.nome) === alvo);
+  },
+
+  gerarChaveEntradaRT(rt, origemTipo = 'planejamento') {
+    return `${origemTipo}:${rt.id || ''}:${this.normalizarTexto(rt.material)}:${Number(rt.quantidade || 0)}`;
+  },
+
+  async registrarEntradaPorRT(rt, origemTipo = 'planejamento') {
+    if (!rt || !rt.material || Number(rt.quantidade || 0) <= 0) return false;
+
+    const chave = this.gerarChaveEntradaRT(rt, origemTipo);
+    const jaExiste = this.movimentacoes.some((mov) => (mov.tipo || 'saida') === 'entrada' && mov.origemChave === chave);
+    if (jaExiste) return false;
+
+    const quantidade = Number(rt.quantidade || 0);
+    let material = this.localizarMaterialPorNome(rt.material);
+
+    if (material) {
+      material.quantidade = Number(material.quantidade || 0) + quantidade;
+      material.dataAtualizacao = new Date().toISOString();
+      material.especificacoes = material.especificacoes || `Entrada automática via RT ${rt.id || ''}`.trim();
+    } else {
+      const novoId = Math.max(0, ...this.materiais.map((m) => Number(m.id || 0))) + 1;
+      material = {
+        id: novoId,
+        nome: rt.material,
+        quantidade,
+        especificacoes: `Entrada automática via RT ${rt.id || ''}`.trim(),
+        foto: null,
+        dataCriacao: new Date().toISOString(),
+        dataAtualizacao: new Date().toISOString(),
+        origemCadastro: 'rt'
+      };
+      this.materiais.unshift(material);
+    }
+
+    const novaMov = {
+      id: Date.now(),
+      tipo: 'entrada',
+      origem: 'rt',
+      origemChave: chave,
+      rtId: rt.id || '',
+      rtTipo: origemTipo,
+      materialId: material.id,
+      materialNome: material.nome,
+      quantidade,
+      responsavel: 'Sistema / RT',
+      funcao: 'Entrada automática',
+      setor: [rt.torre, rt.pavimento].filter(Boolean).join(' / ') || 'Obra',
+      motivo: 'RT marcada como Entregue',
+      observacoes: rt.observacoes || '',
+      dataHora: new Date().toISOString(),
+      lancadoPor: window.currentUser?.username || 'sistema'
+    };
+
+    this.movimentacoes.unshift(novaMov);
+    await this.salvarMateriais();
+    await this.salvarMovimentacoes();
+    this.buscarMateriais();
+    this.preencherMateriaisRastreabilidade();
+    this.renderizarMovimentacoes();
+    this.renderizarRastreabilidadeCompleta();
+    this.renderizarRelatorioDia();
+    return true;
+  },
+
   aplicarPermissoesVisuais() {
     const role = window.currentUser?.role || 'admin';
     const materiaisSection = document.getElementById('materiais-obra');
@@ -3349,7 +3476,7 @@ const appMateriais = {
     container.innerHTML = materiais.map(m => {
       const dataFormatada = new Date(m.dataAtualizacao).toLocaleDateString('pt-BR');
       const horaFormatada = new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
-      const ultimaMov = this.movimentacoes.filter(x => x.materialId === m.id).sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora))[0];
+      const ultimaMov = this.movimentacoes.filter(x => x.materialId === m.id && (x.tipo || 'saida') === 'saida').sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora))[0];
       
       return `
         <div class="material-card">
@@ -3366,7 +3493,7 @@ const appMateriais = {
               </div>
             </div>
             <div class="material-date">📅 ${dataFormatada} às ${horaFormatada}</div>
-            ${ultimaMov ? `<div class="material-date">🧾 Última retirada: ${ultimaMov.responsavel} - ${ultimaMov.quantidade} un.</div>` : ''}
+            ${ultimaMov ? `<div class="material-date">🧾 Última saída: ${ultimaMov.responsavel} - ${ultimaMov.quantidade} un.</div>` : ''}
             <div class="material-actions">
               ${podeRetirar ? `<button class="btn btn-warning" onclick="appMateriais.abrirModalRetirada(${m.id})">📤 Registrar Retirada</button>` : ''}
               ${podeEditar ? `<button class="edit-btn" onclick="appMateriais.abrirModalEditar(${m.id})">✏️ Editar</button>` : ''}
@@ -3434,6 +3561,7 @@ const appMateriais = {
 
     const novaMov = {
       id: Date.now(),
+      tipo: 'saida',
       materialId: material.id,
       materialNome: material.nome,
       quantidade,
@@ -3471,12 +3599,12 @@ const appMateriais = {
     }
     box.style.display = 'block';
     const itens = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 20);
-    box.innerHTML = `<h2>🧾 Últimas Retiradas</h2>
+    box.innerHTML = `<h2>🧾 Últimas Movimentações</h2>
       <div class="btn-group" style="margin-bottom:1rem;">
         ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
         <button class="btn btn-secondary" onclick="app.showSection('rastreabilidade', document.querySelector('nav button[data-section=&quot;rastreabilidade&quot;]'))">📋 Ver Rastreabilidade Completa</button>
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Material</th><th>Qtd.</th><th>Responsável</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${(m.tipo || 'saida') === 'entrada' ? 'Entrada' : 'Saída'}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação registrada ainda.</p>`}`;
   },
 
   obterMovimentacoesFiltradas() {
@@ -3536,6 +3664,7 @@ const appMateriais = {
     const materialEncontrado = this.materiais.find(m => String(m.nome || '').toLowerCase() === materialNome.toLowerCase());
     const novaMov = {
       id: Date.now(),
+      tipo: 'saida',
       materialId: materialEncontrado ? materialEncontrado.id : null,
       materialNome,
       quantidade,
@@ -3575,7 +3704,7 @@ const appMateriais = {
         <span class="btn btn-primary" style="cursor:default;">🧾 ${itens.length} registros</span>
         ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Material</th><th>Qtd.</th><th>Responsável</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${(m.tipo || 'saida') === 'entrada' ? 'Entrada' : 'Saída'}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
   },
 
   async excluirMovimentacao(id) {
@@ -3783,7 +3912,7 @@ const appMateriais = {
 
     <div class="stats">
       <div class="stat"><div class="value">${materiais.length}</div><div>${materiais.length ? 'Materiais listados' : 'Materiais no relatório'}</div></div>
-      <div class="stat"><div class="value">${materiais.length ? totalItens : movimentacoes.reduce((s, m) => s + Number(m.quantidade || 0), 0)}</div><div>${materiais.length ? 'Saldo total' : 'Total retirado'}</div></div>
+      <div class="stat"><div class="value">${materiais.length ? totalItens : movimentacoes.reduce((s, m) => s + Number(m.quantidade || 0), 0)}</div><div>${materiais.length ? 'Saldo total' : 'Total movimentado'}</div></div>
       <div class="stat"><div class="value">${movimentacoes.length}</div><div>Registros de rastreabilidade</div></div>
     </div>
 
@@ -3810,7 +3939,7 @@ const appMateriais = {
     ` : ''}
 
     <h2 class="section-title">Rastreabilidade</h2>
-    ${movimentacoes.length ? `<table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th></tr></thead><tbody>${movimentacoes.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td class="center">${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td></tr>`).join('')}</tbody></table>` : `<p style="color:#6b7a99; margin-bottom:24px;">Nenhuma retirada registrada para este relatório.</p>`}
+    ${movimentacoes.length ? `<table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Material</th><th>Qtd.</th><th>Responsável</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th></tr></thead><tbody>${movimentacoes.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${(m.tipo || 'saida') === 'entrada' ? 'Entrada' : 'Saída'}</td><td>${m.materialNome}</td><td class="center">${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td></tr>`).join('')}</tbody></table>` : `<p style="color:#6b7a99; margin-bottom:24px;">Nenhuma movimentação registrada para este relatório.</p>`}
 
     <div class="footer">Relatório gerado automaticamente pelo sistema de Controle de Materiais - Plano & Plano</div>
   </div>
@@ -3874,7 +4003,7 @@ const appMateriais = {
     }
     this.abrirJanelaRelatorioRastreabilidade({
       titulo: 'Relatório Completo de Rastreabilidade',
-      subtitulo: 'Relatório exclusivo com todas as retiradas registradas no sistema.',
+      subtitulo: 'Relatório exclusivo com todas as entradas e saídas registradas no sistema.',
       movimentacoes: movimentacoesOrdenadas
     });
   }};
@@ -4436,9 +4565,12 @@ const appRT = {
     this.aplicarDatasPorStatus(item, this.itens[idx]);
     this.itens[idx] = item;
     await this.salvarDados();
+    if (novoStatus === 'Entregue' && statusAtual !== 'Entregue' && window.appMateriais?.registrarEntradaPorRT) {
+      await window.appMateriais.registrarEntradaPorRT(item, 'planejamento');
+    }
     this.preencherFiltroTorres();
     this.renderizar();
-    app.mostrarAlerta('Status do planejamento RT atualizado.', 'success');
+    app.mostrarAlerta(novoStatus === 'Entregue' ? 'Status atualizado e material lançado no estoque.' : 'Status do planejamento RT atualizado.', 'success');
   },
 
   async atualizarStatusDiaDia(id, novoStatus) {
@@ -4452,9 +4584,12 @@ const appRT = {
     this.aplicarDatasPorStatus(item, this.itensDiaDia[idx]);
     this.itensDiaDia[idx] = item;
     await this.salvarDadosDiaDia();
+    if (novoStatus === 'Entregue' && statusAtual !== 'Entregue' && window.appMateriais?.registrarEntradaPorRT) {
+      await window.appMateriais.registrarEntradaPorRT(item, 'dia_a_dia');
+    }
     this.preencherFiltroTorresDiaDia();
     this.renderizarDiaDia();
-    app.mostrarAlerta('Status da RT do Dia a Dia atualizado.', 'success');
+    app.mostrarAlerta(novoStatus === 'Entregue' ? 'Status atualizado e material lançado no estoque.' : 'Status da RT do Dia a Dia atualizado.', 'success');
   },
 
   statusSugerido(item) {
@@ -4488,9 +4623,12 @@ const appRT = {
     const idx = this.itens.findIndex(i => i.id === item.id);
     if (idx >= 0) this.itens[idx] = item; else this.itens.push(item);
     await this.salvarDados();
+    if (item.status === 'Entregue' && window.appMateriais?.registrarEntradaPorRT) {
+      await window.appMateriais.registrarEntradaPorRT(item, 'planejamento');
+    }
     this.fecharModal();
     this.renderizar();
-    app.mostrarAlerta('Planejamento RT salvo com sucesso!', 'success');
+    app.mostrarAlerta(item.status === 'Entregue' ? 'Planejamento RT salvo e material lançado no estoque!' : 'Planejamento RT salvo com sucesso!', 'success');
   },
 
   async excluir(id) {
@@ -4640,10 +4778,13 @@ const appRT = {
     this.aplicarDatasPorStatus(item, anterior);
     if (idx >= 0) this.itensDiaDia[idx] = item; else this.itensDiaDia.unshift(item);
     await this.salvarDadosDiaDia();
+    if (item.status === 'Entregue' && window.appMateriais?.registrarEntradaPorRT) {
+      await window.appMateriais.registrarEntradaPorRT(item, 'dia_a_dia');
+    }
     this.preencherFiltroTorresDiaDia();
     this.fecharModalDiaDia();
     this.renderizarDiaDia();
-    app.mostrarAlerta('RT do Dia a Dia salva com sucesso!', 'success');
+    app.mostrarAlerta(item.status === 'Entregue' ? 'RT do Dia a Dia salva e material lançado no estoque!' : 'RT do Dia a Dia salva com sucesso!', 'success');
   },
 
   async excluirDiaDia(id) {
