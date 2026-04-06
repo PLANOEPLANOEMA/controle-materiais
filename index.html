@@ -875,7 +875,121 @@
       }
     }
 
-</style>
+
+    /* ── NOVOS CARDS DE SERVIÇO (ESTILO IMAGEM) ── */
+    .servico-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+      border: 1px solid #eef2f7;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .servico-card:hover { transform: translateY(-2px); }
+    .servico-header {
+      padding: 1.25rem;
+      background: #fcfdfe;
+      border-bottom: 1px solid #f0f4f8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .servico-header h3 { margin: 0; color: #1F3864; font-size: 1.15rem; font-weight: 700; }
+    .servico-body { padding: 1.25rem; }
+    .checklist-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #4a5568;
+      cursor: pointer;
+    }
+    .checklist-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #27AE60;
+    }
+    .dates-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .date-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .date-field label { font-size: 0.85rem; font-weight: 700; color: #718096; display: flex; align-items: center; gap: 0.4rem; }
+    .date-field input {
+      padding: 0.6rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #2d3748;
+      outline: none;
+    }
+    .photos-section {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .photos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .photos-header label { font-weight: 700; color: #4a5568; font-size: 0.9rem; }
+    .btn-upload {
+      background: #2E75B6;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      border: none;
+    }
+    .photos-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .photo-thumb {
+      width: 70px;
+      height: 70px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid #e2e8f0;
+      position: relative;
+    }
+    .photo-remove {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #E84545;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+\n</style>
 </head>
 <body>
 
@@ -992,7 +1106,26 @@
         <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
       </div>
     </div>
-  </section>
+  
+  <!-- Modal para Serviços do Pavimento (Estilo Imagem) -->
+  <div id="modalServicosModal" class="modal" style="display:none;">
+    <div class="modal-content" style="max-width:850px; max-height:90vh; overflow-y:auto; border-radius:16px; padding:0;">
+      <div class="modal-topbar" style="padding:1.25rem 1.5rem; border-bottom:1px solid #eee; background:#fff; position:sticky; top:0; z-index:10; display:flex; justify-content:space-between; align-items:center;">
+        <div style="display:flex; align-items:center; gap:1rem;">
+          <button type="button" class="btn btn-secondary" onclick="predio3D.fecharModalServicos()" style="padding:0.5rem 0.8rem;">✕</button>
+          <h2 style="margin:0; font-size:1.4rem; color:#1F3864;" id="modalServicosTitle">Serviços - Torre A - 10º Pavimento</h2>
+        </div>
+        <button type="button" class="btn btn-secondary" onclick="predio3D.fecharModalServicos()" style="background:none; border:none; font-size:1.5rem; color:#a0aec0; cursor:pointer;">✕</button>
+      </div>
+      <div id="modalServicosContent" style="padding:1.5rem; background:#f4f7fa;">
+        <!-- Cards de serviço serão inseridos aqui -->
+      </div>
+      <div style="padding:1rem 1.5rem; border-top:1px solid #eee; background:#fff; display:flex; justify-content:flex-end; position:sticky; bottom:0;">
+        <button class="btn btn-primary" onclick="predio3D.fecharModalServicos()" style="padding:0.7rem 2rem; border-radius:8px;">Fechar</button>
+      </div>
+    </div>
+  </div>
+\n</section>
 
   <!-- ── POR EMPRESA ── -->
   <section id="por-empresa">
@@ -1810,7 +1943,7 @@ const auth = {
     appMateriais.init();
     appRT.init();
     appRT.carregarMateriais();
-    predio3D.render();
+    predio3D.initServicos(); predio3D.render();
     setTimeout(() => atualizarBotaoMobile('visao-geral'), 50);
   },
 
@@ -1947,7 +2080,7 @@ const predio3D = {
       torre: def.torre,
       floors: def.floors.map(floor => {
         const items = this.getItemsForFloor(def.torre, floor);
-        return { torre: def.torre, floor, key: this.makeFloorKey(def.torre, floor), items, status: this.computeFloorStatus(items) };
+        return { torre: def.torre, floor, key: this.makeFloorKey(def.torre, floor), items, status: this.computeFloorStatus(items, this.makeFloorKey(def.torre, floor)) };
       })
     }));
   },
@@ -2040,7 +2173,144 @@ const predio3D = {
     this.ensureControls();
   },
 
-  selectFloor(key) { this.state.selectedKey = key; this.render(); },
+  
+  servicosLista: ['Contra piso', 'Gesso liso', 'Forro', 'Pintura', 'Instalação de porta'],
+  dadosServicos: {},
+
+  initServicos() {
+    const stored = localStorage.getItem('predio3d_servicos_v2');
+    if (stored) this.dadosServicos = JSON.parse(stored);
+  },
+
+  salvarServicos() {
+    localStorage.setItem('predio3d_servicos_v2', JSON.stringify(this.dadosServicos));
+  },
+
+  selectFloor(key) { 
+    this.state.selectedKey = key; 
+    this.render(); 
+    this.abrirModalServicos(key);
+  },
+
+  abrirModalServicos(key) {
+    const [torre, pavimento] = key.split('__');
+    const modal = document.getElementById('modalServicosModal');
+    const title = document.getElementById('modalServicosTitle');
+    const content = document.getElementById('modalServicosContent');
+    
+    if (!modal || !title || !content) return;
+    
+    title.textContent = `Serviços - ${torre} - ${pavimento}`;
+    
+    if (!this.dadosServicos[key]) this.dadosServicos[key] = {};
+    this.servicosLista.forEach(srv => {
+      if (!this.dadosServicos[key][srv]) {
+        this.dadosServicos[key][srv] = {
+          materialEntregue: false,
+          servicoIniciado: false,
+          finalizado: false,
+          dataInicio: '',
+          dataPrevista: '',
+          fotos: []
+        };
+      }
+    });
+
+    this.renderizarCardsServico(key);
+    modal.style.display = 'flex';
+  },
+
+  renderizarCardsServico(key) {
+    const content = document.getElementById('modalServicosContent');
+    const dadosPav = this.dadosServicos[key];
+    
+    content.innerHTML = this.servicosLista.map(srv => {
+      const d = dadosPav[srv];
+      const fotoId = `input-foto-${srv.replace(/\\s+/g, '-')}`;
+      return `
+        <div class="servico-card">
+          <div class="servico-header">
+            <h3>${srv}</h3>
+            <span style="color:#a0aec0;">▼</span>
+          </div>
+          <div class="servico-body">
+            <div class="checklist-group">
+              <label class="checklist-item">
+                <input type="checkbox" ${d.materialEntregue ? 'checked' : ''} onchange="predio3D.updateSrv('${key}', '${srv}', 'materialEntregue', this.checked)">
+                Material Entregue
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" ${d.servicoIniciado ? 'checked' : ''} onchange="predio3D.updateSrv('${key}', '${srv}', 'servicoIniciado', this.checked)">
+                Serviço Iniciado
+              </label>
+              <label class="checklist-item">
+                <input type="checkbox" ${d.finalizado ? 'checked' : ''} onchange="predio3D.updateSrv('${key}', '${srv}', 'finalizado', this.checked)">
+                Finalizado
+              </label>
+            </div>
+            
+            <div class="dates-group">
+              <div class="date-field">
+                <label>📅 Data de Início</label>
+                <input type="date" value="${d.dataInicio}" onchange="predio3D.updateSrv('${key}', '${srv}', 'dataInicio', this.value)">
+              </div>
+              <div class="date-field">
+                <label>📅 Data Prevista</label>
+                <input type="date" value="${d.dataPrevista}" onchange="predio3D.updateSrv('${key}', '${srv}', 'dataPrevista', this.value)">
+              </div>
+            </div>
+            
+            <div class="photos-section">
+              <div class="photos-header">
+                <label>Fotos do Serviço</label>
+                <label class="btn-upload" for="${fotoId}">
+                  📷 Enviar Fotos
+                  <input type="file" id="${fotoId}" style="display:none" accept="image/*" multiple onchange="predio3D.handleUpload('${key}', '${srv}', this.files)">
+                </label>
+              </div>
+              <div class="photos-grid">
+                ${(d.fotos || []).map((f, idx) => `
+                  <div style="position:relative;">
+                    <img src="${f}" class="photo-thumb">
+                    <button class="photo-remove" onclick="predio3D.removePhoto('${key}', '${srv}', ${idx})">✕</button>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join('');
+  },
+
+  updateSrv(key, srv, campo, valor) {
+    this.dadosServicos[key][srv][campo] = valor;
+    this.salvarServicos();
+    if (campo === 'finalizado') this.render();
+  },
+
+  handleUpload(key, srv, files) {
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        this.dadosServicos[key][srv].fotos.push(e.target.result);
+        this.salvarServicos();
+        this.renderizarCardsServico(key);
+      };
+      reader.readAsDataURL(file);
+    });
+  },
+
+  removePhoto(key, srv, idx) {
+    this.dadosServicos[key][srv].fotos.splice(idx, 1);
+    this.salvarServicos();
+    this.renderizarCardsServico(key);
+  },
+
+  fecharModalServicos() {
+    document.getElementById('modalServicosModal').style.display = 'none';
+  },
+\n  selectFloor(key) { this.state.selectedKey = key; this.render(); },
 
   resetView() {
     this.state.rotateX = -16;
@@ -2268,14 +2538,14 @@ const app = {
     }
     if (id === 'planejamento-rt' && window.appRT && typeof window.appRT.renderizar === 'function') {
       window.appRT.renderizar();
-      if (window.predio3D) window.predio3D.render();
+      if (window.predio3D) window.predio3D.initServicos(); predio3D.render();
     }
     if (id === 'rt-dia-dia' && window.appRT && typeof window.appRT.renderizarDiaDia === 'function') {
       window.appRT.renderizarDiaDia();
-      if (window.predio3D) window.predio3D.render();
+      if (window.predio3D) window.predio3D.initServicos(); predio3D.render();
     }
     if (id === 'predio-3d' && window.predio3D && typeof window.predio3D.render === 'function') {
-      window.predio3D.render();
+      window.predio3D.initServicos(); predio3D.render();
     }
     atualizarBotaoMobile(id);
   },
@@ -3381,7 +3651,121 @@ const appMateriais = {
     .btn { background:#1F3864; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:700; }
     @media print { .actions { display:none; } .page { max-width:none; padding:0; } body { margin: 0; } }
     @media (max-width: 800px) { .stats, .cards { grid-template-columns: 1fr; } .header { flex-direction:column; align-items:flex-start; } }
-  </style>
+  
+    /* ── NOVOS CARDS DE SERVIÇO (ESTILO IMAGEM) ── */
+    .servico-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 1.5rem;
+      border: 1px solid #eef2f7;
+      overflow: hidden;
+      transition: transform 0.2s;
+    }
+    .servico-card:hover { transform: translateY(-2px); }
+    .servico-header {
+      padding: 1.25rem;
+      background: #fcfdfe;
+      border-bottom: 1px solid #f0f4f8;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .servico-header h3 { margin: 0; color: #1F3864; font-size: 1.15rem; font-weight: 700; }
+    .servico-body { padding: 1.25rem; }
+    .checklist-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid #f0f4f8;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-weight: 600;
+      color: #4a5568;
+      cursor: pointer;
+    }
+    .checklist-item input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      cursor: pointer;
+      accent-color: #27AE60;
+    }
+    .dates-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .date-field { display: flex; flex-direction: column; gap: 0.4rem; }
+    .date-field label { font-size: 0.85rem; font-weight: 700; color: #718096; display: flex; align-items: center; gap: 0.4rem; }
+    .date-field input {
+      padding: 0.6rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      color: #2d3748;
+      outline: none;
+    }
+    .photos-section {
+      background: #f8fafc;
+      padding: 1rem;
+      border-radius: 8px;
+    }
+    .photos-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 0.75rem;
+    }
+    .photos-header label { font-weight: 700; color: #4a5568; font-size: 0.9rem; }
+    .btn-upload {
+      background: #2E75B6;
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      border: none;
+    }
+    .photos-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+    }
+    .photo-thumb {
+      width: 70px;
+      height: 70px;
+      border-radius: 4px;
+      object-fit: cover;
+      border: 1px solid #e2e8f0;
+      position: relative;
+    }
+    .photo-remove {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: #E84545;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: 12px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+\n</style>
 </head>
 <body>
   <div class="page">
@@ -3933,7 +4317,7 @@ const appRT = {
           this.itens = Array.isArray(itens) ? itens : [];
           try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens)); } catch(e) {}
           this.renderizar();
-          if (window.predio3D) window.predio3D.render();
+          if (window.predio3D) window.predio3D.initServicos(); predio3D.render();
         });
       }
       if (window.__fb?.escutarMudancasRTDiaDia) {
@@ -3942,7 +4326,7 @@ const appRT = {
           this.itensDiaDia = Array.isArray(itens) ? itens : [];
           try { localStorage.setItem(this.STORAGE_KEY_DIA_DIA, JSON.stringify(this.itensDiaDia)); } catch(e) {}
           this.renderizarDiaDia();
-          if (window.predio3D) window.predio3D.render();
+          if (window.predio3D) window.predio3D.initServicos(); predio3D.render();
         });
       }
     } catch (e) { console.warn('Sync ao vivo do planejamento indisponível:', e); }
@@ -3951,13 +4335,13 @@ const appRT = {
   async salvarDados() {
     localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.itens));
     if (window.__fb?.salvarPlanejamentoRTNaNuvem) await window.__fb.salvarPlanejamentoRTNaNuvem(this.itens);
-    if (window.predio3D) window.predio3D.render();
+    if (window.predio3D) window.predio3D.initServicos(); predio3D.render();
   },
 
   async salvarDadosDiaDia() {
     localStorage.setItem(this.STORAGE_KEY_DIA_DIA, JSON.stringify(this.itensDiaDia));
     if (window.__fb?.salvarRTDiaDiaNaNuvem) await window.__fb.salvarRTDiaDiaNaNuvem(this.itensDiaDia);
-    if (window.predio3D) window.predio3D.render();
+    if (window.predio3D) window.predio3D.initServicos(); predio3D.render();
   },
 
   abrirModalNovo() {
