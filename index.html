@@ -271,59 +271,70 @@
     .predio3d-empty { padding:2rem; text-align:center; color:var(--muted); }
     @media (max-width:980px) { .predio3d-layout { grid-template-columns:1fr; } .predio3d-stage, .predio3d-viewport { min-height:520px; } }
 
-    /* ── SALA VIRTUAL 3D DO PAVIMENTO ── */
-    .room3d-modal { position:fixed; inset:0; z-index:2200; display:none; align-items:center; justify-content:center; background:rgba(11,20,38,.62); backdrop-filter:blur(6px); padding:18px; }
+    /* ── APARTAMENTO VIRTUAL 3D DO PAVIMENTO ── */
+    .room3d-modal { position:fixed; inset:0; z-index:2200; display:none; align-items:center; justify-content:center; background:rgba(9,18,35,.65); backdrop-filter:blur(8px); padding:18px; }
     .room3d-modal.active { display:flex; }
-    .room3d-shell { width:min(1280px, 100%); max-height:calc(100vh - 36px); overflow:auto; background:linear-gradient(180deg,#f8fbff 0%,#eef4fb 100%); border-radius:24px; border:1px solid rgba(219,231,247,.95); box-shadow:0 28px 70px rgba(15,35,78,.24); }
-    .room3d-topbar { position:sticky; top:0; z-index:4; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.2rem; background:rgba(248,251,255,.92); border-bottom:1px solid #dbe7f7; backdrop-filter:blur(10px); }
-    .room3d-topbar h3 { margin:0; color:var(--blue-dark); font-size:1.2rem; }
-    .room3d-topbar p { margin:.2rem 0 0 0; color:var(--muted); font-size:.9rem; }
-    .room3d-content { display:grid; grid-template-columns:minmax(360px,1.15fr) 420px; gap:1.1rem; padding:1.2rem; }
-    .room3d-stage { position:relative; min-height:720px; border-radius:24px; overflow:hidden; border:1px solid #dbe7f7; background:radial-gradient(circle at top left, rgba(255,255,255,.95), rgba(232,240,251,.98) 40%, rgba(217,228,243,.98) 100%); }
-    .room3d-stage::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,.7), rgba(255,255,255,0) 36%), radial-gradient(circle at 50% 20%, rgba(255,255,255,.85), rgba(255,255,255,0) 55%); pointer-events:none; }
-    .room3d-scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; perspective:1600px; padding:28px; }
-    .room3d-iso { position:relative; width:min(100%,760px); aspect-ratio:1.18 / 1; transform-style:preserve-3d; transform:rotateX(58deg) rotateZ(-44deg) translateY(14px); }
-    .room3d-floor-slab { position:absolute; inset:14% 8% 10% 10%; border-radius:38px; background:linear-gradient(180deg,#e5d2b4 0%,#d7be97 46%,#c3a579 100%); box-shadow:0 48px 70px rgba(73,88,120,.2), inset 0 12px 18px rgba(255,255,255,.36); }
-    .room3d-floor-grid { position:absolute; inset:16% 10% 12% 12%; border-radius:30px; background-image:linear-gradient(rgba(255,255,255,.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.2) 1px, transparent 1px); background-size:44px 44px; opacity:.42; }
-    .room3d-wall-back, .room3d-wall-left, .room3d-wall-right { position:absolute; border-radius:28px; background:linear-gradient(180deg,#fbfdff 0%,#d9e5f2 100%); box-shadow:inset 0 0 0 1px rgba(159,180,211,.45); }
-    .room3d-wall-back { left:13%; right:14%; top:8%; height:22%; }
-    .room3d-wall-left { left:8%; top:16%; bottom:14%; width:14%; }
-    .room3d-wall-right { right:10%; top:18%; bottom:18%; width:14%; }
-    .room3d-window { position:absolute; top:19%; width:18%; height:10%; border-radius:18px; background:linear-gradient(180deg,#dff1ff 0%,#b9dbf7 100%); border:10px solid rgba(255,255,255,.96); box-shadow:0 18px 24px rgba(82,131,185,.18); }
-    .room3d-window.w1 { left:26%; }
-    .room3d-window.w2 { left:50%; }
-    .room3d-window::before, .room3d-window::after { content:''; position:absolute; background:rgba(255,255,255,.9); }
+    .room3d-shell { width:min(1340px,100%); max-height:calc(100vh - 36px); overflow:auto; background:linear-gradient(180deg,#f7fbff 0%,#edf3fb 100%); border-radius:28px; border:1px solid rgba(219,231,247,.96); box-shadow:0 32px 80px rgba(15,35,78,.28); }
+    .room3d-topbar { position:sticky; top:0; z-index:5; display:flex; align-items:center; justify-content:space-between; gap:1rem; padding:1rem 1.2rem; background:rgba(247,251,255,.94); border-bottom:1px solid #dbe7f7; backdrop-filter:blur(12px); }
+    .room3d-topbar h3 { margin:0; color:var(--blue-dark); font-size:1.24rem; }
+    .room3d-topbar p { margin:.2rem 0 0; color:var(--muted); font-size:.92rem; }
+    .room3d-content { display:grid; grid-template-columns:minmax(420px,1.2fr) 430px; gap:1.1rem; padding:1.2rem; }
+    .room3d-stage { position:relative; min-height:760px; border-radius:28px; overflow:hidden; border:1px solid #dbe7f7; background:radial-gradient(circle at 50% 14%, rgba(255,255,255,.98), rgba(234,241,250,.98) 34%, rgba(215,226,241,.98) 100%); }
+    .room3d-stage::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,0) 38%), radial-gradient(circle at 26% 18%, rgba(255,255,255,.8), rgba(255,255,255,0) 34%); pointer-events:none; }
+    .room3d-stage::after { content:''; position:absolute; left:50%; bottom:4%; transform:translateX(-50%); width:58%; height:6%; border-radius:50%; background:rgba(83,104,138,.16); filter:blur(18px); pointer-events:none; }
+    .room3d-legend-bar { position:absolute; top:16px; left:16px; right:16px; z-index:3; display:flex; flex-wrap:wrap; gap:.55rem; }
+    .room3d-legend-pill { display:inline-flex; align-items:center; gap:.38rem; padding:.45rem .78rem; border-radius:999px; background:rgba(255,255,255,.92); border:1px solid #d8e5f7; color:var(--blue-dark); font-size:.78rem; font-weight:700; box-shadow:0 10px 18px rgba(31,56,100,.08); }
+    .room3d-scene { position:absolute; inset:0; display:flex; align-items:center; justify-content:center; perspective:1800px; padding:34px; }
+    .room3d-apartment { position:relative; width:min(100%,860px); aspect-ratio:1.18 / 1; transform-style:preserve-3d; transform:rotateX(58deg) rotateZ(-41deg) translateY(10px); }
+    .room3d-floor-base { position:absolute; inset:20% 10% 10% 10%; border-radius:34px; background:linear-gradient(180deg,#dcc19a 0%,#cda87a 45%,#b78b5e 100%); box-shadow:0 46px 74px rgba(72,91,129,.2), inset 0 14px 20px rgba(255,255,255,.26); }
+    .room3d-floor-finish { position:absolute; inset:22% 12% 12% 12%; border-radius:28px; background:linear-gradient(180deg,#d9b88f 0%,#c69c6d 100%); }
+    .room3d-floor-lines { position:absolute; inset:22.5% 12.5% 12.5% 12.5%; border-radius:28px; background-image:linear-gradient(rgba(255,255,255,.18) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.18) 1px, transparent 1px); background-size:46px 46px; opacity:.42; }
+    .room3d-wall-back, .room3d-wall-left, .room3d-wall-right { position:absolute; border-radius:26px; background:linear-gradient(180deg,#fbfdff 0%,#dbe6f2 100%); box-shadow:inset 0 0 0 1px rgba(156,179,210,.45); }
+    .room3d-wall-back { left:16%; right:18%; top:9%; height:24%; }
+    .room3d-wall-left { left:10%; top:16%; bottom:14%; width:16%; }
+    .room3d-wall-right { right:11%; top:18%; bottom:16%; width:15%; }
+    .room3d-ceiling-panel { position:absolute; left:18%; right:20%; top:11%; height:16%; border-radius:22px; background:linear-gradient(180deg,#f6f9fc 0%,#dde8f3 100%); box-shadow:0 18px 28px rgba(95,118,154,.12); opacity:.96; }
+    .room3d-ceiling-detail { position:absolute; left:31%; right:33%; top:14.3%; height:7.2%; border-radius:16px; background:linear-gradient(180deg,#ffffff 0%,#e7eef6 100%); box-shadow:inset 0 0 0 1px rgba(190,206,226,.7); }
+    .room3d-door-frame { position:absolute; right:18%; bottom:21%; width:13%; height:35%; border-radius:18px 18px 8px 8px; background:linear-gradient(180deg,#d2b38c 0%,#b48757 100%); box-shadow:0 16px 22px rgba(52,43,32,.16); }
+    .room3d-door-leaf { position:absolute; inset:4% 8% 3% 8%; border-radius:14px 14px 6px 6px; background:linear-gradient(180deg,#8f623d 0%,#6d472e 100%); box-shadow:inset 0 0 0 1px rgba(46,28,16,.24); }
+    .room3d-door-leaf::before { content:''; position:absolute; left:18%; right:18%; top:14%; height:36%; border-radius:12px; border:1px solid rgba(247,231,199,.18); }
+    .room3d-door-leaf::after { content:''; position:absolute; right:14%; top:49%; width:10px; height:10px; border-radius:50%; background:#f8deb0; box-shadow:0 0 0 4px rgba(255,255,255,.1); }
+    .room3d-window { position:absolute; top:18%; width:18%; height:11%; border-radius:18px; background:linear-gradient(180deg,#e0f2ff 0%,#b8d9f4 100%); border:10px solid rgba(255,255,255,.96); box-shadow:0 18px 24px rgba(82,131,185,.18); }
+    .room3d-window.w1 { left:28%; }
+    .room3d-window.w2 { left:51%; }
+    .room3d-window::before, .room3d-window::after { content:''; position:absolute; background:rgba(255,255,255,.92); }
     .room3d-window::before { width:4px; top:0; bottom:0; left:50%; transform:translateX(-50%); }
     .room3d-window::after { height:4px; left:0; right:0; top:50%; transform:translateY(-50%); }
-    .room3d-door { position:absolute; right:20%; bottom:21%; width:12%; height:32%; border-radius:18px 18px 8px 8px; background:linear-gradient(180deg,#a2774d 0%,#7c5637 100%); box-shadow:inset 0 0 0 1px rgba(66,39,20,.18), 0 18px 22px rgba(38,34,29,.14); }
-    .room3d-door::after { content:''; position:absolute; right:12%; top:46%; width:10px; height:10px; border-radius:50%; background:#f8deb0; box-shadow:0 0 0 4px rgba(255,255,255,.12); }
-    .room3d-ceiling { position:absolute; left:15%; right:17%; top:10%; height:16%; border-radius:24px; background:linear-gradient(180deg,#f4f7fb 0%,#dfe9f4 100%); opacity:.86; box-shadow:0 18px 30px rgba(98,118,150,.12); }
-    .room3d-sofa { position:absolute; left:20%; bottom:22%; width:22%; height:14%; border-radius:24px; background:linear-gradient(180deg,#bec9d8 0%,#8fa2ba 100%); box-shadow:0 16px 24px rgba(63,80,110,.18); }
-    .room3d-sofa::before { content:''; position:absolute; left:7%; right:7%; top:-26%; height:48%; border-radius:18px; background:linear-gradient(180deg,#d9e2ee 0%,#adc0d4 100%); }
-    .room3d-rug { position:absolute; left:28%; right:26%; bottom:22%; height:17%; border-radius:50%; background:radial-gradient(circle at center, rgba(230,236,246,.95), rgba(204,214,229,.95)); box-shadow:0 24px 30px rgba(70,94,128,.14); }
-    .room3d-table { position:absolute; left:44%; bottom:28%; width:14%; height:9%; border-radius:50%; background:linear-gradient(180deg,#fafbfd 0%,#d8e1ec 100%); box-shadow:0 14px 18px rgba(86,109,145,.14); }
-    .room3d-plant { position:absolute; left:60%; bottom:23%; width:9%; height:16%; }
-    .room3d-plant::before { content:''; position:absolute; left:20%; right:20%; bottom:0; height:34%; border-radius:10px 10px 14px 14px; background:linear-gradient(180deg,#b58e67 0%,#8c6544 100%); }
-    .room3d-plant::after { content:''; position:absolute; left:0; right:0; top:0; bottom:20%; border-radius:50% 50% 40% 40%; background:radial-gradient(circle at center, #8bcf8b 0%, #4ea35f 72%); }
-    .room3d-service-tags { position:absolute; inset:0; pointer-events:none; }
-    .room3d-tag { position:absolute; pointer-events:auto; min-width:170px; max-width:190px; background:rgba(255,255,255,.94); border:1px solid #d7e5f7; border-radius:18px; box-shadow:0 14px 28px rgba(31,56,100,.12); padding:.75rem .85rem; }
-    .room3d-tag strong { display:block; color:var(--blue-dark); font-size:.92rem; }
-    .room3d-tag small { display:block; margin-top:.35rem; color:var(--muted); font-size:.76rem; }
-    .room3d-tag.done { border-color:rgba(39,174,96,.38); }
-    .room3d-tag.progress { border-color:rgba(245,166,35,.4); }
-    .room3d-tag.late { border-color:rgba(232,69,69,.36); }
-    .room3d-tag.tag-contrapiso { left:8%; bottom:10%; }
-    .room3d-tag.tag-gesso { left:10%; top:12%; }
-    .room3d-tag.tag-forro { right:30%; top:8%; }
-    .room3d-tag.tag-pintura { right:7%; top:30%; }
-    .room3d-tag.tag-porta { right:6%; bottom:17%; }
+    .room3d-sofa { position:absolute; left:18%; bottom:23%; width:26%; height:16%; border-radius:26px; background:linear-gradient(180deg,#c5ceda 0%,#97a9be 100%); box-shadow:0 18px 26px rgba(63,80,110,.18); }
+    .room3d-sofa::before { content:''; position:absolute; left:6%; right:6%; top:-28%; height:50%; border-radius:18px; background:linear-gradient(180deg,#dce4ee 0%,#b0c1d3 100%); }
+    .room3d-rug { position:absolute; left:28%; right:24%; bottom:20%; height:18%; border-radius:50%; background:radial-gradient(circle at center, rgba(232,236,244,.96), rgba(204,214,229,.96)); box-shadow:0 24px 30px rgba(70,94,128,.14); }
+    .room3d-table { position:absolute; left:47%; bottom:28%; width:15%; height:10%; border-radius:50%; background:linear-gradient(180deg,#fafbfd 0%,#d8e1ec 100%); box-shadow:0 14px 18px rgba(86,109,145,.14); }
+    .room3d-tv { position:absolute; right:24%; top:25%; width:12%; height:8%; border-radius:12px; background:linear-gradient(180deg,#3a465d 0%,#161c28 100%); box-shadow:0 10px 16px rgba(33,43,66,.18); }
+    .room3d-plant { position:absolute; left:63%; bottom:22%; width:10%; height:18%; }
+    .room3d-plant::before { content:''; position:absolute; left:21%; right:21%; bottom:0; height:34%; border-radius:10px 10px 14px 14px; background:linear-gradient(180deg,#b58e67 0%,#8c6544 100%); }
+    .room3d-plant::after { content:''; position:absolute; left:0; right:0; top:0; bottom:18%; border-radius:50% 50% 40% 40%; background:radial-gradient(circle at center, #8bcf8b 0%, #4ea35f 72%); }
+    .room3d-hotspots { position:absolute; inset:0; z-index:4; }
+    .room3d-surface-btn { position:absolute; display:flex; align-items:center; gap:.45rem; padding:.7rem .9rem; border-radius:18px; border:1px solid #d7e5f7; background:rgba(255,255,255,.94); box-shadow:0 14px 28px rgba(31,56,100,.12); color:var(--blue-dark); font-weight:800; font-size:.84rem; cursor:pointer; transition:transform .18s ease, box-shadow .18s ease, border-color .18s ease; }
+    .room3d-surface-btn:hover { transform:translateY(-2px) scale(1.01); box-shadow:0 16px 32px rgba(31,56,100,.16); }
+    .room3d-surface-btn:focus-visible { outline:2px solid rgba(0,115,230,.35); outline-offset:2px; }
+    .room3d-surface-btn.active { border-color:#0d6efd; box-shadow:0 18px 34px rgba(13,110,253,.18); }
+    .room3d-surface-btn .dot { width:10px; height:10px; border-radius:50%; background:#9cb4d3; }
+    .room3d-surface-btn.done .dot { background:#27AE60; }
+    .room3d-surface-btn.progress .dot { background:#F5A623; }
+    .room3d-surface-btn.late .dot { background:#E84545; }
+    .room3d-btn-contrapiso { left:13%; bottom:10%; }
+    .room3d-btn-gesso { left:8%; top:20%; }
+    .room3d-btn-pintura { right:6%; top:30%; }
+    .room3d-btn-forro { right:33%; top:7%; }
+    .room3d-btn-porta { right:7%; bottom:17%; }
     .room3d-side { display:flex; flex-direction:column; gap:1rem; }
     .room3d-summary { background:#fff; border:1px solid #dbe7f7; border-radius:22px; padding:1rem; box-shadow:0 14px 28px rgba(31,56,100,.08); }
     .room3d-summary-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:.75rem; margin-top:.85rem; }
     .room3d-summary-card { border-radius:16px; background:#f7fbff; border:1px solid #e0ebf8; padding:.85rem; }
     .room3d-summary-card .num { font-size:1.2rem; font-weight:800; color:var(--blue-dark); }
     .room3d-services { display:grid; gap:.85rem; }
-    .room3d-service-card { background:#fff; border:1px solid #dbe7f7; border-radius:22px; padding:1rem; box-shadow:0 10px 22px rgba(31,56,100,.07); }
+    .room3d-service-card { background:#fff; border:1px solid #dbe7f7; border-radius:22px; padding:1rem; box-shadow:0 10px 22px rgba(31,56,100,.07); transition:border-color .18s ease, box-shadow .18s ease, transform .18s ease; }
+    .room3d-service-card.active { border-color:#0d6efd; box-shadow:0 18px 34px rgba(13,110,253,.14); transform:translateY(-1px); }
     .room3d-service-head { display:flex; align-items:start; justify-content:space-between; gap:.75rem; margin-bottom:.75rem; }
     .room3d-check { display:flex; align-items:center; gap:.65rem; font-weight:700; color:var(--blue-dark); }
     .room3d-check input { width:18px; height:18px; accent-color:#27AE60; }
@@ -340,8 +351,8 @@
     .room3d-photo-remove { position:absolute; top:6px; right:6px; border:none; border-radius:999px; width:28px; height:28px; background:rgba(11,20,38,.7); color:#fff; font-weight:800; }
     .room3d-empty-photos { color:var(--muted); font-size:.84rem; padding:.4rem 0 0 0; }
     .room3d-pav-note { margin-top:.6rem; color:var(--muted); font-size:.84rem; }
-    @media (max-width:1100px) { .room3d-content { grid-template-columns:1fr; } .room3d-stage { min-height:500px; } }
-    @media (max-width:640px) { .room3d-modal { padding:8px; } .room3d-topbar { padding:.9rem; } .room3d-content { padding:.85rem; } .room3d-service-fields, .room3d-summary-grid { grid-template-columns:1fr; } .room3d-tag { min-width:138px; max-width:150px; padding:.55rem .65rem; } }
+    @media (max-width:1100px) { .room3d-content { grid-template-columns:1fr; } .room3d-stage { min-height:520px; } }
+    @media (max-width:640px) { .room3d-modal { padding:8px; } .room3d-topbar { padding:.9rem; } .room3d-content { padding:.85rem; } .room3d-service-fields, .room3d-summary-grid { grid-template-columns:1fr; } .room3d-surface-btn { font-size:.76rem; padding:.55rem .65rem; } }
 
 
     /* ── Main layout ── */
@@ -1533,29 +1544,36 @@
   <div class="room3d-shell">
     <div class="room3d-topbar">
       <div>
-        <h3 id="room3dTitle">Sala virtual do pavimento</h3>
-        <p id="room3dSubtitle">Acompanhe os serviços do ambiente interno.</p>
+        <h3 id="room3dTitle">Apartamento virtual do pavimento</h3>
+        <p id="room3dSubtitle">Clique nas superfícies do ambiente para abrir o serviço correto.</p>
       </div>
       <button type="button" class="btn btn-secondary" onclick="floorRooms.close()">✕ Fechar</button>
     </div>
     <div class="room3d-content">
       <div class="room3d-stage">
+        <div class="room3d-legend-bar">
+          <span class="room3d-legend-pill">🏠 Apartamento visual</span>
+          <span class="room3d-legend-pill">🖱️ Parede, teto, chão e porta clicáveis</span>
+        </div>
         <div class="room3d-scene">
-          <div class="room3d-iso">
-            <div class="room3d-floor-slab"></div>
-            <div class="room3d-floor-grid"></div>
+          <div class="room3d-apartment">
+            <div class="room3d-floor-base"></div>
+            <div class="room3d-floor-finish"></div>
+            <div class="room3d-floor-lines"></div>
             <div class="room3d-wall-back"></div>
             <div class="room3d-wall-left"></div>
             <div class="room3d-wall-right"></div>
+            <div class="room3d-ceiling-panel"></div>
+            <div class="room3d-ceiling-detail"></div>
             <div class="room3d-window w1"></div>
             <div class="room3d-window w2"></div>
-            <div class="room3d-ceiling"></div>
-            <div class="room3d-door"></div>
+            <div class="room3d-door-frame"><div class="room3d-door-leaf"></div></div>
             <div class="room3d-rug"></div>
             <div class="room3d-sofa"></div>
             <div class="room3d-table"></div>
+            <div class="room3d-tv"></div>
             <div class="room3d-plant"></div>
-            <div class="room3d-service-tags" id="room3dServiceTags"></div>
+            <div class="room3d-hotspots" id="room3dHotspots"></div>
           </div>
         </div>
       </div>
@@ -1563,8 +1581,8 @@
         <div class="room3d-summary">
           <div style="display:flex;justify-content:space-between;gap:.8rem;align-items:flex-start;">
             <div>
-              <strong style="display:block;color:var(--blue-dark);font-size:1rem;">Controle interno do pavimento</strong>
-              <div class="room3d-pav-note">Checklist, datas previstas, fotos e rastreio visual do avanço.</div>
+              <strong style="display:block;color:var(--blue-dark);font-size:1rem;">Controle interno do apartamento</strong>
+              <div class="room3d-pav-note">Parede esquerda = gesso liso, parede direita = pintura, teto = forro, chão = contra piso e porta = instalação de porta.</div>
             </div>
             <span class="predio3d-badge" id="room3dOverallStatus">Sem dados</span>
           </div>
@@ -1579,7 +1597,6 @@
     </div>
   </div>
 </div>
-
 
 <!-- ── MODAL RT DIA A DIA ── -->
 <div id="modalRTDiaDia" class="modal">
@@ -1955,23 +1972,24 @@ const auth = {
 
 
 const floorRooms = {
-  STORAGE_KEY: 'predio3d_floor_rooms_v2',
+  STORAGE_KEY: 'predio3d_floor_rooms_v3',
   servicesTemplate: [
-    { id: 'contrapiso', nome: 'Primeiro Contra piso', tagClass: 'tag-contrapiso' },
-    { id: 'gesso', nome: 'Gesso liso', tagClass: 'tag-gesso' },
-    { id: 'forro', nome: 'Forro', tagClass: 'tag-forro' },
-    { id: 'pintura', nome: 'Pintura', tagClass: 'tag-pintura' },
-    { id: 'porta', nome: 'Instalação de porta', tagClass: 'tag-porta' }
+    { id: 'contrapiso', nome: 'Primeiro Contra piso', surfaceClass: 'room3d-btn-contrapiso', targetLabel: 'Chão', descricao: 'Clique no chão do apartamento para atualizar o contra piso.' },
+    { id: 'gesso', nome: 'Gesso liso', surfaceClass: 'room3d-btn-gesso', targetLabel: 'Parede esquerda', descricao: 'Área de gesso liso da parede interna.' },
+    { id: 'forro', nome: 'Forro', surfaceClass: 'room3d-btn-forro', targetLabel: 'Teto', descricao: 'Área de forro do teto do apartamento.' },
+    { id: 'pintura', nome: 'Pintura', surfaceClass: 'room3d-btn-pintura', targetLabel: 'Parede direita', descricao: 'Área de pintura da parede interna.' },
+    { id: 'porta', nome: 'Instalação de porta', surfaceClass: 'room3d-btn-porta', targetLabel: 'Porta', descricao: 'Instalação e acabamento da porta do ambiente.' }
   ],
   state: {},
   activeKey: null,
+  activeServiceId: null,
 
   init() {
     try {
       const saved = localStorage.getItem(this.STORAGE_KEY);
       this.state = saved ? JSON.parse(saved) : {};
     } catch (e) {
-      console.warn('Não foi possível carregar a sala virtual:', e);
+      console.warn('Não foi possível carregar o apartamento virtual:', e);
       this.state = {};
     }
     const modal = document.getElementById('room3dModal');
@@ -1984,7 +2002,7 @@ const floorRooms = {
   },
 
   save() {
-    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state)); } catch (e) { console.warn('Não foi possível salvar a sala virtual:', e); }
+    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.state)); } catch (e) { console.warn('Não foi possível salvar o apartamento virtual:', e); }
   },
 
   makeDefaultService(def) {
@@ -2007,87 +2025,34 @@ const floorRooms = {
     return this.state[key];
   },
 
-  getService(key, serviceId) {
-    const floor = this.getFloorState(key);
-    return floor.services.find(s => s.id === serviceId);
-  },
-
   getServiceStatus(service) {
-    if (!service) return 'cinza';
-    if (service.concluido) return 'verde';
-    const hasStarted = !!service.inicio || !!(service.fotos && service.fotos.length) || !!(service.observacoes || '').trim();
+    if (!service) return { key:'none', label:'Sem dados', className:'' };
+    if (service.concluido) return { key:'done', label:'Concluído', className:'done' };
+    const hoje = new Date();
+    hoje.setHours(0,0,0,0);
     if (service.previsaoFim) {
-      const prev = new Date(service.previsaoFim + 'T12:00:00');
-      const today = new Date();
-      today.setHours(0,0,0,0);
-      if (prev < today && !service.concluido) return 'vermelho';
+      const fim = new Date(`${service.previsaoFim}T00:00:00`);
+      if (!Number.isNaN(fim.getTime()) && fim < hoje) return { key:'late', label:'Atrasado', className:'late' };
     }
-    if (hasStarted) return 'amarelo';
-    return 'cinza';
+    if (service.inicio || service.previsaoFim || (service.observacoes || '').trim() || (service.fotos || []).length) {
+      return { key:'progress', label:'Em andamento', className:'progress' };
+    }
+    return { key:'none', label:'Sem dados', className:'' };
   },
 
-  getFloorStatus(key) {
-    const services = this.getFloorState(key).services;
-    if (!services.length) return 'cinza';
-    const statuses = services.map(s => this.getServiceStatus(s));
-    if (statuses.every(s => s === 'verde')) return 'verde';
-    if (statuses.includes('vermelho')) return 'vermelho';
-    if (statuses.includes('amarelo') || statuses.includes('verde')) return 'amarelo';
-    return 'cinza';
-  },
-
-  getSummary(key) {
-    const services = this.getFloorState(key).services;
-    return {
-      done: services.filter(s => s.concluido).length,
-      progress: services.filter(s => this.getServiceStatus(s) === 'amarelo').length,
-      photos: services.reduce((acc, s) => acc + ((s.fotos || []).length), 0)
-    };
-  },
-
-  getStatusLabel(status) {
-    return ({ verde:'Concluído', amarelo:'Em andamento', vermelho:'Atrasado', cinza:'Sem dados' })[status] || 'Sem dados';
-  },
-
-  compressImage(file) {
-    return new Promise((resolve, reject) => {
-      try {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            let { width, height } = img;
-            const maxWidth = 1280;
-            const maxHeight = 1280;
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = Math.round(width * ratio);
-              height = Math.round(height * ratio);
-            }
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-            let quality = 0.78;
-            let output = canvas.toDataURL('image/jpeg', quality);
-            while (output.length > 450000 && quality > 0.5) {
-              quality -= 0.06;
-              output = canvas.toDataURL('image/jpeg', quality);
-            }
-            resolve(output);
-          };
-          img.onerror = reject;
-          img.src = event.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      } catch (error) { reject(error); }
-    });
+  getOverallStatus(floorState) {
+    const services = floorState?.services || [];
+    const statuses = services.map(s => this.getServiceStatus(s).key);
+    if (!statuses.length || statuses.every(s => s === 'none')) return { label:'Sem dados', className:'' };
+    if (statuses.every(s => s === 'done')) return { label:'Concluído', className:'success' };
+    if (statuses.includes('late')) return { label:'Atrasado', className:'error' };
+    if (statuses.includes('progress') || statuses.includes('done')) return { label:'Em andamento', className:'warning' };
+    return { label:'Sem dados', className:'' };
   },
 
   open(key) {
     this.activeKey = key;
+    this.activeServiceId = this.activeServiceId || 'gesso';
     const modal = document.getElementById('room3dModal');
     if (!modal) return;
     modal.classList.add('active');
@@ -2101,134 +2066,146 @@ const floorRooms = {
     document.body.style.overflow = '';
   },
 
-  async handlePhotoInput(serviceId, input) {
-    const file = input && input.files && input.files[0];
-    if (!file || !this.activeKey) return;
-    try {
-      const service = this.getService(this.activeKey, serviceId);
-      if (!service) return;
-      const img = await this.compressImage(file);
-      service.fotos = Array.isArray(service.fotos) ? service.fotos : [];
-      service.fotos.unshift({ id: Date.now(), src: img });
-      this.getFloorState(this.activeKey).updatedAt = new Date().toISOString();
-      this.save();
-      this.render();
-      if (window.predio3D) window.predio3D.render();
-    } catch (e) {
-      console.error('Erro ao processar foto do serviço:', e);
-      if (window.app && typeof app.mostrarAlerta === 'function') app.mostrarAlerta('Não foi possível processar a foto do serviço.', 'error');
-    } finally {
-      if (input) input.value = '';
-    }
+  focusService(serviceId) {
+    this.activeServiceId = serviceId;
+    this.renderHotspots();
+    document.querySelectorAll('.room3d-service-card').forEach(card => card.classList.toggle('active', card.dataset.serviceId === serviceId));
+    const card = document.querySelector(`.room3d-service-card[data-service-id="${serviceId}"]`);
+    if (card) card.scrollIntoView({ behavior:'smooth', block:'nearest' });
   },
 
-  removePhoto(serviceId, photoId) {
+  updateService(serviceId, patch) {
     if (!this.activeKey) return;
-    const service = this.getService(this.activeKey, serviceId);
-    if (!service) return;
-    service.fotos = (service.fotos || []).filter(photo => String(photo.id) !== String(photoId));
-    this.getFloorState(this.activeKey).updatedAt = new Date().toISOString();
+    const floorState = this.getFloorState(this.activeKey);
+    floorState.services = floorState.services.map(service => service.id === serviceId ? { ...service, ...patch } : service);
+    floorState.updatedAt = new Date().toISOString();
     this.save();
     this.render();
     if (window.predio3D) window.predio3D.render();
   },
 
-  updateField(serviceId, field, value) {
-    if (!this.activeKey) return;
-    const service = this.getService(this.activeKey, serviceId);
+  async handlePhotos(event, serviceId) {
+    const files = Array.from(event.target.files || []);
+    if (!files.length) return;
+    const readers = await Promise.all(files.map(file => new Promise((resolve) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ''));
+      reader.readAsDataURL(file);
+    })));
+    const floorState = this.getFloorState(this.activeKey);
+    const service = floorState.services.find(s => s.id === serviceId);
     if (!service) return;
-    service[field] = field === 'concluido' ? !!value : value;
-    this.getFloorState(this.activeKey).updatedAt = new Date().toISOString();
+    service.fotos = [...(service.fotos || []), ...readers.filter(Boolean)].slice(0, 12);
+    floorState.updatedAt = new Date().toISOString();
+    this.save();
+    this.render();
+    if (window.predio3D) window.predio3D.render();
+    event.target.value = '';
+  },
+
+  removePhoto(serviceId, index) {
+    const floorState = this.getFloorState(this.activeKey);
+    const service = floorState.services.find(s => s.id === serviceId);
+    if (!service) return;
+    service.fotos = (service.fotos || []).filter((_, idx) => idx !== index);
+    floorState.updatedAt = new Date().toISOString();
     this.save();
     this.render();
     if (window.predio3D) window.predio3D.render();
   },
 
-  renderTags(key) {
-    const box = document.getElementById('room3dServiceTags');
-    if (!box) return;
-    const services = this.getFloorState(key).services;
-    box.innerHTML = this.servicesTemplate.map(def => {
-      const svc = services.find(s => s.id === def.id) || this.makeDefaultService(def);
-      const status = this.getServiceStatus(svc);
-      const statusClass = status === 'verde' ? 'done' : status === 'vermelho' ? 'late' : status === 'amarelo' ? 'progress' : '';
-      return `<div class="room3d-tag ${def.tagClass} ${statusClass}" onclick="floorRooms.scrollToService('${def.id}')"><strong>${def.nome}</strong><small>${this.getStatusLabel(status)}</small></div>`;
+  renderHotspots() {
+    const container = document.getElementById('room3dHotspots');
+    if (!container || !this.activeKey) return;
+    const floorState = this.getFloorState(this.activeKey);
+    container.innerHTML = this.servicesTemplate.map(def => {
+      const service = floorState.services.find(s => s.id === def.id) || this.makeDefaultService(def);
+      const status = this.getServiceStatus(service);
+      const active = this.activeServiceId === def.id ? 'active' : '';
+      return `<button type="button" class="room3d-surface-btn ${def.surfaceClass} ${status.className} ${active}" onclick="floorRooms.focusService('${def.id}')"><span class="dot"></span>${def.targetLabel}</button>`;
     }).join('');
-  },
-
-  scrollToService(serviceId) {
-    const el = document.getElementById(`room3d-card-${serviceId}`);
-    if (el) el.scrollIntoView({ behavior:'smooth', block:'center' });
   },
 
   render() {
     if (!this.activeKey) return;
-    const selected = window.predio3D ? window.predio3D.findFloorByKey(this.activeKey) : null;
+    const floorState = this.getFloorState(this.activeKey);
+    const [torre, pavimento] = String(this.activeKey).split('||');
     const title = document.getElementById('room3dTitle');
     const subtitle = document.getElementById('room3dSubtitle');
-    const list = document.getElementById('room3dServices');
-    const overall = document.getElementById('room3dOverallStatus');
-    const sDone = document.getElementById('room3dSummaryDone');
-    const sProg = document.getElementById('room3dSummaryProgress');
-    const sPhotos = document.getElementById('room3dSummaryPhotos');
-    if (!title || !subtitle || !list || !overall || !sDone || !sProg || !sPhotos) return;
+    if (title) title.textContent = `Apartamento virtual • ${torre || '-'} • ${pavimento || '-'}`;
+    if (subtitle) subtitle.textContent = 'Clique nas superfícies do ambiente para abrir o serviço correspondente.';
 
-    const floorState = this.getFloorState(this.activeKey);
-    const floorStatus = this.getFloorStatus(this.activeKey);
-    const summary = this.getSummary(this.activeKey);
-    const infosRt = selected && Array.isArray(selected.items) ? selected.items : [];
+    const totalDone = floorState.services.filter(service => service.concluido).length;
+    const totalProgress = floorState.services.filter(service => this.getServiceStatus(service).key === 'progress').length;
+    const totalPhotos = floorState.services.reduce((acc, service) => acc + (service.fotos || []).length, 0);
+    const overall = this.getOverallStatus(floorState);
 
-    title.textContent = selected ? `Sala virtual • ${selected.torre} • ${selected.floor}` : 'Sala virtual do pavimento';
-    subtitle.textContent = infosRt.length ? `RTs vinculadas visualmente: ${infosRt.length} item(ns). O andamento do pavimento agora é controlado pelos serviços internos.` : 'O andamento do pavimento agora é controlado pelos serviços internos.';
-    overall.textContent = this.getStatusLabel(floorStatus);
-    sDone.textContent = String(summary.done);
-    sProg.textContent = String(summary.progress);
-    sPhotos.textContent = String(summary.photos);
-    this.renderTags(this.activeKey);
+    const overallEl = document.getElementById('room3dOverallStatus');
+    if (overallEl) {
+      overallEl.textContent = overall.label;
+      overallEl.className = `predio3d-badge ${overall.className || ''}`.trim();
+    }
+    const doneEl = document.getElementById('room3dSummaryDone'); if (doneEl) doneEl.textContent = String(totalDone);
+    const progressEl = document.getElementById('room3dSummaryProgress'); if (progressEl) progressEl.textContent = String(totalProgress);
+    const photosEl = document.getElementById('room3dSummaryPhotos'); if (photosEl) photosEl.textContent = String(totalPhotos);
 
-    list.innerHTML = this.servicesTemplate.map(def => {
-      const svc = floorState.services.find(s => s.id === def.id) || this.makeDefaultService(def);
-      const status = this.getServiceStatus(svc);
-      const photos = (svc.fotos || []).map(photo => `
-        <div class="room3d-photo-item">
-          <img src="${photo.src}" alt="${def.nome}">
-          <button type="button" class="room3d-photo-remove" onclick="floorRooms.removePhoto('${def.id}','${photo.id}')">×</button>
-        </div>`).join('');
+    if (!this.activeServiceId || !floorState.services.some(service => service.id === this.activeServiceId)) {
+      this.activeServiceId = 'gesso';
+    }
+
+    const container = document.getElementById('room3dServices');
+    if (!container) return;
+    container.innerHTML = floorState.services.map(service => {
+      const def = this.servicesTemplate.find(item => item.id === service.id) || { targetLabel: 'Área' };
+      const status = this.getServiceStatus(service);
+      const activeClass = this.activeServiceId === service.id ? 'active' : '';
       return `
-        <div class="room3d-service-card" id="room3d-card-${def.id}">
+        <div class="room3d-service-card ${activeClass}" data-service-id="${service.id}">
           <div class="room3d-service-head">
             <label class="room3d-check">
-              <input type="checkbox" ${svc.concluido ? 'checked' : ''} onchange="floorRooms.updateField('${def.id}','concluido', this.checked)">
-              <span>${def.nome}</span>
+              <input type="checkbox" ${service.concluido ? 'checked' : ''} onchange="floorRooms.updateService('${service.id}', { concluido: this.checked })" />
+              <span>${service.nome}</span>
             </label>
-            <span class="room3d-status-chip">${this.getStatusLabel(status)}</span>
+            <span class="room3d-status-chip">${status.label}</span>
           </div>
+          <div style="margin:-.15rem 0 .8rem;color:var(--muted);font-size:.82rem;"><strong style="color:var(--blue-dark);">Superfície:</strong> ${def.targetLabel} • ${def.descricao || ''}</div>
           <div class="room3d-service-fields">
             <div>
               <label>Início do serviço</label>
-              <input type="date" value="${svc.inicio || ''}" onchange="floorRooms.updateField('${def.id}','inicio', this.value)">
+              <input type="date" value="${service.inicio || ''}" onchange="floorRooms.updateService('${service.id}', { inicio: this.value })" />
             </div>
             <div>
               <label>Data prevista de finalização</label>
-              <input type="date" value="${svc.previsaoFim || ''}" onchange="floorRooms.updateField('${def.id}','previsaoFim', this.value)">
+              <input type="date" value="${service.previsaoFim || ''}" onchange="floorRooms.updateService('${service.id}', { previsaoFim: this.value })" />
             </div>
             <div class="field-full">
-              <label>Observações do serviço</label>
-              <textarea placeholder="Anotações, pendências, equipe, acabamento..." oninput="floorRooms.updateField('${def.id}','observacoes', this.value)">${svc.observacoes || ''}</textarea>
+              <label>Checklist / observações</label>
+              <textarea onchange="floorRooms.updateService('${service.id}', { observacoes: this.value })" placeholder="Descreva o andamento, pendências e conferências feitas.">${service.observacoes || ''}</textarea>
             </div>
             <div class="field-full">
               <label>Fotos do serviço</label>
               <div class="room3d-upload-row">
-                <input id="room3d-upload-${def.id}" type="file" accept="image/*" style="display:none;" onchange="floorRooms.handlePhotoInput('${def.id}', this)">
-                <input id="room3d-camera-${def.id}" type="file" accept="image/*" capture="environment" style="display:none;" onchange="floorRooms.handlePhotoInput('${def.id}', this)">
-                <button type="button" class="btn btn-secondary" onclick="document.getElementById('room3d-upload-${def.id}').click()">🖼️ Adicionar foto</button>
-                <button type="button" class="btn btn-primary" onclick="document.getElementById('room3d-camera-${def.id}').click()">📷 Tirar foto</button>
+                <label class="btn btn-secondary" style="cursor:pointer;">
+                  📷 Adicionar foto
+                  <input type="file" accept="image/*" multiple style="display:none;" onchange="floorRooms.handlePhotos(event, '${service.id}')" />
+                </label>
               </div>
-              ${photos ? `<div class="room3d-photo-grid">${photos}</div>` : `<div class="room3d-empty-photos">Nenhuma foto adicionada ainda.</div>`}
+              <div class="room3d-photo-grid">
+                ${(service.fotos || []).length ? (service.fotos || []).map((foto, idx) => `
+                  <div class="room3d-photo-item">
+                    <img src="${foto}" alt="Foto do serviço ${service.nome}" />
+                    <button type="button" class="room3d-photo-remove" onclick="floorRooms.removePhoto('${service.id}', ${idx})">×</button>
+                  </div>
+                `).join('') : `<div class="room3d-empty-photos">Nenhuma foto adicionada ainda.</div>`}
+              </div>
             </div>
           </div>
-        </div>`;
+        </div>
+      `;
     }).join('');
+
+    this.renderHotspots();
+    setTimeout(() => this.focusService(this.activeServiceId), 0);
   }
 };
 
