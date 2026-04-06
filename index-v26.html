@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sistema de Controle de Obras - Plano & Plano</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --blue-dark: #1F3864;
+      --blue-mid: #2E75B6;
+      --blue-light: #DDEEFF;
+      --accent: #E84545;
+      --success: #27AE60;
+      --warning: #F5A623;
+      --bg: #F0F4FA;
+      --card: #FFFFFF;
+      --text: #1a2340;
+      --muted: #6b7a99;
+      --radius: 14px;
+      --shadow: 0 4px 24px rgba(31,56,100,.10);
+    }
+
+    html { scroll-behavior: smooth; }
+    
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 1rem 2rem;
+      box-shadow: var(--shadow);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    nav {
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    nav a {
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+      transition: opacity 0.2s;
+    }
+
+    nav a:hover {
+      opacity: 0.8;
+    }
+
+    .btn-nav {
+      background: rgba(255,255,255,0.2);
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      transition: all 0.2s;
+    }
+
+    .btn-nav:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Hero */
+    .hero {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 4rem 2rem;
+      text-align: center;
+    }
+
+    .hero-content {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .hero h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+      font-weight: 800;
+    }
+
+    .hero p {
+      font-size: 1.3rem;
+      opacity: 0.95;
+      margin-bottom: 2rem;
+    }
+
+    .hero-buttons {
+      display: flex;
+      gap: 1rem;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 1rem 2rem;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .btn-primary {
+      background: #fff;
+      color: var(--blue-dark);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255,255,255,0.2);
+      color: #fff;
+      border: 2px solid #fff;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255,255,255,0.3);
+    }
+
+    /* Container */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Features */
+    .features {
+      padding: 4rem 2rem;
+      background: var(--bg);
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .feature-card {
+      background: var(--card);
+      padding: 2rem;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      border: 1px solid #dbe7f7;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 36px rgba(31,56,100,.15);
+    }
+
+    .feature-icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+
+    .feature-card h3 {
+      color: var(--blue-dark);
+      margin-bottom: 1rem;
+      font-size: 1.3rem;
+    }
+
+    .feature-card p {
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    /* Modules */
+    .modules {
+      padding: 4rem 2rem;
+      background: #fff;
+    }
+
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      margin-top: 3rem;
+    }
+
+    .module-card {
+      background: var(--card);
+      border-radius: var(--radius);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+      border: 1px solid #dbe7f7;
+      transition: all 0.3s;
+    }
+
+    .module-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 36px rgba(31,56,100,.15);
+    }
+
+    .module-header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 2rem;
+      text-align: center;
+    }
+
+    .module-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .module-header h3 {
+      font-size: 1.3rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .module-body {
+      padding: 1.5rem;
+    }
+
+    .module-body p {
+      color: var(--muted);
+      margin-bottom: 1rem;
+      line-height: 1.6;
+    }
+
+    .module-features {
+      list-style: none;
+      margin-bottom: 1.5rem;
+    }
+
+    .module-features li {
+      color: var(--muted);
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #eef2f7;
+    }
+
+    .module-features li:before {
+      content: "✓ ";
+      color: var(--success);
+      font-weight: 700;
+      margin-right: 0.5rem;
+    }
+
+    .module-features li:last-child {
+      border-bottom: none;
+    }
+
+    .module-btn {
+      width: 100%;
+      padding: 0.8rem;
+      background: var(--blue-mid);
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .module-btn:hover {
+      background: var(--blue-dark);
+      transform: translateY(-2px);
+    }
+
+    /* Stats */
+    .stats {
+      padding: 4rem 2rem;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+    }
+
+    .stat-item {
+      text-align: center;
+    }
+
+    .stat-number {
+      font-size: 2.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-label {
+      font-size: 1rem;
+      opacity: 0.9;
+    }
+
+    /* Footer */
+    footer {
+      background: var(--blue-dark);
+      color: #fff;
+      padding: 3rem 2rem;
+      text-align: center;
+    }
+
+    .footer-content {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+      margin-bottom: 2rem;
+      text-align: left;
+    }
+
+    .footer-section h4 {
+      margin-bottom: 1rem;
+      font-size: 1.1rem;
+    }
+
+    .footer-section ul {
+      list-style: none;
+    }
+
+    .footer-section li {
+      margin-bottom: 0.5rem;
+      opacity: 0.9;
+    }
+
+    .footer-section a {
+      color: #fff;
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .footer-section a:hover {
+      opacity: 0.7;
+    }
+
+    .footer-bottom {
+      border-top: 1px solid rgba(255,255,255,0.1);
+      padding-top: 2rem;
+      opacity: 0.8;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      nav {
+        flex-direction: column;
+        gap: 1rem;
+        width: 100%;
+      }
+
+      nav a {
+        display: block;
+      }
+
+      .hero h1 {
+        font-size: 2rem;
+      }
+
+      .hero p {
+        font-size: 1rem;
+      }
+
+      .hero-buttons {
+        flex-direction: column;
+      }
+
+      .btn {
+        width: 100%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header>
+    <div class="header-content">
+      <div class="logo">🏗️ Plano & Plano</div>
+      <nav>
+        <a href="#features">Recursos</a>
+        <a href="#modules">Módulos</a>
+        <a href="#demo">Demo</a>
+        <a href="sala3d.html" class="btn-nav">Entrar no Sistema</a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>🏢 Sistema de Controle de Obras v26</h1>
+      <p>Gerenciamento completo de materiais, serviços e rastreabilidade em tempo real</p>
+      <div class="hero-buttons">
+        <a href="sala3d.html" class="btn btn-primary">🚀 Acessar Sistema</a>
+        <a href="demo.html" class="btn btn-secondary">👁️ Ver Demonstração</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features" id="features">
+    <div class="container">
+      <h2 style="text-align: center; color: var(--blue-dark); font-size: 2rem; margin-bottom: 1rem;">✨ Principais Recursos</h2>
+      <p style="text-align: center; color: var(--muted); margin-bottom: 2rem; font-size: 1.1rem;">
+        Tudo que você precisa para gerenciar sua obra com eficiência
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon">🏠</div>
+          <h3>Prédio 3D Interativo</h3>
+          <p>Visualize sua obra em 3D e clique nos pavimentos para gerenciar serviços de forma intuitiva</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📸</div>
+          <h3>Fotos e Documentação</h3>
+          <p>Adicione até 5 fotos por serviço para documentar o progresso e manter histórico visual</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📋</div>
+          <h3>Checklist de Serviços</h3>
+          <p>Marque serviços como concluídos com datas de início e previsão de finalização</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">📦</div>
+          <h3>Controle de Materiais</h3>
+          <p>Requisições automáticas com entrada direta no estoque ao marcar como entregue</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">🧾</div>
+          <h3>Rastreabilidade Completa</h3>
+          <p>Histórico de entrada e saída de materiais com responsável e motivo</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-icon">⚡</div>
+          <h3>Sincronização em Tempo Real</h3>
+          <p>Dados sincronizados instantaneamente entre todos os usuários do sistema</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Modules -->
+  <section class="modules" id="modules">
+    <div class="container">
+      <h2 style="text-align: center; color: var(--blue-dark); font-size: 2rem; margin-bottom: 1rem;">📊 Módulos do Sistema</h2>
+      
+      <div class="modules-grid">
+        <!-- Sala 3D -->
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon">🏠</div>
+            <h3>Sala 3D</h3>
+            <p style="font-size: 0.9rem; opacity: 0.9;">Ambiente imersivo</p>
+          </div>
+          <div class="module-body">
+            <p>Visualize e gerencie serviços em um ambiente 3D realista de sala de estar.</p>
+            <ul class="module-features">
+              <li>Câmera interativa (mouse)</li>
+              <li>Clique para abrir serviços</li>
+              <li>5 áreas de trabalho</li>
+              <li>Fotos e datas</li>
+            </ul>
+            <a href="sala3d.html" class="module-btn">Abrir Sala 3D →</a>
+          </div>
+        </div>
+
+        <!-- Prédio 3D -->
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon">🏢</div>
+            <h3>Prédio 3D</h3>
+            <p style="font-size: 0.9rem; opacity: 0.9;">Visualização de torres</p>
+          </div>
+          <div class="module-body">
+            <p>Veja todos os pavimentos das torres e o status de conclusão de serviços.</p>
+            <ul class="module-features">
+              <li>Múltiplas torres</li>
+              <li>Cores por status</li>
+              <li>Resumo de progresso</li>
+              <li>Clique para detalhes</li>
+            </ul>
+            <a href="demo.html" class="module-btn">Ver Prédio 3D →</a>
+          </div>
+        </div>
+
+        <!-- RTs -->
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon">📋</div>
+            <h3>Requisições (RTs)</h3>
+            <p style="font-size: 0.9rem; opacity: 0.9;">Planejamento de materiais</p>
+          </div>
+          <div class="module-body">
+            <p>Crie e gerencie requisições de materiais com status e rastreamento.</p>
+            <ul class="module-features">
+              <li>Criar novas RTs</li>
+              <li>Alterar status</li>
+              <li>Entrada automática</li>
+              <li>Histórico completo</li>
+            </ul>
+            <a href="demo.html" class="module-btn">Gerenciar RTs →</a>
+          </div>
+        </div>
+
+        <!-- Materiais -->
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon">📦</div>
+            <h3>Controle de Materiais</h3>
+            <p style="font-size: 0.9rem; opacity: 0.9;">Estoque em tempo real</p>
+          </div>
+          <div class="module-body">
+            <p>Acompanhe materiais em estoque com entrada automática via RTs.</p>
+            <ul class="module-features">
+              <li>Entrada automática</li>
+              <li>Quantidade em tempo real</li>
+              <li>Origem rastreável</li>
+              <li>Histórico de movimentação</li>
+            </ul>
+            <a href="demo.html" class="module-btn">Ver Estoque →</a>
+          </div>
+        </div>
+
+        <!-- Rastreabilidade -->
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon">🧾</div>
+            <h3>Rastreabilidade</h3>
+            <p style="font-size: 0.9rem; opacity: 0.9;">Histórico de movimentações</p>
+          </div>
+          <div class="module-body">
+            <p>Acompanhe entrada e saída de materiais com responsável e motivo.</p>
+            <ul class="module-features">
+              <li>Entrada via RT</li>
+              <li>Saída registrada</li>
+              <li>Responsável</li>
+              <li>Data e hora</li>
+            </ul>
+            <a href="demo.html" class="module-btn">Ver Histórico →</a>
+          </div>
+        </div>
+
+        <!-- Documentação -->
+        <div class="module-card">
+          <div class="module-header">
+            <div class="module-icon">📚</div>
+            <h3>Documentação</h3>
+            <p style="font-size: 0.9rem; opacity: 0.9;">Guias e referências</p>
+          </div>
+          <div class="module-body">
+            <p>Acesse guias completos de integração e uso do sistema.</p>
+            <ul class="module-features">
+              <li>Guia de demo</li>
+              <li>Integração passo a passo</li>
+              <li>Arquitetura do sistema</li>
+              <li>FAQ e troubleshooting</li>
+            </ul>
+            <button class="module-btn" onclick="alert('Documentação disponível no arquivo ZIP')">Acessar Docs →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats">
+    <div class="container">
+      <h2 style="text-align: center; font-size: 2rem; margin-bottom: 1rem;">📈 Resultados</h2>
+      
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Serviços por Pavimento</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">∞</div>
+          <div class="stat-label">Fotos por Serviço</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">100%</div>
+          <div class="stat-label">Rastreabilidade</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-number">⚡</div>
+          <div class="stat-label">Tempo Real</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" style="padding: 4rem 2rem; background: var(--bg);">
+    <div class="container">
+      <h2 style="text-align: center; color: var(--blue-dark); font-size: 2rem; margin-bottom: 2rem;">🎬 Teste Agora</h2>
+      
+      <div style="background: var(--card); padding: 2rem; border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid #dbe7f7;">
+        <h3 style="color: var(--blue-dark); margin-bottom: 1rem;">Escolha como começar:</h3>
+        
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem;">
+          <div style="padding: 1.5rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid var(--blue-mid);">
+            <h4 style="color: var(--blue-dark); margin-bottom: 0.5rem;">🏠 Sala 3D Imersiva</h4>
+            <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.9rem;">Ambiente 3D realista com janelas de serviços flutuantes</p>
+            <a href="sala3d.html" class="btn btn-primary" style="display: block; text-align: center;">Abrir Sala 3D</a>
+          </div>
+
+          <div style="padding: 1.5rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid var(--success);">
+            <h4 style="color: var(--blue-dark); margin-bottom: 0.5rem;">🏢 Prédio 3D + RTs</h4>
+            <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.9rem;">Visualize torres, crie RTs e teste entrada automática</p>
+            <a href="demo.html" class="btn btn-primary" style="display: block; text-align: center;">Ver Demonstração</a>
+          </div>
+
+          <div style="padding: 1.5rem; background: #f8fafc; border-radius: 8px; border-left: 4px solid var(--warning);">
+            <h4 style="color: var(--blue-dark); margin-bottom: 0.5rem;">📚 Documentação</h4>
+            <p style="color: var(--muted); margin-bottom: 1rem; font-size: 0.9rem;">Leia guias de integração e arquitetura</p>
+            <button class="btn btn-primary" onclick="alert('Documentação incluída no arquivo ZIP')" style="display: block; width: 100%;">Ver Docs</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <div class="footer-content">
+      <div class="footer-grid">
+        <div class="footer-section">
+          <h4>🏗️ Plano & Plano</h4>
+          <p style="margin-bottom: 1rem;">Sistema completo de controle de obras e materiais</p>
+        </div>
+
+        <div class="footer-section">
+          <h4>Módulos</h4>
+          <ul>
+            <li><a href="sala3d.html">Sala 3D</a></li>
+            <li><a href="demo.html">Prédio 3D</a></li>
+            <li><a href="demo.html">RTs</a></li>
+            <li><a href="demo.html">Materiais</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Recursos</h4>
+          <ul>
+            <li><a href="#features">Recursos</a></li>
+            <li><a href="#modules">Módulos</a></li>
+            <li><a href="#demo">Demo</a></li>
+            <li><a href="#">Documentação</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-section">
+          <h4>Versão 26</h4>
+          <ul>
+            <li>✅ Prédio 3D Independente</li>
+            <li>✅ Serviços com Fotos</li>
+            <li>✅ Entrada Automática</li>
+            <li>✅ Rastreabilidade Completa</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>&copy; 2026 Plano & Plano. Todos os direitos reservados.</p>
+        <p style="margin-top: 0.5rem; font-size: 0.9rem;">Sistema de Controle de Obras - Versão 26</p>
+      </div>
+    </div>
+  </footer>
+</body>
+</html>
