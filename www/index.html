@@ -246,6 +246,35 @@
     .predio3d-cinza .roof, .predio3d-cinza .side { background:#869798; }
     .predio3d-floor-item small { color:var(--muted); display:block; margin-top:.2rem; }
     .predio3d-empty { padding:2rem; text-align:center; color:var(--muted); }
+
+    .predio3d-room-shell { position:relative; width:100%; min-height:760px; display:flex; align-items:center; justify-content:center; perspective:1700px; overflow:hidden; }
+    .predio3d-room-scene { position:relative; width:720px; height:470px; transform-style:preserve-3d; transform:rotateX(10deg) rotateY(-18deg) scale(1); }
+    .predio3d-room-floor { position:absolute; left:80px; top:245px; width:520px; height:180px; background:linear-gradient(180deg,#e1c59b,#cda36d); transform:rotateX(90deg) translateZ(-90px); box-shadow:0 25px 60px rgba(31,56,100,.18); }
+    .predio3d-room-wall-back { position:absolute; left:80px; top:75px; width:520px; height:170px; background:linear-gradient(180deg,#fdfefe,#edf4ff); border:1px solid #dbe7f7; box-shadow:0 20px 40px rgba(31,56,100,.08) inset; }
+    .predio3d-room-wall-left { position:absolute; left:0; top:75px; width:80px; height:170px; background:linear-gradient(180deg,#eef3fb,#dfeaf9); transform-origin:right center; transform:rotateY(74deg); border:1px solid #dbe7f7; }
+    .predio3d-room-window { position:absolute; top:105px; width:96px; height:74px; background:linear-gradient(180deg,#bde0ff,#e9f7ff); border:6px solid #9ec2e8; box-shadow:inset 0 0 0 3px rgba(255,255,255,.45); }
+    .predio3d-room-window.w1 { left:132px; } .predio3d-room-window.w2 { left:262px; } .predio3d-room-window.w3 { left:392px; }
+    .predio3d-room-door { position:absolute; right:62px; top:96px; width:74px; height:148px; background:linear-gradient(180deg,#c58e57,#a66f3e); border:6px solid #8f633a; border-bottom:none; }
+    .predio3d-room-label { position:absolute; left:98px; top:26px; background:rgba(255,255,255,.96); border:1px solid #dbe7f7; border-radius:14px; padding:.7rem 1rem; box-shadow:0 14px 28px rgba(31,56,100,.1); color:var(--blue-dark); min-width:300px; }
+    .predio3d-service-nodes { position:absolute; inset:0; pointer-events:none; }
+    .predio3d-service-node { position:absolute; width:150px; background:rgba(255,255,255,.97); border:1px solid #dbe7f7; border-radius:16px; padding:.7rem .8rem; box-shadow:0 18px 35px rgba(31,56,100,.14); pointer-events:auto; cursor:pointer; }
+    .predio3d-service-node strong { display:block; color:var(--blue-dark); font-size:.9rem; } .predio3d-service-node small { color:var(--muted); }
+    .predio3d-service-node.done { border-color:#27AE60; box-shadow:0 0 0 2px rgba(39,174,96,.12),0 18px 35px rgba(31,56,100,.14); }
+    .predio3d-service-node.late { border-color:#E84545; box-shadow:0 0 0 2px rgba(232,69,69,.12),0 18px 35px rgba(31,56,100,.14); }
+    .predio3d-service-node.n1 { left:16px; top:98px; } .predio3d-service-node.n2 { left:24px; top:255px; } .predio3d-service-node.n3 { left:288px; top:308px; } .predio3d-service-node.n4 { right:18px; top:120px; } .predio3d-service-node.n5 { right:4px; top:290px; }
+    .predio3d-service-card { background:#f8fbff; border:1px solid #e3edf9; border-radius:14px; padding:.85rem; margin-bottom:.7rem; }
+    .predio3d-service-card h4 { margin:0 0 .6rem 0; color:var(--blue-dark); }
+    .predio3d-service-grid { display:grid; grid-template-columns:1fr 1fr; gap:.7rem; margin-top:.75rem; }
+    .predio3d-service-card label { font-size:.82rem; color:var(--muted); display:block; margin-bottom:.28rem; }
+    .predio3d-service-card input[type="date"], .predio3d-service-card input[type="text"], .predio3d-service-card textarea { width:100%; padding:.55rem .65rem; border:1px solid #d6e3f4; border-radius:10px; background:#fff; }
+    .predio3d-service-card textarea { min-height:72px; resize:vertical; }
+    .predio3d-service-check { display:flex; align-items:center; gap:.55rem; margin-bottom:.55rem; font-weight:700; color:var(--blue-dark); }
+    .predio3d-photo-list { display:flex; flex-wrap:wrap; gap:.6rem; margin-top:.7rem; }
+    .predio3d-photo-item { position:relative; width:82px; height:82px; border-radius:12px; overflow:hidden; border:1px solid #dbe7f7; background:#eef5ff; }
+    .predio3d-photo-item img { width:100%; height:100%; object-fit:cover; }
+    .predio3d-photo-item button { position:absolute; top:4px; right:4px; border:none; border-radius:999px; width:24px; height:24px; background:rgba(0,0,0,.68); color:#fff; cursor:pointer; }
+    @media (max-width:980px) { .predio3d-room-shell { min-height:620px; } .predio3d-room-scene { transform:scale(.78) rotateX(8deg) rotateY(-16deg); } .predio3d-service-grid { grid-template-columns:1fr; } }
+
     @media (max-width:980px) { .predio3d-layout { grid-template-columns:1fr; } .predio3d-stage, .predio3d-viewport { min-height:620px; } .predio3d-scene { gap:42px; padding:120px 18px 54px; } .predio3d-building { width:150px; } .predio3d-floor, .predio3d-floor .front, .predio3d-floor .back, .predio3d-floor .roof { width:150px; } }
     .predio3d-verde .front, .predio3d-dot.verde { background:#27AE60; }
     .predio3d-verde .top, .predio3d-verde .side { background:#239a55; }
@@ -875,24 +904,7 @@
       }
     }
 
-
-    .servico-window { background:#f8fbff; border:1px solid #dbe7f7; border-radius:14px; padding:.9rem; display:grid; gap:.75rem; }
-    .servico-window.done { border-color:#bfe6cb; background:#f7fffa; }
-    .servico-window .title-row { display:flex; align-items:center; justify-content:space-between; gap:.6rem; }
-    .servico-window .title-row strong { color:var(--blue-dark); }
-    .servico-window .service-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.65rem; }
-    .servico-window .service-field { display:grid; gap:.25rem; }
-    .servico-window label { font-size:.78rem; color:var(--muted); font-weight:700; }
-    .servico-window input[type='date'], .servico-window input[type='file'] { width:100%; padding:.55rem .65rem; border:1px solid #d8e3f3; border-radius:10px; background:#fff; }
-    .servico-window .checkline { display:flex; align-items:center; gap:.5rem; font-weight:700; color:var(--blue-dark); }
-    .servico-window .photo-list { display:flex; flex-wrap:wrap; gap:.6rem; }
-    .servico-window .photo-thumb { position:relative; width:92px; height:92px; border-radius:12px; overflow:hidden; background:#eef4ff; border:1px solid #dbe7f7; }
-    .servico-window .photo-thumb img { width:100%; height:100%; object-fit:cover; }
-    .servico-window .photo-thumb button { position:absolute; right:4px; top:4px; border:none; background:rgba(232,69,69,.92); color:#fff; width:24px; height:24px; border-radius:999px; cursor:pointer; font-size:.8rem; }
-    .predio3d-interior-header { margin:.25rem 0 .85rem; color:var(--muted); font-size:.88rem; }
-    .predio3d-interior-grid { display:grid; gap:.8rem; }
-    
-  </style>
+</style>
 </head>
 <body>
 
@@ -1180,11 +1192,12 @@
           <select id="predio3dTower" onchange="predio3D.render()"></select>
         </div>
         <button class="btn btn-secondary" onclick="predio3D.resetView()">↺ Resetar visão</button>
+        <button class="btn btn-warning" id="predio3dBackBtn" style="display:none;" onclick="predio3D.closeRoom()">← Voltar ao prédio</button>
         <button class="btn btn-success" onclick="predio3D.gerarPdf()">📄 PDF do 3D PRÉDIO</button>
       </div>
       <div class="predio3d-layout">
         <div class="predio3d-stage">
-          <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento para abrir o interior</div>
+          <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento</div>
           <div id="predio3dViewport" class="predio3d-viewport">
             <div id="predio3dBuilding" class="predio3d-building"></div>
           </div>
@@ -1846,12 +1859,56 @@ const auth = {
 
 // ── 3D PRÉDIO ──
 const predio3D = {
+  STORAGE_KEY: 'predio3d_servicos_por_pavimento_v2',
   towerConfig: { 'Torre A': 18, 'Torre B': 20 },
-  state: { rotateX: -16, rotateY: -26, scale: 1, selectedKey: null, tower: 'all', dragging: false, startX: 0, startY: 0, baseRotateX: -16, baseRotateY: -26 },
+  state: { rotateX: -16, rotateY: -26, scale: 1, selectedKey: null, tower: 'all', dragging: false, startX: 0, startY: 0, baseRotateX: -16, baseRotateY: -26, roomOpen: false, activeServiceId: null },
   controlsBound: false,
-  STORAGE_KEY: 'predio3d_servicos_pavimento_v1',
-  servicosBase: ['Contra piso','Gesso liso','Forro','Pintura','Instalação de porta'],
+  serviceTemplates: [
+    { id: 'contra_piso', nome: 'Primeiro Contra piso' },
+    { id: 'gesso_liso', nome: 'Gesso liso' },
+    { id: 'forro', nome: 'Forro' },
+    { id: 'pintura', nome: 'Pintura' },
+    { id: 'instalacao_porta', nome: 'Instalação de porta' }
+  ],
+  servicePositions: {
+    contra_piso: 'n1',
+    gesso_liso: 'n2',
+    forro: 'n3',
+    pintura: 'n4',
+    instalacao_porta: 'n5'
+  },
+  floorServiceData: {},
 
+  loadFloorServiceData() {
+    if (Object.keys(this.floorServiceData || {}).length) return;
+    try { this.floorServiceData = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{}') || {}; }
+    catch (e) { this.floorServiceData = {}; }
+  },
+  async saveFloorServiceData() {
+    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.floorServiceData || {})); } catch (e) {}
+  },
+  getDefaultServices() {
+    return this.serviceTemplates.map(s => ({ id: s.id, nome: s.nome, checked: false, dataInicio: '', dataPrevistaFim: '', observacoes: '', fotos: [] }));
+  },
+  ensureFloorServices(key) {
+    this.loadFloorServiceData();
+    if (!this.floorServiceData[key]) {
+      this.floorServiceData[key] = { services: this.getDefaultServices(), updatedAt: new Date().toISOString() };
+    } else if (!Array.isArray(this.floorServiceData[key].services)) {
+      this.floorServiceData[key].services = this.getDefaultServices();
+    } else {
+      const existing = this.floorServiceData[key].services;
+      this.floorServiceData[key].services = this.serviceTemplates.map(t => {
+        const found = existing.find(x => x.id === t.id || x.nome === t.nome) || {};
+        return { id: t.id, nome: t.nome, checked: !!found.checked, dataInicio: found.dataInicio || '', dataPrevistaFim: found.dataPrevistaFim || '', observacoes: found.observacoes || '', fotos: Array.isArray(found.fotos) ? found.fotos : [] };
+      });
+    }
+    return this.floorServiceData[key].services;
+  },
+  getServicesForFloor(torre, floor) {
+    const key = this.makeFloorKey(torre, floor);
+    return this.ensureFloorServices(key);
+  },
 
   getTowerDefinitions() {
     const mk = (torre, total) => {
@@ -1927,60 +1984,29 @@ const predio3D = {
     return filtered.length ? filtered : defs;
   },
 
-
-  loadServiceData() {
-    if (this._serviceData) return this._serviceData;
-    try {
-      this._serviceData = JSON.parse(localStorage.getItem(this.STORAGE_KEY) || '{}') || {};
-    } catch (e) {
-      this._serviceData = {};
-    }
-    return this._serviceData;
-  },
-
-  saveServiceData() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.loadServiceData()));
-    } catch (e) {
-      console.warn('Falha ao salvar serviços do pavimento:', e);
-    }
-  },
-
-  emptyService(nome) {
-    return { nome, concluido: false, inicio: '', previsaoFim: '', fotos: [] };
-  },
-
-  getServicesForFloor(torre, floor) {
-    const data = this.loadServiceData();
-    const key = this.makeFloorKey(torre, floor);
-    if (!Array.isArray(data[key]) || !data[key].length) {
-      data[key] = this.servicosBase.map(nome => this.emptyService(nome));
-      this.saveServiceData();
-    }
-    data[key] = this.servicosBase.map(nome => {
-      const atual = (data[key] || []).find(s => s && s.nome === nome);
-      return atual ? { nome, concluido: !!atual.concluido, inicio: atual.inicio || '', previsaoFim: atual.previsaoFim || '', fotos: Array.isArray(atual.fotos) ? atual.fotos : [] } : this.emptyService(nome);
-    });
-    return data[key];
+  getItensBase() {
+    const planejamento = (window.appRT?.itens || []).map(item => ({ ...item, origem: 'planejamento' }));
+    const diaDia = (window.appRT?.itensDiaDia || []).map(item => ({ ...item, origem: 'dia-dia' }));
+    return [...planejamento, ...diaDia].map(item => ({
+      ...item,
+      torre: this.normalizeTower(item.torre),
+      pavimento: this.normalizeFloor(item.pavimento)
+    })).filter(item => item.torre && item.pavimento);
   },
 
   getItemsForFloor(torre, floor) {
-    return this.getServicesForFloor(torre, floor);
+    return this.getItensBase().filter(item => item.torre === torre && item.pavimento === floor);
   },
 
-  computeFloorStatus(items) {
-    if (!items.length) return 'cinza';
-    if (items.every(i => i.concluido)) return 'verde';
-    const hoje = new Date();
-    hoje.setHours(0,0,0,0);
-    const hasLate = items.some(i => {
-      if (i.concluido || !i.previsaoFim) return false;
-      const dt = this.parseDate(i.previsaoFim);
-      return dt && dt < hoje;
-    });
+  computeFloorStatus(items, torre, floor) {
+    const services = this.getServicesForFloor(torre, floor);
+    if (!services.length) return 'cinza';
+    if (services.every(s => s.checked)) return 'verde';
+    const today = new Date(); today.setHours(0,0,0,0);
+    const hasLate = services.some(s => s.dataPrevistaFim && !s.checked && new Date(s.dataPrevistaFim + 'T12:00:00') < today);
     if (hasLate) return 'vermelho';
-    const hasStarted = items.some(i => i.concluido || i.inicio || i.previsaoFim || (Array.isArray(i.fotos) && i.fotos.length));
-    return hasStarted ? 'amarelo' : 'cinza';
+    const hasProgress = services.some(s => s.checked || s.dataInicio || s.dataPrevistaFim || (s.fotos || []).length || (s.observacoes || '').trim());
+    return hasProgress ? 'amarelo' : 'cinza';
   },
 
   buildFloors() {
@@ -1988,55 +2014,9 @@ const predio3D = {
       torre: def.torre,
       floors: def.floors.map(floor => {
         const items = this.getItemsForFloor(def.torre, floor);
-        return { torre: def.torre, floor, key: this.makeFloorKey(def.torre, floor), items, status: this.computeFloorStatus(items) };
+        return { torre: def.torre, floor, key: this.makeFloorKey(def.torre, floor), items, services: this.getServicesForFloor(def.torre, floor), status: this.computeFloorStatus(items, def.torre, floor) };
       })
     }));
-  },
-
-  serviceBadge(servico) {
-    if (servico.concluido) return 'Concluído';
-    if (servico.inicio || servico.previsaoFim || (servico.fotos || []).length) return 'Em andamento';
-    return 'Pendente';
-  },
-
-  updateServiceField(key, nome, campo, valor) {
-    const data = this.loadServiceData();
-    const lista = data[key] || [];
-    const item = lista.find(s => s.nome === nome);
-    if (!item) return;
-    item[campo] = valor;
-    if (campo === 'concluido' && valor && !item.inicio) item.inicio = this.hojeISO?.() || new Date().toISOString().slice(0,10);
-    this.saveServiceData();
-    this.render();
-  },
-
-  removeServicePhoto(key, nome, idx) {
-    const data = this.loadServiceData();
-    const lista = data[key] || [];
-    const item = lista.find(s => s.nome === nome);
-    if (!item || !Array.isArray(item.fotos)) return;
-    item.fotos.splice(idx, 1);
-    this.saveServiceData();
-    this.render();
-  },
-
-  addServicePhotos(input, key, nome) {
-    const files = Array.from(input.files || []);
-    if (!files.length) return;
-    const data = this.loadServiceData();
-    const lista = data[key] || [];
-    const item = lista.find(s => s.nome === nome);
-    if (!item) return;
-    Promise.all(files.map(file => new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = ev => resolve(String(ev.target.result || ''));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    }))).then(results => {
-      item.fotos = [...(item.fotos || []), ...results.filter(Boolean)].slice(0, 12);
-      this.saveServiceData();
-      this.render();
-    }).catch(() => app.mostrarAlerta('Não foi possível carregar a foto do serviço.', 'error'));
   },
 
   render() {
@@ -2048,6 +2028,7 @@ const predio3D = {
     const selectedLabel = document.getElementById('predio3dSelectedLabel');
     const countFloors = document.getElementById('predio3dCountFloors');
     const countCritical = document.getElementById('predio3dCountCritical');
+    const backBtn = document.getElementById('predio3dBackBtn');
     if (!building || !floorList || !details || !selectedLabel || !countFloors || !countCritical) return;
 
     const allFloors = towers.flatMap(t => t.floors);
@@ -2057,6 +2038,39 @@ const predio3D = {
     if (!this.state.selectedKey && allFloors.length) this.state.selectedKey = allFloors[0].key;
     if (this.state.selectedKey && !allFloors.some(f => f.key === this.state.selectedKey)) this.state.selectedKey = allFloors[0]?.key || null;
 
+    floorList.innerHTML = allFloors.length ? allFloors.slice().sort((a,b) => {
+      const towerDiff = a.torre.localeCompare(b.torre, 'pt-BR');
+      if (towerDiff !== 0) return towerDiff;
+      return this.floorOrder(b.floor) - this.floorOrder(a.floor);
+    }).map(f => `
+      <div class="predio3d-floor-item ${this.state.selectedKey === f.key ? 'active' : ''}" onclick='predio3D.openFloorRoom(${JSON.stringify(f.key)})'>
+        <div>
+          <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
+          <small>${f.torre} • ${f.services.filter(s => s.checked).length}/${f.services.length} serviços concluídos</small>
+        </div>
+        <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
+      </div>`).join('') : '<div class="predio3d-empty">Nenhum pavimento encontrado.</div>';
+
+    const selected = allFloors.find(f => f.key === this.state.selectedKey);
+    if (!selected) {
+      selectedLabel.textContent = 'Selecione um pavimento';
+      details.innerHTML = '<div class="predio3d-empty">Nenhum pavimento disponível.</div>';
+      return;
+    }
+
+    selectedLabel.textContent = `${selected.torre} • ${selected.floor} • ${this.statusLabel(selected.status)}`;
+    details.innerHTML = this.renderServiceDetails(selected, !this.state.roomOpen);
+
+    if (this.state.roomOpen) {
+      if (backBtn) backBtn.style.display = 'inline-flex';
+      building.className = '';
+      building.style.height = 'auto';
+      building.style.transform = 'none';
+      building.innerHTML = this.renderRoomScene(selected);
+      return;
+    }
+
+    if (backBtn) backBtn.style.display = 'none';
     const maxFloors = Math.max(...towers.map(t => t.floors.length), 1);
     const totalHeight = Math.max(620, maxFloors * 28 + 120);
     building.style.height = totalHeight + 'px';
@@ -2069,7 +2083,7 @@ const predio3D = {
         const isTop = idx === tower.floors.length - 1;
         return `
           <div class="predio3d-floor predio3d-${floorObj.status}${this.state.selectedKey === floorObj.key ? ' active' : ''}" style="bottom:${34 + y}px;">
-            <div class="face front" onclick='predio3D.selectFloor(${JSON.stringify(floorObj.key)})'>
+            <div class="face front" onclick='predio3D.openFloorRoom(${JSON.stringify(floorObj.key)})'>
               <span>${floorObj.floor}</span>
               <span class="label-small">${predio3D.statusLabel(floorObj.status)}</span>
             </div>
@@ -2090,76 +2104,134 @@ const predio3D = {
         </div>`;
     }).join('');
 
-    floorList.innerHTML = allFloors.length ? allFloors.slice().sort((a,b) => {
-      const towerDiff = a.torre.localeCompare(b.torre, 'pt-BR');
-      if (towerDiff !== 0) return towerDiff;
-      return this.floorOrder(b.floor) - this.floorOrder(a.floor);
-    }).map(f => `
-      <div class="predio3d-floor-item ${this.state.selectedKey === f.key ? 'active' : ''}" onclick='predio3D.selectFloor(${JSON.stringify(f.key)})'>
-        <div>
-          <div style="font-weight:700;color:var(--blue-dark)">${f.floor}</div>
-          <small>${f.torre} • ${f.items.length ? `${f.items.filter(x => x.concluido).length}/${f.items.length} serviços concluídos` : 'Sem serviços'}</small>
-        </div>
-        <span class="predio3d-badge">${this.statusLabel(f.status)}</span>
-      </div>`).join('') : '<div class="predio3d-empty">Nenhum pavimento encontrado.</div>';
-
-    const selected = allFloors.find(f => f.key === this.state.selectedKey);
-    
-    if (!selected) {
-      selectedLabel.textContent = 'Selecione um pavimento';
-      details.innerHTML = '<div class="predio3d-empty">Nenhum pavimento disponível.</div>';
-    } else {
-      selectedLabel.textContent = `${selected.torre} • ${selected.floor} • ${this.statusLabel(selected.status)}`;
-      details.innerHTML = `
-        <div class="predio3d-interior-header">Interior do pavimento com janelas de serviços. Marque o checklist, informe início, previsão de término e anexe fotos.</div>
-        <div class="predio3d-interior-grid">
-          ${selected.items.map(servico => `
-            <div class="servico-window ${servico.concluido ? 'done' : ''}">
-              <div class="title-row">
-                <strong>${servico.nome}</strong>
-                <span class="predio3d-badge">${this.serviceBadge(servico)}</span>
-              </div>
-              <label class="checkline">
-                <input type="checkbox" ${servico.concluido ? 'checked' : ''} onchange="predio3D.updateServiceField(${JSON.stringify(selected.key)}, ${JSON.stringify(servico.nome)}, 'concluido', this.checked)">
-                Checklist concluído
-              </label>
-              <div class="service-grid">
-                <div class="service-field">
-                  <label>Início do serviço</label>
-                  <input type="date" value="${servico.inicio || ''}" onchange="predio3D.updateServiceField(${JSON.stringify(selected.key)}, ${JSON.stringify(servico.nome)}, 'inicio', this.value)">
-                </div>
-                <div class="service-field">
-                  <label>Data prevista de finalização</label>
-                  <input type="date" value="${servico.previsaoFim || ''}" onchange="predio3D.updateServiceField(${JSON.stringify(selected.key)}, ${JSON.stringify(servico.nome)}, 'previsaoFim', this.value)">
-                </div>
-                <div class="service-field">
-                  <label>Adicionar foto</label>
-                  <input type="file" accept="image/*" multiple onchange="predio3D.addServicePhotos(this, ${JSON.stringify(selected.key)}, ${JSON.stringify(servico.nome)})">
-                </div>
-              </div>
-              <div class="photo-list">
-                ${(servico.fotos || []).length ? servico.fotos.map((foto, idx) => `
-                  <div class="photo-thumb">
-                    <img src="${foto}" alt="${servico.nome}">
-                    <button type="button" onclick="predio3D.removeServicePhoto(${JSON.stringify(selected.key)}, ${JSON.stringify(servico.nome)}, ${idx})">×</button>
-                  </div>
-                `).join('') : '<span style="color:var(--muted);font-size:.85rem;">Nenhuma foto adicionada.</span>'}
-              </div>
-            </div>
-          `).join('')}
-        </div>`;
-    }
-
     this.ensureControls();
   },
 
+  renderRoomScene(selected) {
+    const nodes = selected.services.map(service => {
+      const cls = this.getServiceNodeClass(service);
+      const pos = this.servicePositions[service.id] || 'n1';
+      return `<button type="button" class="predio3d-service-node ${pos} ${cls}" onclick="predio3D.focusService('${service.id}')"><strong>${service.nome}</strong><small>${service.checked ? 'Checklist concluído' : service.dataPrevistaFim ? 'Prev.: ' + new Date(service.dataPrevistaFim+'T12:00:00').toLocaleDateString('pt-BR') : 'Sem previsão'}</small></button>`;
+    }).join('');
+    return `
+      <div class="predio3d-room-shell">
+        <div class="predio3d-room-scene">
+          <div class="predio3d-room-label">
+            <div style="font-size:1rem;font-weight:800;">${selected.torre} • ${selected.floor}</div>
+            <div style="font-size:.88rem;color:var(--muted);margin-top:.25rem;">Sala virtual 3D do pavimento. Clique nas janelas de serviço para editar o andamento.</div>
+          </div>
+          <div class="predio3d-room-wall-back"></div>
+          <div class="predio3d-room-wall-left"></div>
+          <div class="predio3d-room-window w1"></div>
+          <div class="predio3d-room-window w2"></div>
+          <div class="predio3d-room-window w3"></div>
+          <div class="predio3d-room-door"></div>
+          <div class="predio3d-room-floor"></div>
+          <div class="predio3d-service-nodes">${nodes}</div>
+        </div>
+      </div>`;
+  },
+
+  getServiceNodeClass(service) {
+    if (service.checked) return 'done';
+    const today = new Date(); today.setHours(0,0,0,0);
+    if (service.dataPrevistaFim && new Date(service.dataPrevistaFim + 'T12:00:00') < today) return 'late';
+    return '';
+  },
+
+  renderServiceDetails(selected, showHint = false) {
+    const hint = showHint ? `<div class="predio3d-details-item"><strong>Ao clicar em um pavimento</strong><div style="margin-top:.3rem;color:var(--muted);font-size:.88rem;">abre a sala virtual 3D com as janelas de serviço e o checklist do pavimento.</div></div>` : '';
+    return hint + selected.services.map(service => {
+      const photos = (service.fotos || []).map((foto, idx) => `
+        <div class="predio3d-photo-item">
+          <img src="${foto}" alt="${service.nome}">
+          <button type="button" onclick="predio3D.removeServicePhoto('${selected.key}','${service.id}',${idx})">×</button>
+        </div>`).join('');
+      return `
+        <div class="predio3d-service-card" id="service-card-${service.id}">
+          <h4>${service.nome}</h4>
+          <label class="predio3d-service-check">
+            <input type="checkbox" ${service.checked ? 'checked' : ''} onchange="predio3D.updateServiceField('${selected.key}','${service.id}','checked', this.checked)">
+            Serviço concluído
+          </label>
+          <div class="predio3d-service-grid">
+            <div>
+              <label>Início do serviço</label>
+              <input type="date" value="${service.dataInicio || ''}" onchange="predio3D.updateServiceField('${selected.key}','${service.id}','dataInicio', this.value)">
+            </div>
+            <div>
+              <label>Previsão de finalização</label>
+              <input type="date" value="${service.dataPrevistaFim || ''}" onchange="predio3D.updateServiceField('${selected.key}','${service.id}','dataPrevistaFim', this.value)">
+            </div>
+          </div>
+          <div style="margin-top:.75rem;">
+            <label>Observações</label>
+            <textarea onchange="predio3D.updateServiceField('${selected.key}','${service.id}','observacoes', this.value)">${service.observacoes || ''}</textarea>
+          </div>
+          <div style="margin-top:.75rem;">
+            <label>Adicionar foto do serviço</label>
+            <input type="file" accept="image/*" onchange="predio3D.handleServicePhoto(event,'${selected.key}','${service.id}')">
+          </div>
+          <div class="predio3d-photo-list">${photos || '<span style="color:var(--muted);font-size:.85rem;">Sem fotos anexadas.</span>'}</div>
+        </div>`;
+    }).join('');
+  },
+
+  focusService(serviceId) {
+    const el = document.getElementById(`service-card-${serviceId}`);
+    if (el) {
+      el.scrollIntoView({ behavior:'smooth', block:'center' });
+      el.style.boxShadow = '0 0 0 3px rgba(46,117,182,.16)';
+      setTimeout(() => { el.style.boxShadow = ''; }, 1200);
+    }
+  },
+
+  async updateServiceField(floorKey, serviceId, field, value) {
+    const services = this.ensureFloorServices(floorKey);
+    const idx = services.findIndex(s => s.id === serviceId);
+    if (idx < 0) return;
+    services[idx][field] = value;
+    this.floorServiceData[floorKey].updatedAt = new Date().toISOString();
+    await this.saveFloorServiceData();
+    this.render();
+  },
+
+  handleServicePhoto(event, floorKey, serviceId) {
+    const file = event.target.files && event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = async (ev) => {
+      const services = this.ensureFloorServices(floorKey);
+      const service = services.find(s => s.id === serviceId);
+      if (!service) return;
+      service.fotos = Array.isArray(service.fotos) ? service.fotos : [];
+      service.fotos.push(ev.target.result);
+      this.floorServiceData[floorKey].updatedAt = new Date().toISOString();
+      await this.saveFloorServiceData();
+      this.render();
+    };
+    reader.readAsDataURL(file);
+  },
+
+  async removeServicePhoto(floorKey, serviceId, photoIdx) {
+    const services = this.ensureFloorServices(floorKey);
+    const service = services.find(s => s.id === serviceId);
+    if (!service || !Array.isArray(service.fotos)) return;
+    service.fotos.splice(photoIdx, 1);
+    this.floorServiceData[floorKey].updatedAt = new Date().toISOString();
+    await this.saveFloorServiceData();
+    this.render();
+  },
+
+  openFloorRoom(key) { this.state.selectedKey = key; this.state.roomOpen = true; this.render(); },
+  closeRoom() { this.state.roomOpen = false; this.render(); },
   selectFloor(key) { this.state.selectedKey = key; this.render(); },
 
   resetView() {
     this.state.rotateX = -16;
     this.state.rotateY = -26;
     this.state.scale = 1;
-    this.render();
+    if (!this.state.roomOpen) this.render();
   },
 
   ensureControls() {
@@ -2168,6 +2240,7 @@ const predio3D = {
     if (!viewport) return;
     this.controlsBound = true;
     const onDown = (x, y) => {
+      if (this.state.roomOpen) return;
       this.state.dragging = true;
       this.state.startX = x;
       this.state.startY = y;
@@ -2176,7 +2249,7 @@ const predio3D = {
       viewport.classList.add('dragging');
     };
     const onMove = (x, y) => {
-      if (!this.state.dragging) return;
+      if (!this.state.dragging || this.state.roomOpen) return;
       const dx = x - this.state.startX;
       const dy = y - this.state.startY;
       this.state.rotateY = this.state.baseRotateY + dx * 0.28;
@@ -2195,6 +2268,7 @@ const predio3D = {
     viewport.addEventListener('touchmove', (e) => { const t = e.touches[0]; onMove(t.clientX, t.clientY); }, { passive: true });
     window.addEventListener('touchend', onUp);
     viewport.addEventListener('wheel', (e) => {
+      if (this.state.roomOpen) return;
       e.preventDefault();
       const next = this.state.scale + (e.deltaY < 0 ? 0.05 : -0.05);
       this.state.scale = Math.max(0.72, Math.min(1.5, next));
@@ -2211,7 +2285,7 @@ const predio3D = {
         <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.torre}</td>
         <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.floor}</td>
         <td style="padding:.55rem;border:1px solid #d7e2f2;">${this.statusLabel(f.status)}</td>
-        <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.items.length}</td>
+        <td style="padding:.55rem;border:1px solid #d7e2f2;">${f.services.filter(s => s.checked).length}/${f.services.length}</td>
       </tr>`).join('');
     const wrapper = document.createElement('div');
     wrapper.innerHTML = `
@@ -2224,7 +2298,7 @@ const predio3D = {
           <div style="font-weight:700;color:#1F3864;">Plano & Plano</div>
         </div>
         <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead><tr><th style="padding:.6rem;border:1px solid #d7e2f2;">Torre</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Pavimento</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Status</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Serviços</th></tr></thead>
+          <thead><tr><th style="padding:.6rem;border:1px solid #d7e2f2;">Torre</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Pavimento</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Status</th><th style="padding:.6rem;border:1px solid #d7e2f2;">Serviços concluídos</th></tr></thead>
           <tbody>${rows}</tbody>
         </table>
       </div>`;
@@ -2934,6 +3008,58 @@ const appMateriais = {
     }
   },
 
+  async registrarEntradaPorRT(rtItem, origemTipo = 'planejamento') {
+    const quantidade = Number(rtItem.quantidade || 0);
+    const nome = String(rtItem.material || '').trim();
+    if (!nome || quantidade <= 0) return false;
+    const chaveOrigem = `${origemTipo}:${rtItem.id}:${nome}:${quantidade}`;
+    const existente = this.movimentacoes.find(m => m.tipo === 'entrada_rt' && m.chaveOrigem === chaveOrigem);
+    if (existente) return false;
+
+    let material = this.materiais.find(m => String(m.nome || '').trim().toLowerCase() === nome.toLowerCase());
+    if (!material) {
+      const novoId = Math.max(...this.materiais.map(m => Number(m.id) || 0), 0) + 1;
+      material = {
+        id: novoId,
+        nome,
+        quantidade: 0,
+        especificacoes: `Entrada automática via RT - ${rtItem.servico || 'Serviço'}`,
+        foto: '',
+        dataCriacao: new Date().toISOString(),
+        dataAtualizacao: new Date().toISOString()
+      };
+      this.materiais.push(material);
+    }
+    material.quantidade = Number(material.quantidade || 0) + quantidade;
+    material.dataAtualizacao = new Date().toISOString();
+
+    this.movimentacoes.unshift({
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      tipo: 'entrada_rt',
+      chaveOrigem,
+      materialId: material.id,
+      materialNome: material.nome,
+      quantidade,
+      responsavel: 'Entrada por RT entregue',
+      funcao: rtItem.servico || '',
+      setor: [rtItem.torre, rtItem.pavimento].filter(Boolean).join(' / '),
+      motivo: `RT ${origemTipo === 'dia-dia' ? 'Dia a Dia' : 'Planejamento'} entregue`,
+      observacoes: rtItem.observacoes || '',
+      dataHora: new Date().toISOString(),
+      lancadoPor: window.currentUser?.username || 'sistema',
+      origemRtId: rtItem.id
+    });
+
+    await this.salvarMateriais();
+    await this.salvarMovimentacoes();
+    this.buscarMateriais();
+    this.preencherMateriaisRastreabilidade();
+    this.renderizarRelatorioDia();
+    this.renderizarRastreabilidadeCompleta();
+    return true;
+  },
+
+
   aplicarPermissoesVisuais() {
     const role = window.currentUser?.role || 'admin';
     const materiaisSection = document.getElementById('materiais-obra');
@@ -3299,64 +3425,6 @@ const appMateriais = {
     app.mostrarAlerta('Retirada registrada com sucesso!', 'success');
   },
 
-  async registrarEntradaPorRT(item, tipo='planejamento') {
-    if (!item || !item.material) return;
-    const origem = `${tipo}_${item.id}`;
-    const jaExiste = this.movimentacoes.some(m => m.origem === origem && m.tipo === 'entrada');
-    if (jaExiste) return;
-
-    const nomeMaterial = String(item.material || '').trim();
-    const quantidade = Math.max(1, Number(item.quantidade || 1));
-    let material = this.materiais.find(m => String(m.nome || '').toLowerCase() === nomeMaterial.toLowerCase());
-    const agora = new Date().toISOString();
-
-    if (material) {
-      material.quantidade = Number(material.quantidade || 0) + quantidade;
-      material.dataAtualizacao = agora;
-    } else {
-      material = {
-        id: Date.now(),
-        nome: nomeMaterial,
-        quantidade,
-        especificacoes: `Entrada automática via RT (${item.servico || 'serviço'})`,
-        foto: '',
-        dataCadastro: agora,
-        dataAtualizacao: agora
-      };
-      this.materiais.unshift(material);
-    }
-
-    this.movimentacoes.unshift({
-      id: Date.now() + Math.floor(Math.random()*1000),
-      materialId: material.id,
-      materialNome: material.nome,
-      quantidade,
-      responsavel: item.torre && item.pavimento ? `${item.torre} / ${item.pavimento}` : 'Estoque',
-      funcao: item.servico || '-',
-      setor: 'Entrada automática RT',
-      motivo: 'Entrada no estoque por RT entregue',
-      observacoes: `Origem: ${tipo === 'dia' ? 'RT Dia a Dia' : 'Planejamento RT'}`,
-      dataHora: agora,
-      lancadoPor: window.currentUser?.username || 'sistema',
-      origem,
-      tipo: 'entrada'
-    });
-
-    await this.salvarMateriais();
-    await this.salvarMovimentacoes();
-    this.buscarMateriais();
-    this.preencherMateriaisRastreabilidade();
-    this.renderizarMovimentacoes();
-    this.renderizarRastreabilidadeCompleta();
-    this.renderizarRelatorioDia();
-  },
-
-  async processarEntradaRT(itemAnterior, itemAtual, tipo='planejamento') {
-    if (!itemAtual || itemAtual.status !== 'Entregue') return;
-    if (itemAnterior && itemAnterior.status === 'Entregue') return;
-    await this.registrarEntradaPorRT(itemAtual, tipo);
-  },
-
   renderizarMovimentacoes() {
     const section = document.getElementById('materiais-obra');
     if (!section) return;
@@ -3373,12 +3441,12 @@ const appMateriais = {
     }
     box.style.display = 'block';
     const itens = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 20);
-    box.innerHTML = `<h2>🧾 Últimas Retiradas</h2>
+    box.innerHTML = `<h2>🧾 Últimas Movimentações</h2>
       <div class="btn-group" style="margin-bottom:1rem;">
         ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
         <button class="btn btn-secondary" onclick="app.showSection('rastreabilidade', document.querySelector('nav button[data-section=&quot;rastreabilidade&quot;]'))">📋 Ver Rastreabilidade Completa</button>
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Material</th><th>Qtd.</th><th>Responsável</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.tipo === 'entrada_rt' ? 'Entrada RT' : 'Saída'}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação registrada ainda.</p>`}`;
   },
 
   obterMovimentacoesFiltradas() {
@@ -3477,7 +3545,7 @@ const appMateriais = {
         <span class="btn btn-primary" style="cursor:default;">🧾 ${itens.length} registros</span>
         ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Tipo</th><th>Material</th><th>Qtd.</th><th>Responsável</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.tipo === 'entrada_rt' ? 'Entrada RT' : 'Saída'}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
   },
 
   async excluirMovimentacao(id) {
@@ -3552,23 +3620,6 @@ const appMateriais = {
     .btn { background:#1F3864; color:#fff; border:none; border-radius:8px; padding:10px 16px; cursor:pointer; font-weight:700; }
     @media print { .actions { display:none; } .page { max-width:none; padding:0; } body { margin: 0; } }
     @media (max-width: 800px) { .stats, .cards { grid-template-columns: 1fr; } .header { flex-direction:column; align-items:flex-start; } }
-  
-    .servico-window { background:#f8fbff; border:1px solid #dbe7f7; border-radius:14px; padding:.9rem; display:grid; gap:.75rem; }
-    .servico-window.done { border-color:#bfe6cb; background:#f7fffa; }
-    .servico-window .title-row { display:flex; align-items:center; justify-content:space-between; gap:.6rem; }
-    .servico-window .title-row strong { color:var(--blue-dark); }
-    .servico-window .service-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:.65rem; }
-    .servico-window .service-field { display:grid; gap:.25rem; }
-    .servico-window label { font-size:.78rem; color:var(--muted); font-weight:700; }
-    .servico-window input[type='date'], .servico-window input[type='file'] { width:100%; padding:.55rem .65rem; border:1px solid #d8e3f3; border-radius:10px; background:#fff; }
-    .servico-window .checkline { display:flex; align-items:center; gap:.5rem; font-weight:700; color:var(--blue-dark); }
-    .servico-window .photo-list { display:flex; flex-wrap:wrap; gap:.6rem; }
-    .servico-window .photo-thumb { position:relative; width:92px; height:92px; border-radius:12px; overflow:hidden; background:#eef4ff; border:1px solid #dbe7f7; }
-    .servico-window .photo-thumb img { width:100%; height:100%; object-fit:cover; }
-    .servico-window .photo-thumb button { position:absolute; right:4px; top:4px; border:none; background:rgba(232,69,69,.92); color:#fff; width:24px; height:24px; border-radius:999px; cursor:pointer; font-size:.8rem; }
-    .predio3d-interior-header { margin:.25rem 0 .85rem; color:var(--muted); font-size:.88rem; }
-    .predio3d-interior-grid { display:grid; gap:.8rem; }
-    
   </style>
 </head>
 <body>
@@ -3697,7 +3748,6 @@ const appRT = {
   _unsubDiaDia: null,
   materiaisCatalogo: [],
   meses: ['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'],
-  hojeISO() { return new Date().toISOString().slice(0,10); },
 
   // Carregar catálogo de materiais
   carregarMateriais: async function() {
@@ -3999,6 +4049,9 @@ const appRT = {
     };
   },
 
+  hojeISO() {
+    return new Date().toISOString().slice(0,10);
+  },
 
   montarResumoStatus(item) {
     const partes = [];
@@ -4228,39 +4281,51 @@ const appRT = {
     return `<span>${statusAtual}</span>`;
   },
 
+
+  async sincronizarRTEntregueComEstoque(item, anterior = {}, origemTipo = 'planejamento') {
+    const atual = String(item?.status || '').trim();
+    if (atual !== 'Entregue') return false;
+    if (window.appMateriais && typeof window.appMateriais.registrarEntradaPorRT === 'function') {
+      return await window.appMateriais.registrarEntradaPorRT(item, origemTipo);
+    }
+    return false;
+  },
+
   async atualizarStatus(id, novoStatus) {
     const idx = this.itens.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
-    const statusAtual = this.statusSugerido(this.itens[idx]);
+    const anterior = { ...this.itens[idx] };
+    const statusAtual = this.statusSugerido(anterior);
     if (!this.podeAlterarStatusEspecifico(statusAtual, novoStatus)) {
       return app.mostrarAlerta('Almoxarife só pode alterar de Aguardando entrega para Entregue.', 'error');
     }
-    const anterior = { ...this.itens[idx] };
-    const item = { ...this.itens[idx], status: novoStatus, updatedAt: new Date().toISOString() };
-    this.aplicarDatasPorStatus(item, this.itens[idx]);
+    const item = { ...anterior, status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, anterior);
     this.itens[idx] = item;
-    await appMateriais.processarEntradaRT(anterior, item, 'planejamento');
     await this.salvarDados();
+    await this.sincronizarRTEntregueComEstoque(item, anterior, 'planejamento');
     this.preencherFiltroTorres();
     this.renderizar();
+    if (window.predio3D) window.predio3D.render();
     app.mostrarAlerta('Status do planejamento RT atualizado.', 'success');
   },
 
   async atualizarStatusDiaDia(id, novoStatus) {
     const idx = this.itensDiaDia.findIndex(i => String(i.id) === String(id));
     if (idx < 0) return;
-    const statusAtual = this.statusSugerido(this.itensDiaDia[idx]);
+    const anterior = { ...this.itensDiaDia[idx] };
+    const statusAtual = this.statusSugerido(anterior);
     if (!this.podeAlterarStatusEspecifico(statusAtual, novoStatus)) {
       return app.mostrarAlerta('Almoxarife só pode alterar de Aguardando entrega para Entregue.', 'error');
     }
-    const anterior = { ...this.itensDiaDia[idx] };
-    const item = { ...this.itensDiaDia[idx], status: novoStatus, updatedAt: new Date().toISOString() };
-    this.aplicarDatasPorStatus(item, this.itensDiaDia[idx]);
+    const item = { ...anterior, status: novoStatus, updatedAt: new Date().toISOString() };
+    this.aplicarDatasPorStatus(item, anterior);
     this.itensDiaDia[idx] = item;
-    await appMateriais.processarEntradaRT(anterior, item, 'dia');
     await this.salvarDadosDiaDia();
+    await this.sincronizarRTEntregueComEstoque(item, anterior, 'dia-dia');
     this.preencherFiltroTorresDiaDia();
     this.renderizarDiaDia();
+    if (window.predio3D) window.predio3D.render();
     app.mostrarAlerta('Status da RT do Dia a Dia atualizado.', 'success');
   },
 
@@ -4293,12 +4358,14 @@ const appRT = {
     };
     item.dataIdealPedido = this.calcularDataIdeal(item.dataServico, item.leadTime);
     const idx = this.itens.findIndex(i => i.id === item.id);
-    const anteriorPlanejamento = idx >= 0 ? { ...this.itens[idx] } : null;
+    const anterior = idx >= 0 ? { ...this.itens[idx] } : {};
+    this.aplicarDatasPorStatus(item, anterior);
     if (idx >= 0) this.itens[idx] = item; else this.itens.push(item);
-    await appMateriais.processarEntradaRT(anteriorPlanejamento, item, 'planejamento');
     await this.salvarDados();
+    await this.sincronizarRTEntregueComEstoque(item, anterior, 'planejamento');
     this.fecharModal();
     this.renderizar();
+    if (window.predio3D) window.predio3D.render();
     app.mostrarAlerta('Planejamento RT salvo com sucesso!', 'success');
   },
 
@@ -4445,15 +4512,15 @@ const appRT = {
       updatedAt: new Date().toISOString()
     });
     const idx = this.itensDiaDia.findIndex(i => i.id === item.id);
-    const anterior = idx >= 0 ? this.itensDiaDia[idx] : {};
+    const anterior = idx >= 0 ? { ...this.itensDiaDia[idx] } : {};
     this.aplicarDatasPorStatus(item, anterior);
-    const anteriorDia = idx >= 0 ? { ...this.itensDiaDia[idx] } : null;
     if (idx >= 0) this.itensDiaDia[idx] = item; else this.itensDiaDia.unshift(item);
-    await appMateriais.processarEntradaRT(anteriorDia, item, 'dia');
     await this.salvarDadosDiaDia();
+    await this.sincronizarRTEntregueComEstoque(item, anterior, 'dia-dia');
     this.preencherFiltroTorresDiaDia();
     this.fecharModalDiaDia();
     this.renderizarDiaDia();
+    if (window.predio3D) window.predio3D.render();
     app.mostrarAlerta('RT do Dia a Dia salva com sucesso!', 'success');
   },
 
