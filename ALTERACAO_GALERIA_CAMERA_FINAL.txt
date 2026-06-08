@@ -1,1 +1,1 @@
-Corrigido: no celular agora há dois botões separados e o salvamento aceita arquivo vindo da galeria ou da câmera.
+Foi adicionada compressão automática da imagem antes de salvar o material. Isso reduz o tamanho da foto tirada no celular e evita falha ao salvar no Firestore.

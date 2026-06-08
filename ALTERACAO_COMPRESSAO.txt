@@ -1,1 +1,4 @@
-Foi adicionada compressão automática da imagem antes de salvar o material. Isso reduz o tamanho da foto tirada no celular e evita falha ao salvar no Firestore.
+Alteração aplicada no formulário de Controle de Materiais:
+- campo de foto agora aceita câmera do celular
+- input usa accept='image/*' e capture='environment'
+- botão '📷 Tirar Foto' adicionado no modal
