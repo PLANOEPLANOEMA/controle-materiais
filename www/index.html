@@ -959,6 +959,16 @@
       }
     }
 
+/* ── CONTROLE DE SALDO / NF ── */
+.saldo-status{display:inline-flex;align-items:center;gap:.35rem;padding:.35rem .65rem;border-radius:999px;font-weight:800;font-size:.78rem;white-space:nowrap}
+.saldo-ok{background:#eaf8f0;color:#1f7a42}.saldo-atencao{background:#fff7df;color:#9a6a00}.saldo-critico{background:#ffe8e8;color:#b42318}.saldo-zerado{background:#f1f5f9;color:#475569}
+.saldo-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:1rem;margin:1rem 0}
+.saldo-card{background:#fff;border:1px solid #dbe7f5;border-radius:16px;padding:1rem;box-shadow:0 8px 22px rgba(31,56,100,.08)}
+.saldo-card .label{color:#6b7a99;font-size:.85rem}.saldo-card .value{font-size:1.55rem;font-weight:900;color:var(--blue-dark);margin-top:.25rem}
+.saldo-progress{height:10px;background:#e9f0f8;border-radius:999px;overflow:hidden;margin-top:.6rem}.saldo-progress span{display:block;height:100%;background:linear-gradient(90deg,var(--blue),var(--blue-light));border-radius:999px}
+.saldo-alert-box{border-left:5px solid #e84545;background:#fff5f5;padding:.85rem 1rem;border-radius:12px;margin:.6rem 0;color:#7f1d1d}
+.saldo-actions{display:flex;gap:.45rem;flex-wrap:wrap}
+
 </style>
 </head>
 <body>
@@ -1016,6 +1026,7 @@
     <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
     <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
     <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+    <button data-section="saldo-nf" onclick="app.showSection('saldo-nf', this)">Saldo por NF</button>
   </div>
   
   <!-- Seção Controle de Romaneios -->
@@ -1182,6 +1193,42 @@
     </div>
   </section>
 
+
+
+  <!-- ── CONTROLE DE SALDO POR NF ── -->
+  <section id="saldo-nf">
+    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">💰 Voltar para início</button></div>
+    <div class="card">
+      <h2>💰 Controle de Saldo por NF</h2>
+      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p>
+      <div class="btn-group">
+        <button class="btn btn-primary" onclick="appSaldoNF.abrirModalMaterial()">➕ Cadastrar Material/Contrato</button>
+        <button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">🧾 Lançar NF</button>
+        <button class="btn btn-warning" onclick="appSaldoNF.exportarCSV()">💾 Exportar CSV</button>
+        <button class="btn btn-secondary" onclick="appSaldoNF.renderizar()">🔄 Atualizar</button>
+      </div>
+      <div class="filter-bar">
+        <input type="text" id="saldoBusca" placeholder="🔍 Buscar material, NF ou fornecedor..." oninput="appSaldoNF.renderizar()" />
+        <select id="saldoStatusFiltro" onchange="appSaldoNF.renderizar()">
+          <option value="">Todos os status</option>
+          <option value="ok">Saldo tranquilo</option>
+          <option value="atencao">Atenção</option>
+          <option value="critico">Pedir RT/RS</option>
+          <option value="zerado">Saldo zerado</option>
+        </select>
+      </div>
+      <div id="saldoResumo" class="saldo-grid"></div>
+      <div id="saldoAlertas"></div>
+    </div>
+    <div class="card">
+      <h2>📦 Saldos por Material</h2>
+      <div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div>
+    </div>
+    <div class="card">
+      <h2>🧾 Histórico de NFs lançadas</h2>
+      <div class="table-wrap"><table><thead><tr><th>Data</th><th>NF</th><th>Fornecedor</th><th>Material</th><th>Qtd.</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody id="saldoTabelaNFs"></tbody></table></div>
+    </div>
+  </section>
 
   <!-- ── PLANEJAMENTO RT ── -->
   <section id="planejamento-rt">
@@ -1414,6 +1461,40 @@
   </section>
 
 </main>
+
+
+<!-- ── MODAIS CONTROLE DE SALDO POR NF ── -->
+<div id="modalSaldoMaterial" class="modal">
+  <div class="modal-content">
+    <div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Saldo por NF</span></div>
+    <h3 id="saldoMaterialTitle">Cadastrar Material / Contrato</h3>
+    <form id="formSaldoMaterial" onsubmit="appSaldoNF.salvarMaterial(event)">
+      <div class="form-group"><label for="saldoMaterialNome">Material *</label><input type="text" id="saldoMaterialNome" required placeholder="Ex: Concreto FCK 30, Areia média, Brita 1..." /></div>
+      <div class="form-group"><label for="saldoMaterialUnidade">Unidade *</label><input type="text" id="saldoMaterialUnidade" required placeholder="Ex: m³, un, kg, ton, mês" /></div>
+      <div class="form-group"><label for="saldoMaterialContrato">Saldo contratado *</label><input type="number" step="0.001" min="0" id="saldoMaterialContrato" required placeholder="Ex: 500" /></div>
+      <div class="form-group"><label for="saldoMaterialMargem">Margem de segurança (%) *</label><input type="number" step="0.01" min="0" max="100" id="saldoMaterialMargem" required value="20" /></div>
+      <div class="form-group"><label for="saldoMaterialObs">Observação</label><textarea id="saldoMaterialObs" rows="3" placeholder="Ex: Alinhar nova RT quando chegar em 20% de saldo."></textarea></div>
+      <div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
+    </form>
+  </div>
+</div>
+
+<div id="modalSaldoNF" class="modal">
+  <div class="modal-content">
+    <div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Lançamento de NF</span></div>
+    <h3 id="saldoNFTitle">Lançar NF</h3>
+    <form id="formSaldoNF" onsubmit="appSaldoNF.salvarNF(event)">
+      <div class="form-group"><label for="saldoNFData">Data *</label><input type="date" id="saldoNFData" required /></div>
+      <div class="form-group"><label for="saldoNFNumero">Número da NF *</label><input type="text" id="saldoNFNumero" required placeholder="Ex: 109765" /></div>
+      <div class="form-group"><label for="saldoNFFornecedor">Fornecedor</label><input type="text" id="saldoNFFornecedor" placeholder="Ex: Concremix, Pedreira, Blocos..." /></div>
+      <div class="form-group"><label for="saldoNFMaterial">Material *</label><select id="saldoNFMaterial" required></select></div>
+      <div class="form-group"><label for="saldoNFQuantidade">Quantidade da NF *</label><input type="number" step="0.001" min="0" id="saldoNFQuantidade" required placeholder="Ex: 35" /></div>
+      <div class="form-group"><label for="saldoNFValor">Valor da NF</label><input type="number" step="0.01" min="0" id="saldoNFValor" placeholder="Ex: 12500,00" /></div>
+      <div class="form-group"><label for="saldoNFObs">Observação</label><textarea id="saldoNFObs" rows="3" placeholder="Ex: referente ao pedido/contrato..."></textarea></div>
+      <div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">Cancelar</button><button type="submit" class="btn btn-success">Salvar NF</button></div>
+    </form>
+  </div>
+</div>
 
 <!-- ── MODAL EMPRÉSTIMOS ── -->
 <div id="modal" class="modal">
@@ -1784,7 +1865,10 @@
     escutarMudancasPlanejamentoRT,
     salvarRTDiaDiaNaNuvem,
     carregarRTDiaDiaDaNuvem,
-    escutarMudancasRTDiaDia
+    escutarMudancasRTDiaDia,
+    salvarSaldoNFNaNuvem,
+    carregarSaldoNFDaNuvem,
+    escutarMudancasSaldoNF
   } from "./firebase-controle-usuarios.js?v=1.0.1";
 
   window.__fb = {
@@ -1802,7 +1886,10 @@
     escutarMudancasPlanejamentoRT,
     salvarRTDiaDiaNaNuvem,
     carregarRTDiaDiaDaNuvem,
-    escutarMudancasRTDiaDia
+    escutarMudancasRTDiaDia,
+    salvarSaldoNFNaNuvem,
+    carregarSaldoNFDaNuvem,
+    escutarMudancasSaldoNF
   };
 </script>
 
@@ -1911,10 +1998,10 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      go: ['materiais-obra','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      engenharia: ['materiais-obra','predio-3d','relatorio','relatorio-dia']
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','saldo-nf','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','saldo-nf','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      go: ['materiais-obra','saldo-nf','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      engenharia: ['materiais-obra','saldo-nf','predio-3d','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
     document.querySelectorAll('nav button').forEach((btn) => {
@@ -1951,6 +2038,7 @@ const auth = {
     this.aplicarPermissoes(window.currentUser);
     app.init();
     appMateriais.init();
+    appSaldoNF.init();
     appRT.init();
     appRT.carregarMateriais();
     predio3D.render();
@@ -2648,7 +2736,7 @@ const app = {
 
     const globalKpiGrid = document.getElementById('globalKpiGrid');
     if (globalKpiGrid) {
-      globalKpiGrid.style.display = ['planejamento-rt','predio-3d','rt-dia-dia','materiais-obra','rastreabilidade'].includes(id) ? 'none' : 'grid';
+      globalKpiGrid.style.display = ['planejamento-rt','predio-3d','rt-dia-dia','materiais-obra','saldo-nf','rastreabilidade'].includes(id) ? 'none' : 'grid';
     }
 
     if (id === 'relatorio') {
@@ -2670,6 +2758,9 @@ const app = {
     }
     if (id === 'predio-3d' && window.predio3D && typeof window.predio3D.render === 'function') {
       window.predio3D.render();
+    }
+    if (id === 'saldo-nf' && window.appSaldoNF && typeof window.appSaldoNF.renderizar === 'function') {
+      window.appSaldoNF.renderizar();
     }
     atualizarBotaoMobile(id);
   },
@@ -3944,6 +4035,212 @@ const appMateriais = {
   }};
 
 
+
+const appSaldoNF = {
+  STORAGE_KEY: 'controle_saldo_nf_v1',
+  dados: { materiais: [], nfs: [] },
+  editandoMaterialId: null,
+  editandoNFId: null,
+  _unsub: null,
+
+  init() {
+    this.carregar().then(() => {
+      this.setupEventListeners();
+      this.renderizar();
+      this.iniciarSyncAoVivo();
+    });
+  },
+
+  setupEventListeners() {
+    ['modalSaldoMaterial','modalSaldoNF'].forEach(id => {
+      const modal = document.getElementById(id);
+      if (modal) modal.addEventListener('click', e => { if (e.target.id === id) modal.classList.remove('active'); });
+    });
+  },
+
+  iniciarSyncAoVivo() {
+    try {
+      if (!window.__fb?.escutarMudancasSaldoNF) return;
+      if (this._unsub) this._unsub();
+      this._unsub = window.__fb.escutarMudancasSaldoNF((dados) => {
+        if (!dados) return;
+        this.dados = { materiais: Array.isArray(dados.materiais) ? dados.materiais : [], nfs: Array.isArray(dados.nfs) ? dados.nfs : [] };
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
+        this.renderizar();
+      });
+    } catch(e) { console.warn('Sync saldo NF indisponível:', e); }
+  },
+
+  async carregar() {
+    try {
+      if (window.__fb?.carregarSaldoNFDaNuvem) {
+        const cloud = await window.__fb.carregarSaldoNFDaNuvem();
+        if (cloud && (Array.isArray(cloud.materiais) || Array.isArray(cloud.nfs))) {
+          this.dados = { materiais: cloud.materiais || [], nfs: cloud.nfs || [] };
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
+          return;
+        }
+      }
+      const local = localStorage.getItem(this.STORAGE_KEY);
+      if (local) { this.dados = JSON.parse(local); return; }
+      this.dados = { materiais: [
+        { id: Date.now()+1, nome:'Concreto', unidade:'m³', contrato:500, margem:20, obs:'Exemplo: pedir nova RT/RS ao atingir a margem.' },
+        { id: Date.now()+2, nome:'Areia média', unidade:'m³', contrato:200, margem:15, obs:'' },
+        { id: Date.now()+3, nome:'Brita', unidade:'m³', contrato:150, margem:15, obs:'' },
+        { id: Date.now()+4, nome:'Bloco', unidade:'un', contrato:10000, margem:20, obs:'' },
+        { id: Date.now()+5, nome:'Aço', unidade:'kg', contrato:5000, margem:20, obs:'' }
+      ], nfs: [] };
+      this.salvar();
+    } catch(e) { console.error(e); this.dados = { materiais: [], nfs: [] }; }
+  },
+
+  salvar() {
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.dados));
+    try { if (window.__fb?.salvarSaldoNFNaNuvem) window.__fb.salvarSaldoNFNaNuvem(this.dados); } catch(e) { console.warn('Não salvou saldo NF na nuvem:', e); }
+  },
+
+  moeda(v){ return Number(v||0).toLocaleString('pt-BR',{style:'currency',currency:'BRL'}); },
+  num(v){ return Number(v||0).toLocaleString('pt-BR',{maximumFractionDigits:3}); },
+  esc(v){ return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); },
+
+  totalLancado(materialId) { return this.dados.nfs.filter(n => String(n.materialId) === String(materialId)).reduce((s,n)=>s+Number(n.quantidade||0),0); },
+  saldoAtual(mat) { return Number(mat.contrato||0) - this.totalLancado(mat.id); },
+  margemQtd(mat) { return Number(mat.contrato||0) * (Number(mat.margem||0)/100); },
+  percentualUsado(mat) { const c=Number(mat.contrato||0); return c>0 ? Math.min(100, (this.totalLancado(mat.id)/c)*100) : 0; },
+  status(mat) {
+    const saldo = this.saldoAtual(mat), margem = this.margemQtd(mat);
+    if (saldo <= 0) return {key:'zerado', label:'Saldo zerado', cls:'saldo-zerado', icon:'⚫'};
+    if (saldo <= margem) return {key:'critico', label:'Pedir RT/RS', cls:'saldo-critico', icon:'🔴'};
+    if (saldo <= margem*1.5) return {key:'atencao', label:'Atenção', cls:'saldo-atencao', icon:'🟡'};
+    return {key:'ok', label:'Saldo tranquilo', cls:'saldo-ok', icon:'🟢'};
+  },
+  badge(mat){ const st=this.status(mat); return `<span class="saldo-status ${st.cls}">${st.icon} ${st.label}</span>`; },
+
+  abrirModalMaterial(id=null) {
+    this.editandoMaterialId = id;
+    document.getElementById('formSaldoMaterial').reset();
+    document.getElementById('saldoMaterialMargem').value = 20;
+    document.getElementById('saldoMaterialTitle').textContent = id ? 'Editar Material / Contrato' : 'Cadastrar Material / Contrato';
+    if (id) {
+      const m = this.dados.materiais.find(x => String(x.id) === String(id));
+      if (m) {
+        document.getElementById('saldoMaterialNome').value = m.nome || '';
+        document.getElementById('saldoMaterialUnidade').value = m.unidade || '';
+        document.getElementById('saldoMaterialContrato').value = m.contrato || 0;
+        document.getElementById('saldoMaterialMargem').value = m.margem || 0;
+        document.getElementById('saldoMaterialObs').value = m.obs || '';
+      }
+    }
+    document.getElementById('modalSaldoMaterial').classList.add('active');
+  },
+  fecharModalMaterial(){ document.getElementById('modalSaldoMaterial').classList.remove('active'); this.editandoMaterialId=null; },
+
+  salvarMaterial(e) {
+    e.preventDefault();
+    const item = {
+      id: this.editandoMaterialId || Date.now(),
+      nome: document.getElementById('saldoMaterialNome').value.trim(),
+      unidade: document.getElementById('saldoMaterialUnidade').value.trim(),
+      contrato: Number(document.getElementById('saldoMaterialContrato').value||0),
+      margem: Number(document.getElementById('saldoMaterialMargem').value||0),
+      obs: document.getElementById('saldoMaterialObs').value.trim()
+    };
+    if (this.editandoMaterialId) this.dados.materiais = this.dados.materiais.map(m => String(m.id)===String(item.id) ? item : m);
+    else this.dados.materiais.push(item);
+    this.salvar(); this.fecharModalMaterial(); this.renderizar(); app.mostrarAlerta('Material/contrato salvo com sucesso!', 'success');
+  },
+
+  excluirMaterial(id) {
+    if (!confirm('Excluir este material/contrato? As NFs vinculadas também serão removidas.')) return;
+    this.dados.materiais = this.dados.materiais.filter(m => String(m.id)!==String(id));
+    this.dados.nfs = this.dados.nfs.filter(n => String(n.materialId)!==String(id));
+    this.salvar(); this.renderizar(); app.mostrarAlerta('Material excluído.', 'success');
+  },
+
+  preencherSelectMateriais() {
+    const sel = document.getElementById('saldoNFMaterial');
+    if (!sel) return;
+    sel.innerHTML = '<option value="">Selecione...</option>' + this.dados.materiais.map(m => `<option value="${m.id}">${this.esc(m.nome)} (${this.esc(m.unidade)})</option>`).join('');
+  },
+  abrirModalNF(id=null) {
+    if (!this.dados.materiais.length) return app.mostrarAlerta('Cadastre um material/contrato antes de lançar NF.', 'error');
+    this.editandoNFId = id;
+    this.preencherSelectMateriais();
+    document.getElementById('formSaldoNF').reset();
+    document.getElementById('saldoNFData').value = new Date().toISOString().slice(0,10);
+    document.getElementById('saldoNFTitle').textContent = id ? 'Editar NF' : 'Lançar NF';
+    if (id) {
+      const n = this.dados.nfs.find(x => String(x.id)===String(id));
+      if (n) {
+        document.getElementById('saldoNFData').value = n.data || '';
+        document.getElementById('saldoNFNumero').value = n.numero || '';
+        document.getElementById('saldoNFFornecedor').value = n.fornecedor || '';
+        document.getElementById('saldoNFMaterial').value = n.materialId || '';
+        document.getElementById('saldoNFQuantidade').value = n.quantidade || 0;
+        document.getElementById('saldoNFValor').value = n.valor || '';
+        document.getElementById('saldoNFObs').value = n.obs || '';
+      }
+    }
+    document.getElementById('modalSaldoNF').classList.add('active');
+  },
+  fecharModalNF(){ document.getElementById('modalSaldoNF').classList.remove('active'); this.editandoNFId=null; },
+  salvarNF(e) {
+    e.preventDefault();
+    const item = {
+      id: this.editandoNFId || Date.now(),
+      data: document.getElementById('saldoNFData').value,
+      numero: document.getElementById('saldoNFNumero').value.trim(),
+      fornecedor: document.getElementById('saldoNFFornecedor').value.trim(),
+      materialId: document.getElementById('saldoNFMaterial').value,
+      quantidade: Number(document.getElementById('saldoNFQuantidade').value||0),
+      valor: Number(document.getElementById('saldoNFValor').value||0),
+      obs: document.getElementById('saldoNFObs').value.trim()
+    };
+    if (this.editandoNFId) this.dados.nfs = this.dados.nfs.map(n => String(n.id)===String(item.id) ? item : n);
+    else this.dados.nfs.push(item);
+    this.salvar(); this.fecharModalNF(); this.renderizar();
+    const mat = this.dados.materiais.find(m => String(m.id)===String(item.materialId));
+    const st = mat ? this.status(mat) : null;
+    app.mostrarAlerta(st?.key === 'critico' || st?.key === 'zerado' ? 'NF lançada. Atenção: material na margem de RT/RS!' : 'NF lançada com sucesso!', st?.key === 'critico' || st?.key === 'zerado' ? 'error' : 'success');
+  },
+  excluirNF(id){ if(!confirm('Excluir este lançamento de NF?')) return; this.dados.nfs=this.dados.nfs.filter(n=>String(n.id)!==String(id)); this.salvar(); this.renderizar(); app.mostrarAlerta('NF excluída.', 'success'); },
+
+  listaMateriaisFiltrada(){
+    const busca=(document.getElementById('saldoBusca')?.value||'').toLowerCase();
+    const filtro=document.getElementById('saldoStatusFiltro')?.value||'';
+    return this.dados.materiais.filter(m=>{
+      const nfs=this.dados.nfs.filter(n=>String(n.materialId)===String(m.id));
+      const blob=[m.nome,m.unidade,m.obs,...nfs.flatMap(n=>[n.numero,n.fornecedor,n.obs])].join(' ').toLowerCase();
+      return (!busca || blob.includes(busca)) && (!filtro || this.status(m).key===filtro);
+    }).sort((a,b)=>String(a.nome).localeCompare(String(b.nome)));
+  },
+
+  renderizar(){
+    const lista=this.listaMateriaisFiltrada();
+    const totalContrato=this.dados.materiais.reduce((s,m)=>s+Number(m.contrato||0),0);
+    const totalLancado=this.dados.materiais.reduce((s,m)=>s+this.totalLancado(m.id),0);
+    const criticos=this.dados.materiais.filter(m=>['critico','zerado'].includes(this.status(m).key)).length;
+    const valorNF=this.dados.nfs.reduce((s,n)=>s+Number(n.valor||0),0);
+    const resumo=document.getElementById('saldoResumo');
+    if(resumo) resumo.innerHTML=`<div class="saldo-card"><div class="label">Materiais cadastrados</div><div class="value">${this.dados.materiais.length}</div></div><div class="saldo-card"><div class="label">Total lançado</div><div class="value">${this.num(totalLancado)}</div></div><div class="saldo-card"><div class="label">Materiais em RT/RS</div><div class="value">${criticos}</div></div><div class="saldo-card"><div class="label">Valor total das NFs</div><div class="value">${this.moeda(valorNF)}</div></div>`;
+    const alertas=document.getElementById('saldoAlertas');
+    const matsCrit=this.dados.materiais.filter(m=>['critico','zerado'].includes(this.status(m).key));
+    if(alertas) alertas.innerHTML=matsCrit.length?matsCrit.map(m=>`<div class="saldo-alert-box"><strong>${this.esc(m.nome)}</strong> está com saldo atual de <strong>${this.num(this.saldoAtual(m))} ${this.esc(m.unidade)}</strong>. Alinhar com a engenharia para avaliar nova RT/RS.</div>`).join(''):'';
+    const tbody=document.getElementById('saldoTabelaMateriais');
+    if(tbody) tbody.innerHTML=lista.length?lista.map(m=>{ const usado=this.percentualUsado(m); return `<tr><td data-label="Material"><strong>${this.esc(m.nome)}</strong>${m.obs?`<div style="color:#6b7a99;font-size:12px;">${this.esc(m.obs)}</div>`:''}<div class="saldo-progress"><span style="width:${usado}%"></span></div></td><td data-label="Unid.">${this.esc(m.unidade)}</td><td data-label="Saldo contratado">${this.num(m.contrato)}</td><td data-label="Total lançado">${this.num(this.totalLancado(m.id))}</td><td data-label="Saldo atual"><strong>${this.num(this.saldoAtual(m))}</strong></td><td data-label="Margem">${this.num(this.margemQtd(m))} (${this.num(m.margem)}%)</td><td data-label="Status">${this.badge(m)}</td><td data-label="Ações"><div class="saldo-actions"><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">NF</button><button class="btn btn-secondary" onclick="appSaldoNF.abrirModalMaterial(${m.id})">Editar</button><button class="btn btn-danger" onclick="appSaldoNF.excluirMaterial(${m.id})">Excluir</button></div></td></tr>`}).join(''):'<tr><td colspan="8">Nenhum material encontrado.</td></tr>';
+    const nfs=[...this.dados.nfs].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
+    const tbodyN=document.getElementById('saldoTabelaNFs');
+    if(tbodyN) tbodyN.innerHTML=nfs.length?nfs.map(n=>{ const m=this.dados.materiais.find(x=>String(x.id)===String(n.materialId)); return `<tr><td data-label="Data">${n.data?new Date(n.data+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</td><td data-label="NF"><strong>${this.esc(n.numero)}</strong></td><td data-label="Fornecedor">${this.esc(n.fornecedor||'-')}</td><td data-label="Material">${this.esc(m?.nome||'Material excluído')}</td><td data-label="Qtd.">${this.num(n.quantidade)} ${this.esc(m?.unidade||'')}</td><td data-label="Valor">${n.valor?this.moeda(n.valor):'-'}</td><td data-label="Obs.">${this.esc(n.obs||'-')}</td><td data-label="Ações"><div class="saldo-actions"><button class="btn btn-secondary" onclick="appSaldoNF.abrirModalNF(${n.id})">Editar</button><button class="btn btn-danger" onclick="appSaldoNF.excluirNF(${n.id})">Excluir</button></div></td></tr>`}).join(''):'<tr><td colspan="8">Nenhuma NF lançada.</td></tr>';
+  },
+
+  exportarCSV(){
+    const linhas=[['Data','NF','Fornecedor','Material','Unidade','Quantidade','Valor','Observacao']];
+    this.dados.nfs.forEach(n=>{ const m=this.dados.materiais.find(x=>String(x.id)===String(n.materialId)); linhas.push([n.data,n.numero,n.fornecedor,m?.nome||'',m?.unidade||'',n.quantidade,n.valor,n.obs]); });
+    const csv=linhas.map(l=>l.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(';')).join('\n');
+    const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='controle-saldo-nfs.csv'; a.click(); URL.revokeObjectURL(url);
+  }
+};
+
 const appRT = {
   STORAGE_KEY: 'planejamento_rt_dados',
   STORAGE_KEY_DIA_DIA: 'planejamento_rt_dia_dia_dados',
@@ -4863,6 +5160,7 @@ document.addEventListener('DOMContentLoaded', () => {
   window.auth = auth;
 window.app = app;
 window.appMateriais = appMateriais;
+window.appSaldoNF = appSaldoNF;
 window.appRT = appRT;
 window.floorRooms = floorRooms;
 floorRooms.init();
@@ -4938,6 +5236,7 @@ window.addEventListener('resize', handleMediaChange);
     <button class="mobile-nav-button" data-section="predio-3d" onclick="app.showSection('predio-3d', this); closeMobileMenu()">3D PRÉDIO</button>
     <button class="mobile-nav-button" data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this); closeMobileMenu()">RT Dia a Dia</button>
     <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
+    <button class="mobile-nav-button" data-section="saldo-nf" onclick="app.showSection('saldo-nf', this); closeMobileMenu()">Saldo por NF</button>
   </div>
   
   <!-- Seção Controle de Romaneios -->
