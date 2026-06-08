@@ -27,6 +27,7 @@ const REF_MATERIAIS = doc(db, "controle", "materiais");
 const REF_MOVIMENTACOES = doc(db, "controle", "movimentacoes");
 const REF_PLANEJAMENTO_RT = doc(db, "controle", "planejamento_rt");
 const REF_RT_DIA_DIA = doc(db, "controle", "rt_dia_dia");
+const REF_SALDO_NF = doc(db, "controle", "saldo_nf");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
@@ -113,5 +114,23 @@ export function escutarMudancasRTDiaDia(callback) {
   return onSnapshot(REF_RT_DIA_DIA, (snap) => {
     if (!snap.exists()) return;
     callback(snap.data().itens ?? []);
+  });
+}
+
+
+// ── CONTROLE DE SALDO POR NF ──
+export async function salvarSaldoNFNaNuvem(dados) {
+  await setDoc(REF_SALDO_NF, { dados, updatedAt: Date.now() }, { merge: true });
+}
+
+export async function carregarSaldoNFDaNuvem() {
+  const snap = await getDoc(REF_SALDO_NF);
+  return snap.exists() ? (snap.data().dados ?? null) : null;
+}
+
+export function escutarMudancasSaldoNF(callback) {
+  return onSnapshot(REF_SALDO_NF, (snap) => {
+    if (!snap.exists()) return;
+    callback(snap.data().dados ?? { materiais: [], nfs: [] });
   });
 }
