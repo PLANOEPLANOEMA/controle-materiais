@@ -1,1 +1,4 @@
-Formulário do Controle de Materiais atualizado com dois botões separados: Galeria e Câmera, em estilo app.
+Alteração aplicada no formulário de Controle de Materiais:
+- campo de foto agora aceita câmera do celular
+- input usa accept='image/*' e capture='environment'
+- botão '📷 Tirar Foto' adicionado no modal
