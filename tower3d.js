@@ -1,396 +1,398 @@
 /**
- * Gerenciador de Serviços de Pavimentos
- * Desacoplado das RTs - Funciona independentemente
+ * Torre 3D Realista com Three.js
+ * Integrada ao sistema de planejamento RT
  */
 
-const appServicosPavimentos = {
-  servicos: [],
-  STORAGE_KEY: 'controle_servicos_pavimentos',
-  
-  // Serviços padrão disponíveis
-  servicosPadrao: [
-    'Contra Piso',
-    'Gesso Liso',
-    'Forro',
-    'Pintura',
-    'Instalação de Porta'
-  ],
+class Tower3D {
+  constructor(containerId, towerName, floorsData) {
+    this.containerId = containerId;
+    this.towerName = towerName;
+    this.floorsData = floorsData; // Array com dados dos pavimentos
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.towerGroup = null;
+    this.selectedFloor = null;
+    this.onFloorSelected = null;
+    this.colorMap = {
+      verde: 0x27AE60,
+      amarelo: 0xF5A623,
+      vermelho: 0xE84545,
+      cinza: 0x95a5a6
+    };
+    this.init();
+  }
 
-  // ── INICIALIZAÇÃO ──
-  async init() {
-    await this.carregarServicos();
-    this.iniciarSyncAoVivo();
-  },
+  init() {
+    const container = document.getElementById(this.containerId);
+    if (!container) {
+      console.error(`Container ${this.containerId} não encontrado`);
+      return;
+    }
 
-  // ── CARREGAR DADOS ──
-  async carregarServicos() {
-    try {
-      if (window.__fb && window.__fb.carregarServicosPavimentosDaNuvem) {
-        const cloud = await window.__fb.carregarServicosPavimentosDaNuvem();
-        if (Array.isArray(cloud) && cloud.length) {
-          this.servicos = cloud;
-          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.servicos)); } catch(e) {}
-          console.log('Serviços carregados do Firebase:', this.servicos.length);
-          return;
+    // Scene setup
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xeef5ff);
+    this.scene.fog = new THREE.Fog(0xeef5ff, 100, 200);
+
+    // Camera setup
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    this.camera.position.set(0, 8, 15);
+    this.camera.lookAt(0, 8, 0);
+
+    // Renderer setup
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setSize(width, height);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(this.renderer.domElement);
+
+    // Lighting
+    this.setupLighting();
+
+    // Build tower
+    this.towerGroup = new THREE.Group();
+    this.scene.add(this.towerGroup);
+    this.buildTower();
+
+    // Controls
+    this.setupControls();
+
+    // Animation loop
+    this.animate();
+
+    // Handle resize
+    window.addEventListener('resize', () => this.onWindowResize());
+  }
+
+  setupLighting() {
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    this.scene.add(ambientLight);
+
+    // Directional light (sun)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(20, 30, 20);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.left = -50;
+    directionalLight.shadow.camera.right = 50;
+    directionalLight.shadow.camera.top = 50;
+    directionalLight.shadow.camera.bottom = -50;
+    this.scene.add(directionalLight);
+
+    // Point light for accent
+    const pointLight = new THREE.PointLight(0xffffff, 0.3);
+    pointLight.position.set(-20, 20, 20);
+    this.scene.add(pointLight);
+  }
+
+  buildTower() {
+    const floorHeight = 3.5;
+    const towerWidth = 12;
+    const towerDepth = 8;
+    const numFloors = this.floorsData.length;
+
+    // Foundation (pilares)
+    this.buildFoundation(towerWidth, towerDepth);
+
+    // Floors
+    this.floorsData.forEach((floorData, index) => {
+      const yPosition = index * floorHeight;
+      this.buildFloor(floorData, index, yPosition, towerWidth, towerDepth, floorHeight);
+    });
+
+    // Roof
+    this.buildRoof(numFloors * floorHeight, towerWidth, towerDepth);
+  }
+
+  buildFoundation(width, depth) {
+    const pillarRadius = 0.3;
+    const pillarHeight = 2.5;
+    const spacing = 2.5;
+
+    const pillarPositions = [
+      [-width / 2 + 1, 0, -depth / 2 + 1],
+      [width / 2 - 1, 0, -depth / 2 + 1],
+      [-width / 2 + 1, 0, depth / 2 - 1],
+      [width / 2 - 1, 0, depth / 2 - 1],
+      [0, 0, -depth / 2 + 1],
+      [0, 0, depth / 2 - 1]
+    ];
+
+    const pillarGeometry = new THREE.CylinderGeometry(pillarRadius, pillarRadius, pillarHeight, 16);
+    const pillarMaterial = new THREE.MeshStandardMaterial({
+      color: 0x5a5a5a,
+      metalness: 0.3,
+      roughness: 0.7
+    });
+
+    pillarPositions.forEach(pos => {
+      const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
+      pillar.position.set(pos[0], pos[1] + pillarHeight / 2, pos[2]);
+      pillar.castShadow = true;
+      pillar.receiveShadow = true;
+      this.towerGroup.add(pillar);
+    });
+
+    // Base platform
+    const baseGeometry = new THREE.BoxGeometry(width + 1, 0.5, depth + 1);
+    const baseMaterial = new THREE.MeshStandardMaterial({
+      color: 0x7a7a7a,
+      metalness: 0.2,
+      roughness: 0.8
+    });
+    const base = new THREE.Mesh(baseGeometry, baseMaterial);
+    base.position.y = 2.5;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    this.towerGroup.add(base);
+  }
+
+  buildFloor(floorData, index, yPosition, width, depth, floorHeight) {
+    const floorThickness = 0.3;
+    const wallThickness = 0.2;
+
+    // Get color based on status
+    const color = this.colorMap[floorData.status] || this.colorMap.cinza;
+
+    // Floor slab
+    const floorGeometry = new THREE.BoxGeometry(width, floorThickness, depth);
+    const floorMaterial = new THREE.MeshStandardMaterial({
+      color: color,
+      metalness: 0.1,
+      roughness: 0.8
+    });
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.position.y = yPosition;
+    floor.castShadow = true;
+    floor.receiveShadow = true;
+    floor.userData = { floorIndex: index, floorData: floorData };
+    this.towerGroup.add(floor);
+
+    // Walls
+    this.buildWalls(yPosition, width, depth, floorHeight, wallThickness, color);
+
+    // Windows
+    this.buildWindows(yPosition + floorThickness, width, depth, floorHeight, floorData);
+
+    // Floor label (invisible but interactive)
+    const labelGeometry = new THREE.BoxGeometry(width - 1, floorHeight - 0.5, depth - 1);
+    const labelMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+    const label = new THREE.Mesh(labelGeometry, labelMaterial);
+    label.position.y = yPosition + floorHeight / 2;
+    label.userData = { isFloorLabel: true, floorIndex: index, floorData: floorData };
+    this.towerGroup.add(label);
+  }
+
+  buildWalls(yPosition, width, depth, floorHeight, thickness, color) {
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: color,
+      metalness: 0.05,
+      roughness: 0.9
+    });
+
+    // Front wall
+    const frontGeometry = new THREE.BoxGeometry(width, floorHeight - 0.3, thickness);
+    const frontWall = new THREE.Mesh(frontGeometry, wallMaterial);
+    frontWall.position.set(0, yPosition + floorHeight / 2, -depth / 2);
+    frontWall.castShadow = true;
+    frontWall.receiveShadow = true;
+    this.towerGroup.add(frontWall);
+
+    // Back wall
+    const backWall = new THREE.Mesh(frontGeometry, wallMaterial);
+    backWall.position.set(0, yPosition + floorHeight / 2, depth / 2);
+    backWall.castShadow = true;
+    backWall.receiveShadow = true;
+    this.towerGroup.add(backWall);
+
+    // Left wall
+    const sideGeometry = new THREE.BoxGeometry(thickness, floorHeight - 0.3, depth);
+    const leftWall = new THREE.Mesh(sideGeometry, wallMaterial);
+    leftWall.position.set(-width / 2, yPosition + floorHeight / 2, 0);
+    leftWall.castShadow = true;
+    leftWall.receiveShadow = true;
+    this.towerGroup.add(leftWall);
+
+    // Right wall
+    const rightWall = new THREE.Mesh(sideGeometry, wallMaterial);
+    rightWall.position.set(width / 2, yPosition + floorHeight / 2, 0);
+    rightWall.castShadow = true;
+    rightWall.receiveShadow = true;
+    this.towerGroup.add(rightWall);
+  }
+
+  buildWindows(yPosition, width, depth, floorHeight, floorData) {
+    const windowWidth = 1.2;
+    const windowHeight = 1.0;
+    const windowDepth = 0.15;
+
+    const windowMaterial = new THREE.MeshStandardMaterial({
+      color: 0x87CEEB,
+      metalness: 0.8,
+      roughness: 0.1
+    });
+
+    // Front windows
+    const frontWindowPositions = [
+      -width / 3,
+      0,
+      width / 3
+    ];
+
+    frontWindowPositions.forEach(x => {
+      const windowGeometry = new THREE.BoxGeometry(windowWidth, windowHeight, windowDepth);
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(x, yPosition + floorHeight / 2, -depth / 2 - 0.1);
+      window.castShadow = true;
+      this.towerGroup.add(window);
+    });
+
+    // Back windows
+    frontWindowPositions.forEach(x => {
+      const windowGeometry = new THREE.BoxGeometry(windowWidth, windowHeight, windowDepth);
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(x, yPosition + floorHeight / 2, depth / 2 + 0.1);
+      window.castShadow = true;
+      this.towerGroup.add(window);
+    });
+    if (this.onFloorSelected && this.floorsData[floorIndex]) {
+      this.onFloorSelected(floorIndex, this.floorsData[floorIndex]);
+    }
+  }
+
+  buildRoof(height, width, depth) {
+    const roofHeight = 1.5;
+    const roofGeometry = new THREE.ConeGeometry(Math.max(width, depth) / 1.5, roofHeight, 32);
+    const roofMaterial = new THREE.MeshStandardMaterial({
+      color: 0x5f6f87,
+      metalness: 0.3,
+      roughness: 0.7
+    });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.y = height + roofHeight / 2;
+    roof.castShadow = true;
+    roof.receiveShadow = true;
+    this.towerGroup.add(roof);
+  }
+
+  setupControls() {
+    // Mouse controls
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    this.renderer.domElement.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      previousMousePosition = { x: e.clientX, y: e.clientY };
+
+      // Raycasting for floor selection
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      const rect = this.renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, this.camera);
+      const intersects = raycaster.intersectObjects(this.towerGroup.children, true);
+
+      for (let i = 0; i < intersects.length; i++) {
+        if (intersects[i].object.userData.isFloorLabel) {
+          this.selectFloor(intersects[i].object.userData.floorIndex);
+          break;
         }
       }
-      const salvos = localStorage.getItem(this.STORAGE_KEY);
-      if (salvos) {
-        this.servicos = JSON.parse(salvos);
-        console.log('Serviços carregados do localStorage:', this.servicos.length);
-      } else {
-        this.servicos = [];
-      }
-    } catch (e) {
-      console.error('Erro ao carregar serviços:', e);
-      this.servicos = [];
-    }
-  },
-
-  // ── SINCRONIZAÇÃO EM TEMPO REAL ──
-  iniciarSyncAoVivo() {
-    try {
-      if (window.__fb && window.__fb.escutarMudancasServicosPavimentos) {
-        if (this._unsubServicos) this._unsubServicos();
-        this._unsubServicos = window.__fb.escutarMudancasServicosPavimentos((servicos) => {
-          this.servicos = Array.isArray(servicos) ? servicos : [];
-          try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.servicos)); } catch(e) {}
-          this.renderizarServicosPavimento();
-        });
-      }
-    } catch (e) {
-      console.warn('Sync ao vivo de serviços indisponível:', e);
-    }
-  },
-
-  // ── SALVAR DADOS ──
-  async salvarServicos() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.servicos));
-      if (window.__fb && window.__fb.salvarServicosPavimentosNaNuvem) {
-        await window.__fb.salvarServicosPavimentosNaNuvem(this.servicos);
-      }
-      console.log('Serviços salvos com sucesso!');
-    } catch (e) {
-      console.error('Erro ao salvar serviços:', e);
-      app.mostrarAlerta('Erro ao salvar serviços!', 'error');
-    }
-  },
-
-  // ── GERAR ID ÚNICO ──
-  gerarIdServico(torre, pavimento, servico) {
-    const timestamp = Date.now();
-    const random = Math.random().toString(36).substring(2, 8);
-    return `srv_${torre.replace(/\s+/g, '_')}_${pavimento.replace(/\s+/g, '_')}_${servico.replace(/\s+/g, '_')}_${random}`;
-  },
-
-  // ── ABRIR MODAL DE SERVIÇOS DO PAVIMENTO ──
-  abrirModalServicosPavimento(torre, pavimento) {
-    if (!auth.pode('editar_servicos_pavimentos') && !auth.pode('editar_planejamento_rt')) {
-      app.mostrarAlerta('Seu perfil não pode editar serviços de pavimentos.', 'error');
-      return;
-    }
-
-    const servicosPavimento = this.servicos.filter(s => s.torre === torre && s.pavimento === pavimento);
-    
-    // Se não existem serviços, criar padrão
-    if (servicosPavimento.length === 0) {
-      this.servicosPadrao.forEach(servico => {
-        const novoServico = {
-          id: this.gerarIdServico(torre, pavimento, servico),
-          torre,
-          pavimento,
-          servico,
-          concluido: false,
-          dataInicio: '',
-          dataPrevista: '',
-          dataConclusao: null,
-          fotos: [],
-          observacoes: '',
-          criadoEm: new Date().toISOString(),
-          atualizadoEm: new Date().toISOString()
-        };
-        this.servicos.push(novoServico);
-        servicosPavimento.push(novoServico);
-      });
-      this.salvarServicos();
-    }
-
-    // Renderizar modal
-    this.renderizarModalServicosPavimento(torre, pavimento, servicosPavimento);
-  },
-
-  // ── RENDERIZAR MODAL DE SERVIÇOS ──
-  renderizarModalServicosPavimento(torre, pavimento, servicosPavimento) {
-    let modal = document.getElementById('modalServicosPavimento');
-    if (!modal) {
-      modal = document.createElement('div');
-      modal.id = 'modalServicosPavimento';
-      modal.className = 'modal active';
-      document.body.appendChild(modal);
-    }
-
-    const podeEditar = auth.pode('editar_servicos_pavimentos') || auth.pode('editar_planejamento_rt');
-
-    let html = `
-      <div class="modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
-        <div class="modal-header">
-          <h2>Serviços - ${torre} / ${pavimento}</h2>
-          <button class="close-btn" onclick="appServicosPavimentos.fecharModal()">×</button>
-        </div>
-        <div class="modal-body">
-    `;
-
-    servicosPavimento.forEach(srv => {
-      const fotoCount = srv.fotos ? srv.fotos.length : 0;
-      const statusClass = srv.concluido ? 'concluido' : 'pendente';
-      const statusText = srv.concluido ? '✅ Concluído' : '⏳ Pendente';
-
-      html += `
-        <div class="servico-card ${statusClass}">
-          <div class="servico-header">
-            <div style="display: flex; align-items: center; gap: 1rem; flex: 1;">
-              <input type="checkbox" 
-                     ${srv.concluido ? 'checked' : ''} 
-                     onchange="appServicosPavimentos.toggleServico('${srv.id}')"
-                     ${!podeEditar ? 'disabled' : ''}
-                     style="width: 24px; height: 24px; cursor: pointer; accent-color: #27AE60;">
-              <div>
-                <h3 style="margin: 0; color: #1F3864;">${srv.servico}</h3>
-                <span style="color: #6b7a99; font-size: 0.9rem;">${statusText}</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="servico-body">
-            <!-- Datas -->
-            <div class="dates-group">
-              <div class="date-field">
-                <label>📅 Data de Início</label>
-                <input type="date" 
-                       value="${srv.dataInicio || ''}" 
-                       onchange="appServicosPavimentos.atualizarCampo('${srv.id}', 'dataInicio', this.value)"
-                       ${!podeEditar ? 'disabled' : ''}>
-              </div>
-              <div class="date-field">
-                <label>📅 Data Prevista</label>
-                <input type="date" 
-                       value="${srv.dataPrevista || ''}" 
-                       onchange="appServicosPavimentos.atualizarCampo('${srv.id}', 'dataPrevista', this.value)"
-                       ${!podeEditar ? 'disabled' : ''}>
-              </div>
-            </div>
-
-            <!-- Fotos -->
-            <div class="photos-section">
-              <div class="photos-header">
-                <label style="font-weight: 700; color: #4a5568;">📸 Fotos (${fotoCount}/5)</label>
-                ${podeEditar ? `<button class="btn-upload" onclick="document.getElementById('fotoInput_${srv.id}').click()">📷 Adicionar Foto</button>` : ''}
-                <input type="file" 
-                       id="fotoInput_${srv.id}" 
-                       accept="image/*" 
-                       style="display: none;" 
-                       onchange="appServicosPavimentos.adicionarFoto('${srv.id}', event)">
-              </div>
-              <div class="photos-grid">
-                ${srv.fotos && srv.fotos.length > 0 ? srv.fotos.map((foto, idx) => `
-                  <div style="position: relative;">
-                    <img src="${foto}" alt="Foto ${idx + 1}" class="photo-thumb" style="cursor: pointer;" onclick="appServicosPavimentos.abrirFotoGrande('${srv.id}', ${idx})">
-                    ${podeEditar ? `<button class="photo-remove" onclick="appServicosPavimentos.removerFoto('${srv.id}', ${idx})">×</button>` : ''}
-                  </div>
-                `).join('') : '<span style="color: #999;">Nenhuma foto adicionada</span>'}
-              </div>
-            </div>
-
-            <!-- Observações -->
-            <div style="margin-top: 1.5rem;">
-              <label style="display: block; font-weight: 700; color: #4a5568; margin-bottom: 0.5rem;">📝 Observações</label>
-              <textarea 
-                        style="width: 100%; padding: 0.75rem; border: 1px solid #e2e8f0; border-radius: 6px; font-family: Arial; resize: vertical; min-height: 80px;"
-                        placeholder="Adicione observações sobre este serviço..."
-                        onchange="appServicosPavimentos.atualizarCampo('${srv.id}', 'observacoes', this.value)"
-                        ${!podeEditar ? 'disabled' : ''}>${srv.observacoes || ''}</textarea>
-            </div>
-          </div>
-        </div>
-      `;
     });
 
-    html += `
-        </div>
-        <div class="modal-footer">
-          <button class="btn btn-secondary" onclick="appServicosPavimentos.fecharModal()">Fechar</button>
-          ${podeEditar ? `<button class="btn btn-primary" onclick="appServicosPavimentos.salvarServicos()">💾 Salvar Alterações</button>` : ''}
-        </div>
-      </div>
-    `;
+    this.renderer.domElement.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
 
-    modal.innerHTML = html;
-    modal.classList.add('active');
-    modal.addEventListener('click', (e) => {
-      if (e.target.id === 'modalServicosPavimento') this.fecharModal();
-    });
-  },
+        this.towerGroup.rotation.y += deltaX * 0.005;
+        this.towerGroup.rotation.x += deltaY * 0.005;
 
-  // ── ATUALIZAR CAMPO ──
-  atualizarCampo(id, campo, valor) {
-    const srv = this.servicos.find(s => s.id === id);
-    if (srv) {
-      srv[campo] = valor;
-      srv.atualizadoEm = new Date().toISOString();
-    }
-  },
-
-  // ── TOGGLE SERVIÇO (CONCLUÍDO/PENDENTE) ──
-  toggleServico(id) {
-    const srv = this.servicos.find(s => s.id === id);
-    if (srv) {
-      srv.concluido = !srv.concluido;
-      if (srv.concluido) {
-        srv.dataConclusao = new Date().toISOString();
-      } else {
-        srv.dataConclusao = null;
-      }
-      srv.atualizadoEm = new Date().toISOString();
-      this.salvarServicos();
-    }
-  },
-
-  // ── ADICIONAR FOTO ──
-  async adicionarFoto(id, event) {
-    const file = event.target.files && event.target.files[0];
-    if (!file) return;
-
-    const srv = this.servicos.find(s => s.id === id);
-    if (!srv) return;
-
-    if (!srv.fotos) srv.fotos = [];
-    if (srv.fotos.length >= 5) {
-      app.mostrarAlerta('Máximo de 5 fotos por serviço!', 'error');
-      return;
-    }
-
-    try {
-      const base64 = await this.comprimirImagem(file);
-      srv.fotos.push(base64);
-      srv.atualizadoEm = new Date().toISOString();
-      this.salvarServicos();
-      
-      // Reabrir modal para atualizar
-      const torre = srv.torre;
-      const pavimento = srv.pavimento;
-      const servicosPavimento = this.servicos.filter(s => s.torre === torre && s.pavimento === pavimento);
-      this.renderizarModalServicosPavimento(torre, pavimento, servicosPavimento);
-    } catch (error) {
-      console.error('Erro ao comprimir imagem:', error);
-      app.mostrarAlerta('Erro ao processar imagem!', 'error');
-    }
-  },
-
-  // ── REMOVER FOTO ──
-  removerFoto(id, index) {
-    const srv = this.servicos.find(s => s.id === id);
-    if (srv && srv.fotos) {
-      srv.fotos.splice(index, 1);
-      srv.atualizadoEm = new Date().toISOString();
-      this.salvarServicos();
-      
-      // Reabrir modal para atualizar
-      const torre = srv.torre;
-      const pavimento = srv.pavimento;
-      const servicosPavimento = this.servicos.filter(s => s.torre === torre && s.pavimento === pavimento);
-      this.renderizarModalServicosPavimento(torre, pavimento, servicosPavimento);
-    }
-  },
-
-  // ── ABRIR FOTO GRANDE ──
-  abrirFotoGrande(id, index) {
-    const srv = this.servicos.find(s => s.id === id);
-    if (!srv || !srv.fotos || !srv.fotos[index]) return;
-
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.8);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      cursor: pointer;
-    `;
-    modal.onclick = () => modal.remove();
-    modal.innerHTML = `
-      <div style="position: relative; max-width: 90vw; max-height: 90vh;">
-        <img src="${srv.fotos[index]}" style="max-width: 100%; max-height: 100%; border-radius: 8px;">
-        <button onclick="this.parentElement.parentElement.remove()" 
-                style="position: absolute; top: -40px; right: 0; background: #E84545; color: #fff; border: none; border-radius: 50%; width: 36px; height: 36px; font-size: 24px; cursor: pointer;">×</button>
-      </div>
-    `;
-    document.body.appendChild(modal);
-  },
-
-  // ── COMPRIMIR IMAGEM ──
-  async comprimirImagem(file) {
-    return new Promise((resolve, reject) => {
-      try {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const img = new Image();
-          img.onload = () => {
-            const maxWidth = 900;
-            const maxHeight = 900;
-            let { width, height } = img;
-
-            if (width > maxWidth || height > maxHeight) {
-              const ratio = Math.min(maxWidth / width, maxHeight / height);
-              width = Math.round(width * ratio);
-              height = Math.round(height * ratio);
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-
-            let quality = 0.72;
-            let output = canvas.toDataURL('image/jpeg', quality);
-            while (output.length > 350000 && quality > 0.45) {
-              quality -= 0.07;
-              output = canvas.toDataURL('image/jpeg', quality);
-            }
-            resolve(output);
-          };
-          img.onerror = reject;
-          img.src = event.target.result;
-        };
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      } catch (error) {
-        reject(error);
+        previousMousePosition = { x: e.clientX, y: e.clientY };
       }
     });
-  },
 
-  // ── FECHAR MODAL ──
-  fecharModal() {
-    const modal = document.getElementById('modalServicosPavimento');
-    if (modal) {
-      modal.classList.remove('active');
-      setTimeout(() => modal.remove(), 300);
-    }
-  },
+    this.renderer.domElement.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
 
-  // ── RENDERIZAR SERVIÇOS (PARA FUTURO USO) ──
-  renderizarServicosPavimento() {
-    // Será implementado quando integrado ao prédio 3D
+    // Mouse wheel zoom
+    this.renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomSpeed = 0.1;
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const distance = this.camera.position.length();
+      const newDistance = Math.max(5, Math.min(50, distance + direction * zoomSpeed * distance));
+      const ratio = newDistance / distance;
+      this.camera.position.multiplyScalar(ratio);
+    });
   }
-};
 
-// Inicializar ao carregar
-document.addEventListener('DOMContentLoaded', () => {
-  if (window.appServicosPavimentos) {
-    window.appServicosPavimentos.init();
+  setOnFloorSelected(callback) {
+    this.onFloorSelected = callback;
   }
-});
+
+  rotateToView(angle = 0) {
+    if (this.towerGroup) this.towerGroup.rotation.y = angle;
+  }
+
+  zoomTo(distance = 18) {
+    const dir = this.camera.position.clone().normalize();
+    this.camera.position.copy(dir.multiplyScalar(distance));
+  }
+
+  selectFloor(floorIndex) {
+    this.selectedFloor = floorIndex;
+    // Highlight selected floor
+    this.towerGroup.children.forEach(child => {
+      if (child.userData.floorIndex === floorIndex && child.material && child.material.emissive) {
+        child.material.emissive.setHex(0x444444);
+      } else if (child.userData.floorIndex !== undefined && child.material && child.material.emissive) {
+        child.material.emissive.setHex(0x000000);
+      }
+    });
+  }
+
+  updateFloorStatus(floorIndex, newStatus) {
+    const color = this.colorMap[newStatus] || this.colorMap.cinza;
+    this.towerGroup.children.forEach(child => {
+      if (child.userData.floorIndex === floorIndex && child.material) {
+        child.material.color.setHex(color);
+      }
+    });
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  onWindowResize() {
+    const container = document.getElementById(this.containerId);
+    if (!container) return;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
+  }
+
+  dispose() {
+    if (this.renderer) {
+      this.renderer.dispose();
+      this.renderer.domElement.remove();
+    }
+  }
+}
+
+// Export for use in HTML
+window.Tower3D = Tower3D;
