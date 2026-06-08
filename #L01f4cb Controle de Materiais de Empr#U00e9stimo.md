@@ -1,157 +1,398 @@
-# 📋 Controle de Materiais de Empréstimo
+/**
+ * Torre 3D Realista com Three.js
+ * Integrada ao sistema de planejamento RT
+ */
 
-Uma aplicação web interativa e editável para gerenciar débitos de materiais de construção e empréstimos de forma visual e intuitiva.
+class Tower3D {
+  constructor(containerId, towerName, floorsData) {
+    this.containerId = containerId;
+    this.towerName = towerName;
+    this.floorsData = floorsData; // Array com dados dos pavimentos
+    this.scene = null;
+    this.camera = null;
+    this.renderer = null;
+    this.towerGroup = null;
+    this.selectedFloor = null;
+    this.onFloorSelected = null;
+    this.colorMap = {
+      verde: 0x27AE60,
+      amarelo: 0xF5A623,
+      vermelho: 0xE84545,
+      cinza: 0x95a5a6
+    };
+    this.init();
+  }
 
-## ✨ Características
+  init() {
+    const container = document.getElementById(this.containerId);
+    if (!container) {
+      console.error(`Container ${this.containerId} não encontrado`);
+      return;
+    }
 
-- ✅ **Gestão Completa (CRUD)** — Adicione, edite e delete registros de empréstimos
-- ✅ **Gráficos Interativos** — Visualize dados em tempo real com gráficos de rosca, pizza e barras
-- ✅ **Salvamento Automático** — Dados salvos no navegador (localStorage) — nunca perca suas informações
-- ✅ **Filtros e Busca** — Procure por empresa, material ou data facilmente
-- ✅ **Exportação CSV** — Exporte seus dados para Excel quando precisar
-- ✅ **Design Responsivo** — Funciona perfeitamente em desktop, tablet e celular
-- ✅ **Sem Necessidade de Login** — Acesse instantaneamente, sem criar conta
+    // Scene setup
+    this.scene = new THREE.Scene();
+    this.scene.background = new THREE.Color(0xeef5ff);
+    this.scene.fog = new THREE.Fog(0xeef5ff, 100, 200);
 
-## 🚀 Como Usar
+    // Camera setup
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+    this.camera = new THREE.PerspectiveCamera(75, width / height, 0.1, 1000);
+    this.camera.position.set(0, 8, 15);
+    this.camera.lookAt(0, 8, 0);
 
-### Online (Recomendado)
-Acesse diretamente no navegador:
-```
-https://seu-dominio-aqui.vercel.app
-```
+    // Renderer setup
+    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    this.renderer.setSize(width, height);
+    this.renderer.shadowMap.enabled = true;
+    this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    container.appendChild(this.renderer.domElement);
 
-### Localmente
-1. Baixe o arquivo `index.html`
-2. Abra-o no seu navegador (Chrome, Firefox, Edge)
-3. Comece a adicionar seus registros!
+    // Lighting
+    this.setupLighting();
 
-## 📊 Funcionalidades
+    // Build tower
+    this.towerGroup = new THREE.Group();
+    this.scene.add(this.towerGroup);
+    this.buildTower();
 
-### Visão Geral
-- Gráficos de distribuição por empresa e material
-- Timeline de empréstimos por data
-- KPIs com totalizações
+    // Controls
+    this.setupControls();
 
-### Por Empresa
-- Participação percentual de cada empresa
-- Comparativo visual em barras horizontais
+    // Animation loop
+    this.animate();
 
-### Por Material
-- Distribuição de tipos de material
-- Análise de quais materiais mais circulam
+    // Handle resize
+    window.addEventListener('resize', () => this.onWindowResize());
+  }
 
-### Gerenciar Registros
-- Tabela completa com todos os dados
-- Botões para editar e deletar
-- Filtros por empresa e material
-- Busca por texto livre
-- Exportação em CSV
+  setupLighting() {
+    // Ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.6);
+    this.scene.add(ambientLight);
 
-## 💾 Armazenamento de Dados
+    // Directional light (sun)
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+    directionalLight.position.set(20, 30, 20);
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.camera.left = -50;
+    directionalLight.shadow.camera.right = 50;
+    directionalLight.shadow.camera.top = 50;
+    directionalLight.shadow.camera.bottom = -50;
+    this.scene.add(directionalLight);
 
-Os dados são salvos automaticamente no **localStorage** do seu navegador. Isso significa:
-- ✅ Dados persistem mesmo após fechar o navegador
-- ✅ Funciona completamente offline
-- ✅ Sem servidor necessário
-- ⚠️ Se limpar dados do navegador, os dados serão perdidos (use exportar CSV para backup)
+    // Point light for accent
+    const pointLight = new THREE.PointLight(0xffffff, 0.3);
+    pointLight.position.set(-20, 20, 20);
+    this.scene.add(pointLight);
+  }
 
-## 📥 Exportar Dados
+  buildTower() {
+    const floorHeight = 3.5;
+    const towerWidth = 12;
+    const towerDepth = 8;
+    const numFloors = this.floorsData.length;
 
-1. Vá na aba "Gerenciar Registros"
-2. Clique em "💾 Exportar CSV"
-3. O arquivo será baixado automaticamente
-4. Abra no Excel ou Google Sheets
+    // Foundation (pilares)
+    this.buildFoundation(towerWidth, towerDepth);
 
-## 🔄 Resetar Dados
+    // Floors
+    this.floorsData.forEach((floorData, index) => {
+      const yPosition = index * floorHeight;
+      this.buildFloor(floorData, index, yPosition, towerWidth, towerDepth, floorHeight);
+    });
 
-Para voltar aos dados iniciais:
-1. Clique em "🔄 Resetar Dados" na aba de gerenciamento
-2. Confirme a ação
-3. Todos os dados voltarão ao padrão
+    // Roof
+    this.buildRoof(numFloors * floorHeight, towerWidth, towerDepth);
+  }
 
-## 🛠️ Tecnologias
+  buildFoundation(width, depth) {
+    const pillarRadius = 0.3;
+    const pillarHeight = 2.5;
+    const spacing = 2.5;
 
-- **HTML5** — Estrutura semântica
-- **CSS3** — Design moderno e responsivo
-- **JavaScript Vanilla** — Sem dependências externas (exceto Chart.js)
-- **Chart.js** — Gráficos interativos
-- **localStorage** — Armazenamento local
+    const pillarPositions = [
+      [-width / 2 + 1, 0, -depth / 2 + 1],
+      [width / 2 - 1, 0, -depth / 2 + 1],
+      [-width / 2 + 1, 0, depth / 2 - 1],
+      [width / 2 - 1, 0, depth / 2 - 1],
+      [0, 0, -depth / 2 + 1],
+      [0, 0, depth / 2 - 1]
+    ];
 
-## 📱 Compatibilidade
+    const pillarGeometry = new THREE.CylinderGeometry(pillarRadius, pillarRadius, pillarHeight, 16);
+    const pillarMaterial = new THREE.MeshStandardMaterial({
+      color: 0x5a5a5a,
+      metalness: 0.3,
+      roughness: 0.7
+    });
 
-- ✅ Chrome/Chromium
-- ✅ Firefox
-- ✅ Safari
-- ✅ Edge
-- ✅ Navegadores mobile
+    pillarPositions.forEach(pos => {
+      const pillar = new THREE.Mesh(pillarGeometry, pillarMaterial);
+      pillar.position.set(pos[0], pos[1] + pillarHeight / 2, pos[2]);
+      pillar.castShadow = true;
+      pillar.receiveShadow = true;
+      this.towerGroup.add(pillar);
+    });
 
-## 🚀 Deploy
+    // Base platform
+    const baseGeometry = new THREE.BoxGeometry(width + 1, 0.5, depth + 1);
+    const baseMaterial = new THREE.MeshStandardMaterial({
+      color: 0x7a7a7a,
+      metalness: 0.2,
+      roughness: 0.8
+    });
+    const base = new THREE.Mesh(baseGeometry, baseMaterial);
+    base.position.y = 2.5;
+    base.castShadow = true;
+    base.receiveShadow = true;
+    this.towerGroup.add(base);
+  }
 
-### Opção 1: Vercel (Recomendado)
-1. Faça fork ou clone este repositório
-2. Acesse [vercel.com](https://vercel.com)
-3. Conecte seu repositório GitHub
-4. Clique em "Deploy"
-5. Seu site estará online em minutos!
+  buildFloor(floorData, index, yPosition, width, depth, floorHeight) {
+    const floorThickness = 0.3;
+    const wallThickness = 0.2;
 
-### Opção 2: GitHub Pages
-1. Faça push dos arquivos para GitHub
-2. Vá em Settings → Pages
-3. Selecione "main" como branch
-4. Seu site estará em `https://seu-usuario.github.io/seu-repositorio`
+    // Get color based on status
+    const color = this.colorMap[floorData.status] || this.colorMap.cinza;
 
-### Opção 3: Netlify
-1. Acesse [netlify.com](https://netlify.com)
-2. Faça drag-and-drop da pasta do projeto
-3. Seu site estará online instantaneamente!
+    // Floor slab
+    const floorGeometry = new THREE.BoxGeometry(width, floorThickness, depth);
+    const floorMaterial = new THREE.MeshStandardMaterial({
+      color: color,
+      metalness: 0.1,
+      roughness: 0.8
+    });
+    const floor = new THREE.Mesh(floorGeometry, floorMaterial);
+    floor.position.y = yPosition;
+    floor.castShadow = true;
+    floor.receiveShadow = true;
+    floor.userData = { floorIndex: index, floorData: floorData };
+    this.towerGroup.add(floor);
 
-## 📝 Estrutura de Arquivos
+    // Walls
+    this.buildWalls(yPosition, width, depth, floorHeight, wallThickness, color);
 
-```
-controle_emprestimos/
-├── index.html          # Aplicação principal
-├── vercel.json         # Configuração de deploy
-└── README.md           # Este arquivo
-```
+    // Windows
+    this.buildWindows(yPosition + floorThickness, width, depth, floorHeight, floorData);
 
-## 🎨 Customização
+    // Floor label (invisible but interactive)
+    const labelGeometry = new THREE.BoxGeometry(width - 1, floorHeight - 0.5, depth - 1);
+    const labelMaterial = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0 });
+    const label = new THREE.Mesh(labelGeometry, labelMaterial);
+    label.position.y = yPosition + floorHeight / 2;
+    label.userData = { isFloorLabel: true, floorIndex: index, floorData: floorData };
+    this.towerGroup.add(label);
+  }
 
-Para personalizar as cores, edite as variáveis CSS no `index.html`:
+  buildWalls(yPosition, width, depth, floorHeight, thickness, color) {
+    const wallMaterial = new THREE.MeshStandardMaterial({
+      color: color,
+      metalness: 0.05,
+      roughness: 0.9
+    });
 
-```css
-:root {
-  --blue-dark:  #1F3864;
-  --blue-mid:   #2E75B6;
-  --blue-light: #DDEEFF;
-  --accent:     #E84545;
-  --success:    #27AE60;
+    // Front wall
+    const frontGeometry = new THREE.BoxGeometry(width, floorHeight - 0.3, thickness);
+    const frontWall = new THREE.Mesh(frontGeometry, wallMaterial);
+    frontWall.position.set(0, yPosition + floorHeight / 2, -depth / 2);
+    frontWall.castShadow = true;
+    frontWall.receiveShadow = true;
+    this.towerGroup.add(frontWall);
+
+    // Back wall
+    const backWall = new THREE.Mesh(frontGeometry, wallMaterial);
+    backWall.position.set(0, yPosition + floorHeight / 2, depth / 2);
+    backWall.castShadow = true;
+    backWall.receiveShadow = true;
+    this.towerGroup.add(backWall);
+
+    // Left wall
+    const sideGeometry = new THREE.BoxGeometry(thickness, floorHeight - 0.3, depth);
+    const leftWall = new THREE.Mesh(sideGeometry, wallMaterial);
+    leftWall.position.set(-width / 2, yPosition + floorHeight / 2, 0);
+    leftWall.castShadow = true;
+    leftWall.receiveShadow = true;
+    this.towerGroup.add(leftWall);
+
+    // Right wall
+    const rightWall = new THREE.Mesh(sideGeometry, wallMaterial);
+    rightWall.position.set(width / 2, yPosition + floorHeight / 2, 0);
+    rightWall.castShadow = true;
+    rightWall.receiveShadow = true;
+    this.towerGroup.add(rightWall);
+  }
+
+  buildWindows(yPosition, width, depth, floorHeight, floorData) {
+    const windowWidth = 1.2;
+    const windowHeight = 1.0;
+    const windowDepth = 0.15;
+
+    const windowMaterial = new THREE.MeshStandardMaterial({
+      color: 0x87CEEB,
+      metalness: 0.8,
+      roughness: 0.1
+    });
+
+    // Front windows
+    const frontWindowPositions = [
+      -width / 3,
+      0,
+      width / 3
+    ];
+
+    frontWindowPositions.forEach(x => {
+      const windowGeometry = new THREE.BoxGeometry(windowWidth, windowHeight, windowDepth);
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(x, yPosition + floorHeight / 2, -depth / 2 - 0.1);
+      window.castShadow = true;
+      this.towerGroup.add(window);
+    });
+
+    // Back windows
+    frontWindowPositions.forEach(x => {
+      const windowGeometry = new THREE.BoxGeometry(windowWidth, windowHeight, windowDepth);
+      const window = new THREE.Mesh(windowGeometry, windowMaterial);
+      window.position.set(x, yPosition + floorHeight / 2, depth / 2 + 0.1);
+      window.castShadow = true;
+      this.towerGroup.add(window);
+    });
+    if (this.onFloorSelected && this.floorsData[floorIndex]) {
+      this.onFloorSelected(floorIndex, this.floorsData[floorIndex]);
+    }
+  }
+
+  buildRoof(height, width, depth) {
+    const roofHeight = 1.5;
+    const roofGeometry = new THREE.ConeGeometry(Math.max(width, depth) / 1.5, roofHeight, 32);
+    const roofMaterial = new THREE.MeshStandardMaterial({
+      color: 0x5f6f87,
+      metalness: 0.3,
+      roughness: 0.7
+    });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.y = height + roofHeight / 2;
+    roof.castShadow = true;
+    roof.receiveShadow = true;
+    this.towerGroup.add(roof);
+  }
+
+  setupControls() {
+    // Mouse controls
+    let isDragging = false;
+    let previousMousePosition = { x: 0, y: 0 };
+
+    this.renderer.domElement.addEventListener('mousedown', (e) => {
+      isDragging = true;
+      previousMousePosition = { x: e.clientX, y: e.clientY };
+
+      // Raycasting for floor selection
+      const raycaster = new THREE.Raycaster();
+      const mouse = new THREE.Vector2();
+      const rect = this.renderer.domElement.getBoundingClientRect();
+      mouse.x = ((e.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = -((e.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, this.camera);
+      const intersects = raycaster.intersectObjects(this.towerGroup.children, true);
+
+      for (let i = 0; i < intersects.length; i++) {
+        if (intersects[i].object.userData.isFloorLabel) {
+          this.selectFloor(intersects[i].object.userData.floorIndex);
+          break;
+        }
+      }
+    });
+
+    this.renderer.domElement.addEventListener('mousemove', (e) => {
+      if (isDragging) {
+        const deltaX = e.clientX - previousMousePosition.x;
+        const deltaY = e.clientY - previousMousePosition.y;
+
+        this.towerGroup.rotation.y += deltaX * 0.005;
+        this.towerGroup.rotation.x += deltaY * 0.005;
+
+        previousMousePosition = { x: e.clientX, y: e.clientY };
+      }
+    });
+
+    this.renderer.domElement.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    // Mouse wheel zoom
+    this.renderer.domElement.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const zoomSpeed = 0.1;
+      const direction = e.deltaY > 0 ? 1 : -1;
+      const distance = this.camera.position.length();
+      const newDistance = Math.max(5, Math.min(50, distance + direction * zoomSpeed * distance));
+      const ratio = newDistance / distance;
+      this.camera.position.multiplyScalar(ratio);
+    });
+  }
+
+  setOnFloorSelected(callback) {
+    this.onFloorSelected = callback;
+  }
+
+  rotateToView(angle = 0) {
+    if (this.towerGroup) this.towerGroup.rotation.y = angle;
+  }
+
+  zoomTo(distance = 18) {
+    const dir = this.camera.position.clone().normalize();
+    this.camera.position.copy(dir.multiplyScalar(distance));
+  }
+
+  selectFloor(floorIndex) {
+    this.selectedFloor = floorIndex;
+    // Highlight selected floor
+    this.towerGroup.children.forEach(child => {
+      if (child.userData.floorIndex === floorIndex && child.material && child.material.emissive) {
+        child.material.emissive.setHex(0x444444);
+      } else if (child.userData.floorIndex !== undefined && child.material && child.material.emissive) {
+        child.material.emissive.setHex(0x000000);
+      }
+    });
+  }
+
+  updateFloorStatus(floorIndex, newStatus) {
+    const color = this.colorMap[newStatus] || this.colorMap.cinza;
+    this.towerGroup.children.forEach(child => {
+      if (child.userData.floorIndex === floorIndex && child.material) {
+        child.material.color.setHex(color);
+      }
+    });
+  }
+
+  animate() {
+    requestAnimationFrame(() => this.animate());
+    this.renderer.render(this.scene, this.camera);
+  }
+
+  onWindowResize() {
+    const container = document.getElementById(this.containerId);
+    if (!container) return;
+
+    const width = container.clientWidth;
+    const height = container.clientHeight;
+
+    this.camera.aspect = width / height;
+    this.camera.updateProjectionMatrix();
+    this.renderer.setSize(width, height);
+  }
+
+  dispose() {
+    if (this.renderer) {
+      this.renderer.dispose();
+      this.renderer.domElement.remove();
+    }
+  }
 }
-```
 
-## 🐛 Troubleshooting
-
-### Os dados não estão sendo salvos
-- Verifique se o localStorage está habilitado no navegador
-- Tente em outro navegador
-- Limpe o cache do navegador
-
-### Os gráficos não aparecem
-- Verifique sua conexão com a internet (Chart.js é carregado via CDN)
-- Recarregue a página (F5)
-
-### Não consigo editar os dados
-- Certifique-se de que JavaScript está habilitado
-- Tente em outro navegador
-- Abra o console (F12) para ver se há erros
-
-## 📧 Suporte
-
-Para dúvidas ou sugestões, entre em contato!
-
-## 📄 Licença
-
-Este projeto é de código aberto e livre para uso pessoal e comercial.
-
----
-
-**Desenvolvido com ❤️ para simplificar o controle de materiais de empréstimo**
+// Export for use in HTML
+window.Tower3D = Tower3D;
