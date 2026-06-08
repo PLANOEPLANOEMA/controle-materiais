@@ -1,1 +1,1 @@
-Formulário do Controle de Materiais atualizado com dois botões separados: Galeria e Câmera, em estilo app.
+Pacote com visual estilo app no formulário de Controle de Materiais e dois botões separados: galeria e câmera.
