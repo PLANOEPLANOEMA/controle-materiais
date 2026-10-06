@@ -1,0 +1,4 @@
+Alteração aplicada no formulário de Controle de Materiais:
+- campo de foto agora aceita câmera do celular
+- input usa accept='image/*' e capture='environment'
+- botão '📷 Tirar Foto' adicionado no modal

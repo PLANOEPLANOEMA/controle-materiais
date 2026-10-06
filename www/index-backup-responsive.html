@@ -1,0 +1,894 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Controle de Materiais de Empréstimo - Plano & Plano</title>
+  <link rel="stylesheet" href="./predio3d-modern.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <style>
+    /* ── Reset & Base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --blue-dark:  #1F3864;
+      --blue-mid:   #2E75B6;
+      --blue-light: #DDEEFF;
+      --accent:     #E84545;
+      --success:    #27AE60;
+      --warning:    #F5A623;
+      --bg:         #F0F4FA;
+      --card:       #FFFFFF;
+      --text:       #1a2340;
+      --muted:      #6b7a99;
+      --radius:     14px;
+      --shadow:     0 4px 24px rgba(31,56,100,.10);
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    /* ── LOGIN SCREEN ── */
+    #login-screen {
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 1rem;
+    }
+    #login-screen.hidden {
+      display: none;
+    }
+    .login-container {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 3rem 2rem;
+      width: 100%;
+      max-width: 420px;
+      text-align: center;
+    }
+    .login-logo {
+      margin-bottom: 2rem;
+    }
+    .login-logo img {
+      height: 80px;
+      width: auto;
+      object-fit: contain;
+      display:block;
+      margin:0 auto;
+    }
+    .login-container h1 {
+      font-size: 1.8rem;
+      color: var(--blue-dark);
+      margin-bottom: 0.5rem;
+      font-weight: 800;
+    }
+    .login-container p {
+      color: var(--muted);
+      margin-bottom: 2rem;
+      font-size: 0.95rem;
+    }
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+    .login-form .form-group {
+      text-align: left;
+    }
+    .login-form label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+      color: var(--blue-dark);
+      font-size: 0.9rem;
+    }
+    .login-form input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border: 2px solid #c8d6ea;
+      border-radius: 8px;
+      font-size: 1rem;
+      outline: none;
+      transition: all 0.2s;
+    }
+    .login-form input:focus {
+      border-color: var(--blue-mid);
+      box-shadow: 0 0 0 4px rgba(46,117,182,0.1);
+    }
+    .login-form button {
+      padding: 0.85rem 1.5rem;
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 0.5rem;
+    }
+    .login-form button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(31,56,100,0.3);
+    }
+    .login-form button:active {
+      transform: translateY(0);
+    }
+    .login-error {
+      color: var(--accent);
+      font-size: 0.85rem;
+      margin-top: 1rem;
+      display: none;
+    }
+    .login-error.show {
+      display: block;
+    }
+
+    /* ── Header ── */
+    header {
+      background: linear-gradient(135deg, var(--blue-dark) 0%, var(--blue-mid) 100%);
+      color: #fff;
+      padding: 1.5rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+      overflow: hidden;
+      z-index: 100;
+    }
+    header::before {
+      content: '';
+      position: absolute; inset: 0;
+      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+    }
+    .header-content {
+      display:flex;
+      align-items:center;
+      gap:1.5rem;
+      position:relative;
+      z-index:1;
+      flex:1;
+    }
+    .logo-container { flex-shrink:0; }
+    .logo-container img { height:60px; width:auto; object-fit:contain; display:block; }
+    .header-text h1 { font-size: 1.8rem; font-weight: 700; letter-spacing: .5px; margin: 0; }
+    .header-text p  { margin: 0.25rem 0 0 0; opacity: .85; font-size: 0.95rem; }
+
+    /* ── MENU HAMBÚRGUER ── */
+    .menu-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      width: 50px;
+      height: 50px;
+      background: var(--blue-mid);
+      border: none;
+      border-radius: 50%;
+      cursor: pointer;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      z-index: 200;
+      box-shadow: 0 4px 12px rgba(46,117,182,.35);
+      transition: all 0.3s;
+    }
+    .menu-toggle:hover {
+      background: var(--blue-dark);
+      transform: scale(1.1);
+    }
+    .menu-toggle span {
+      width: 24px;
+      height: 3px;
+      background: #fff;
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .menu-toggle.active span:nth-child(1) {
+      transform: rotate(45deg) translate(8px, 8px);
+    }
+    .menu-toggle.active span:nth-child(2) {
+      opacity: 0;
+    }
+    .menu-toggle.active span:nth-child(3) {
+      transform: rotate(-45deg) translate(8px, -8px);
+    }
+
+    /* ── MOBILE MENU ── */
+    .mobile-menu {
+      position: fixed;
+      top: 0;
+      right: -100%;
+      width: 100%;
+      max-width: 320px;
+      height: 100vh;
+      background: var(--card);
+      box-shadow: -4px 0 20px rgba(31,56,100,.2);
+      z-index: 150;
+      transition: right 0.3s ease;
+      overflow-y: auto;
+      padding-top: 80px;
+      padding-bottom: 20px;
+    }
+    .mobile-menu.active {
+      right: 0;
+    }
+    .mobile-menu-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      z-index: 140;
+      display: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .mobile-menu.active ~ .mobile-menu-overlay {
+      display: block;
+      opacity: 1;
+    }
+    .mobile-nav-section {
+      padding: 1rem;
+      border-bottom: 1px solid #e8edf5;
+    }
+    .mobile-nav-section-title {
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: .75rem;
+      padding: 0 .5rem;
+    }
+    .mobile-nav-button {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border: none;
+      border-radius: 8px;
+      padding: .75rem 1rem;
+      font-size: .92rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s;
+      margin-bottom: .5rem;
+    }
+    .mobile-nav-button:hover, .mobile-nav-button.active {
+      background: var(--blue-mid);
+      color: #fff;
+    }
+
+    /* ── Nav pills (Desktop) ── */
+    nav {
+      display: flex; justify-content: center; gap: 2rem;
+      padding: 1.5rem 1.5rem;
+      background: var(--card);
+      box-shadow: 0 2px 8px rgba(31,56,100,.08);
+      flex-wrap: wrap;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    nav.hidden-on-scroll {
+      transform: translateY(-100%);
+      transition: transform 0.3s ease;
+    }
+    .nav-section {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      align-items: flex-start;
+    }
+    .nav-section-title {
+      font-size: .8rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      text-transform: uppercase;
+      letter-spacing: .5px;
+      margin-bottom: .25rem;
+      padding: 0 .5rem;
+    }
+    nav button {
+      background: var(--blue-light);
+      color: var(--blue-dark);
+      border: none; border-radius: 50px;
+      padding: .5rem 1.4rem;
+      font-size: .92rem; font-weight: 600;
+      cursor: pointer; transition: all .2s;
+      white-space: nowrap;
+    }
+    nav button:hover, nav button.active {
+      background: var(--blue-mid);
+      color: #fff;
+      box-shadow: 0 4px 12px rgba(46,117,182,.35);
+    }
+
+    /* ── Main Content ── */
+    main {
+      padding: 2rem;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+    section {
+      display: none;
+    }
+    section.active {
+      display: block;
+    }
+
+    /* ── KPI Grid ── */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .kpi {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border-left: 4px solid var(--blue-mid);
+    }
+    .kpi .icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .kpi .value {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--blue-dark);
+      margin-bottom: 0.5rem;
+    }
+    .kpi .label {
+      font-size: 0.85rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--card);
+      border-radius: var(--radius);
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+    }
+    .card h2 {
+      color: var(--blue-dark);
+      font-size: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-weight: 700;
+    }
+
+    /* ── Charts ── */
+    .chart-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    .chart-wrap {
+      position: relative;
+      height: 320px;
+      background: var(--blue-light);
+      border-radius: 12px;
+      padding: 1rem;
+    }
+
+    /* ── 3D PRÉDIO ── */
+    .predio3d-toolbar { display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; margin-bottom:1rem; }
+    .predio3d-layout { display:grid; grid-template-columns:minmax(340px,1fr) 360px; gap:1.25rem; align-items:start; }
+    .predio3d-stage { min-height:760px; background:linear-gradient(180deg,#eef4ff 0%,#f9fbff 56%,#eef3f8 100%); border-radius:18px; overflow:hidden; position:relative; box-shadow:var(--shadow); border:1px solid #dbe7f7; }
+    .predio3d-help { position:absolute; top:12px; left:12px; z-index:2; background:rgba(255,255,255,.92); border-radius:999px; padding:.45rem .8rem; font-size:.82rem; color:var(--muted); box-shadow:0 4px 14px rgba(31,56,100,.08); }
+    .predio3d-viewport { perspective:1600px; width:100%; min-height:760px; display:flex; align-items:center; justify-content:center; touch-action:none; cursor:grab; user-select:none; }
+    .predio3d-viewport.dragging { cursor:grabbing; }
+    .predio3d-scene { display:flex; align-items:flex-end; justify-content:center; gap:84px; min-width:100%; min-height:100%; padding:120px 48px 70px; transform-style:preserve-3d; }
+    .predio3d-tower-wrap { display:flex; flex-direction:column; align-items:center; gap:.85rem; transform-style:preserve-3d; }
+    .predio3d-tower-title { background:rgba(255,255,255,.94); border:1px solid #dbe7f7; border-radius:999px; padding:.45rem .85rem; font-size:.86rem; font-weight:800; color:var(--blue-dark); box-shadow:0 10px 20px rgba(31,56,100,.08); }
+    .predio3d-building { position:relative; width:190px; transform-style:preserve-3d; transition:transform .08s linear; }
+    .predio3d-floor { position:absolute; left:0; width:190px; height:24px; transform-style:preserve-3d; }
+    .predio3d-floor .face { position:absolute; box-sizing:border-box; border:1px solid rgba(16,36,79,.14); backface-visibility:visible; }
+    .predio3d-floor .front, .predio3d-floor .back { width:190px; height:24px; display:flex; align-items:center; justify-content:space-between; padding:0 .7rem; font-weight:700; font-size:.78rem; color:#fff; }
+    .predio3d-floor .front { transform:translateZ(28px); border-radius:7px; box-shadow:0 10px 18px rgba(31,56,100,.14); cursor:pointer; }
+    .predio3d-floor .front::before { content:''; position:absolute; inset:0; border-radius:7px; background:linear-gradient(90deg, rgba(255,255,255,.18), rgba(255,255,255,0) 48%, rgba(0,0,0,.10)); pointer-events:none; }
+    .predio3d-floor .back { transform:rotateY(180deg) translateZ(28px); border-radius:7px; }
+    .predio3d-floor .side { width:56px; height:24px; top:0; opacity:.96; }
+    .predio3d-floor .side-left { left:0; transform-origin:left center; transform:rotateY(-90deg); }
+    .predio3d-floor .side-right { right:0; transform-origin:right center; transform:rotateY(90deg); }
+    .predio3d-floor .roof { width:190px; height:56px; left:0; top:-28px; transform-origin:center bottom; opacity:.96; border-radius:7px 7px 0 0; transform:rotateX(90deg); }
+    .predio3d-floor .label-small { opacity:.92; font-size:.72rem; }
+    .predio3d-floor.active .front, .predio3d-floor.active .back, .predio3d-floor.active .side, .predio3d-floor.active .roof { outline:2px solid rgba(255,255,255,.96); box-shadow:0 0 0 4px rgba(31,56,100,.16), 0 14px 22px rgba(31,56,100,.22); }
+    .predio3d-base { position:absolute; left:50%; bottom:-22px; width:232px; height:40px; background:linear-gradient(180deg,#dbe7f7 0%,#bdd0ea 100%); border-radius:28px; transform:translateX(-50%) translateZ(10px); box-shadow:0 22px 34px rgba(31,56,100,.18); }
+    .predio3d-ground { position:absolute; left:50%; bottom:-34px; width:320px; height:56px; background:radial-gradient(circle at center, rgba(140,167,205,.32) 0%, rgba(140,167,205,.16) 55%, rgba(140,167,205,0) 75%); transform:translateX(-50%) rotateX(90deg); }
+    .predio3d-verde .front, .predio3d-verde .back, .predio3d-dot.verde { background:#27AE60; }
+    .predio3d-verde .roof, .predio3d-verde .side { background:#239a55; }
+    .predio3d-amarelo .front, .predio3d-amarelo .back, .predio3d-dot.amarelo { background:#F5A623; color:#1a2340; }
+    .predio3d-amarelo .roof, .predio3d-amarelo .side { background:#dc951f; }
+    .predio3d-vermelho .front, .predio3d-vermelho .back, .predio3d-dot.vermelho { background:#E84545; }
+    .predio3d-vermelho .roof, .predio3d-vermelho .side { background:#cf3d3d; }
+    .predio3d-cinza .front, .predio3d-cinza .back, .predio3d-dot.cinza { background:#95a5a6; }
+    .predio3d-cinza .roof, .predio3d-cinza .side { background:#869798; }
+
+    /* ── RESPONSIVE MOBILE ── */
+    @media (max-width: 1024px) {
+      nav { gap: 1.5rem; }
+      .predio3d-layout { grid-template-columns:1fr; }
+      .predio3d-stage, .predio3d-viewport { min-height:620px; }
+      .predio3d-scene { gap:42px; padding:120px 18px 54px; }
+      .predio3d-building { width:150px; }
+      .predio3d-floor, .predio3d-floor .front, .predio3d-floor .back, .predio3d-floor .roof { width:150px; }
+    }
+    @media (max-width: 768px) {
+      header {
+        padding: 1rem 1.5rem;
+      }
+      .header-text h1 {
+        font-size: 1.3rem;
+      }
+      .header-text p {
+        font-size: 0.8rem;
+      }
+      .logo-container img {
+        height: 45px;
+      }
+      .user-area {
+        display: none;
+      }
+      nav {
+        display: none;
+      }
+      .menu-toggle {
+        display: flex;
+      }
+      main {
+        padding: 1.5rem 1rem;
+        padding-top: 80px;
+      }
+      .kpi-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1rem;
+      }
+      .kpi {
+        padding: 1rem;
+      }
+      .kpi .value {
+        font-size: 1.5rem;
+      }
+      .card {
+        padding: 1.5rem;
+      }
+      .card h2 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+      }
+      .chart-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+      .predio3d-layout { grid-template-columns:1fr; }
+      .predio3d-stage, .predio3d-viewport { min-height:500px; }
+      .predio3d-scene { gap:30px; padding:100px 12px 40px; }
+      .predio3d-building { width:120px; }
+      .predio3d-floor, .predio3d-floor .front, .predio3d-floor .back, .predio3d-floor .roof { width:120px; height:18px; }
+      .predio3d-floor .front, .predio3d-floor .back { padding:0 .5rem; font-size:.7rem; }
+    }
+    @media (max-width: 480px) {
+      header {
+        padding: 0.8rem 1rem;
+      }
+      .header-text h1 {
+        font-size: 1rem;
+      }
+      .header-text p {
+        display: none;
+      }
+      .logo-container img {
+        height: 40px;
+      }
+      main {
+        padding: 1rem 0.75rem;
+        padding-top: 70px;
+      }
+      .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+      }
+      .kpi {
+        padding: 0.75rem;
+      }
+      .kpi .value {
+        font-size: 1.2rem;
+      }
+      .kpi .icon {
+        font-size: 1.8rem;
+        margin-bottom: 0.5rem;
+      }
+      .card {
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .card h2 {
+        font-size: 1rem;
+        margin-bottom: 0.75rem;
+      }
+      .predio3d-layout { grid-template-columns:1fr; }
+      .predio3d-stage, .predio3d-viewport { min-height:400px; }
+      .predio3d-scene { gap:20px; padding:80px 8px 30px; }
+      .predio3d-building { width:100px; }
+      .predio3d-floor, .predio3d-floor .front, .predio3d-floor .back, .predio3d-floor .roof { width:100px; height:16px; }
+      .predio3d-floor .front, .predio3d-floor .back { padding:0 .4rem; font-size:.65rem; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="login-screen">
+  <div class="login-container">
+    <div class="login-logo">
+      <img src="./logo.png" alt="Plano & Plano" />
+    </div>
+    <h1>Acesso Restrito</h1>
+    <p>Faça login para acessar o controle de materiais</p>
+    <form class="login-form" onsubmit="auth.login(event)">
+      <div class="form-group">
+        <label for="login-input">Login</label>
+        <input type="text" id="login-input" required autocomplete="off" />
+      </div>
+      <div class="form-group">
+        <label for="password-input">Senha</label>
+        <div style="display: flex; gap: 0.5rem; align-items: center;">
+          <input type="password" id="password-input" placeholder="Digite sua senha" required autocomplete="off" style="flex: 1;" />
+          <button type="button" onclick="auth.toggleSenha()" style="padding: 0.6rem 0.8rem; background: #ddeeff; border: 1px solid #c8d6ea; border-radius: 8px; cursor: pointer; font-size: 1rem;">👁️</button>
+        </div>
+      </div>
+      <button type="submit">Acessar Sistema</button>
+      <div id="login-error" class="login-error">❌ Login ou senha incorretos! Tente novamente.</div>
+    </form>
+  </div>
+</div>
+
+<!-- ── MAIN APP ── -->
+<header>
+  <div class="header-content">
+    <div class="logo-container">
+      <img src="./logo.png" alt="Plano & Plano" />
+    </div>
+    <div class="header-text">
+      <h1>Controle de Materiais</h1>
+      <p>Gestão profissional de empréstimos e estoque - Plano & Plano</p>
+    </div>
+  </div>
+  <div class="user-area" id="userArea" style="position:relative; z-index:1; text-align:right; min-width:220px;">
+    <div id="currentUserLabel" style="font-weight:700; font-size:0.95rem;"></div>
+    <div id="currentUserRole" style="opacity:.85; font-size:0.85rem; margin-top:0.25rem;"></div>
+    <button class="btn btn-secondary" style="margin-top:0.6rem;" onclick="auth.logout()">Sair</button>
+  </div>
+</header>
+
+<!-- ── MENU HAMBÚRGUER (Mobile) ── -->
+<button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()">
+  <span></span>
+  <span></span>
+  <span></span>
+</button>
+
+<!-- ── MOBILE MENU ── -->
+<nav class="mobile-menu" id="mobileMenu">
+  <!-- Seção RT -->
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">📋 RT</div>
+    <button class="mobile-nav-button active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this); closeMobileMenu()">Planejamento RT</button>
+    <button class="mobile-nav-button" data-section="predio-3d" onclick="app.showSection('predio-3d', this); closeMobileMenu()">3D PRÉDIO</button>
+    <button class="mobile-nav-button" data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this); closeMobileMenu()">RT Dia a Dia</button>
+  </div>
+  
+  <!-- Seção Controle de Romaneios -->
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">📦 Controle de Romaneios</div>
+    <button class="mobile-nav-button" data-section="visao-geral" onclick="app.showSection('visao-geral', this); closeMobileMenu()">Visão Geral</button>
+    <button class="mobile-nav-button" data-section="por-empresa" onclick="app.showSection('por-empresa', this); closeMobileMenu()">Por Empresa</button>
+    <button class="mobile-nav-button" data-section="por-material" onclick="app.showSection('por-material', this); closeMobileMenu()">Por Material</button>
+    <button class="mobile-nav-button" data-section="registros" onclick="app.showSection('registros', this); closeMobileMenu()">Gerenciar Registros</button>
+    <button class="mobile-nav-button" data-section="relatorio" onclick="app.showSection('relatorio', this); closeMobileMenu()">Relatório Visual</button>
+  </div>
+  
+  <!-- Outras seções -->
+  <div class="mobile-nav-section">
+    <div class="mobile-nav-section-title">⚙️ Outros</div>
+    <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
+    <button class="mobile-nav-button" data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this); closeMobileMenu()">Rastreabilidade</button>
+    <button class="mobile-nav-button" data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this); closeMobileMenu()">Relatório do Dia</button>
+  </div>
+</nav>
+<div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+
+<!-- ── DESKTOP NAV (Hidden on mobile) ── -->
+<nav id="desktopNav">
+  <!-- Seção RT -->
+  <div class="nav-section">
+    <div class="nav-section-title">📋 RT</div>
+    <button class="active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
+    <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
+    <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
+  </div>
+  
+  <!-- Seção Controle de Romaneios -->
+  <div class="nav-section">
+    <div class="nav-section-title">📦 Controle de Romaneios</div>
+    <button data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button>
+    <button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button>
+    <button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button>
+    <button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button>
+    <button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button>
+  </div>
+  
+  <!-- Outras seções -->
+  <div class="nav-section">
+    <div class="nav-section-title">⚙️ Outros</div>
+    <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
+    <button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button>
+    <button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button>
+  </div>
+</nav>
+
+<main id="mainContent">
+  <!-- Alert ── -->
+  <div id="alert" class="alert"></div>
+
+  <!-- KPIs sempre visíveis -->
+  <div id="globalKpiGrid" class="kpi-grid">
+    <div class="kpi">
+      <div class="icon">📦</div>
+      <div class="value" id="kpiTotal">0</div>
+      <div class="label">Total de Itens</div>
+    </div>
+    <div class="kpi">
+      <div class="icon">🏢</div>
+      <div class="value" id="kpiEmpresas">0</div>
+      <div class="label">Empresas</div>
+    </div>
+    <div class="kpi">
+      <div class="icon">🔨</div>
+      <div class="value" id="kpiMateriais">0</div>
+      <div class="label">Tipos de Material</div>
+    </div>
+    <div class="kpi">
+      <div class="icon">✅</div>
+      <div class="value" id="kpiConcluidos">0</div>
+      <div class="label">Concluídos</div>
+    </div>
+  </div>
+
+  <!-- ── VISÃO GERAL ── -->
+  <section id="visao-geral" class="active">
+    <div class="card">
+      <h2>📊 Resumo Geral</h2>
+      <div class="chart-grid">
+        <div class="chart-wrap"><canvas id="chartData"></canvas></div>
+        <div class="chart-wrap"><canvas id="chartStatus"></canvas></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── POR EMPRESA ── -->
+  <section id="por-empresa">
+    <div class="card">
+      <h2>🏢 Participação por Empresa</h2>
+      <div id="progressEmpresas"></div>
+    </div>
+    <div class="card">
+      <h2>📈 Comparativo de Empresas</h2>
+      <div class="chart-wrap" style="height:320px"><canvas id="chartEmpresaBar"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ── POR MATERIAL ── -->
+  <section id="por-material">
+    <div class="card">
+      <h2>🔨 Participação por Material</h2>
+      <div id="progressMateriais"></div>
+    </div>
+    <div class="card">
+      <h2>📈 Comparativo de Materiais</h2>
+      <div class="chart-wrap" style="height:320px"><canvas id="chartMaterialBar"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ── 3D PRÉDIO ── -->
+  <section id="predio-3d">
+    <div class="card">
+      <h2>🏢 Visualização 3D do Prédio</h2>
+      <div class="predio3d-layout">
+        <div class="predio3d-stage">
+          <div class="predio3d-help">Arraste para girar • Scroll para zoom</div>
+          <div class="predio3d-viewport" id="predio3dViewport">
+            <div class="predio3d-scene" id="predio3dScene">
+              <!-- Prédios serão renderizados aqui -->
+            </div>
+          </div>
+        </div>
+        <div id="predio3dPanel" style="background:var(--card); border-radius:var(--radius); padding:1.5rem; box-shadow:var(--shadow); max-height:760px; overflow-y:auto;"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ── PLANEJAMENTO RT ── -->
+  <section id="planejamento-rt">
+    <div class="card">
+      <h2>📋 Planejamento de RT</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">Seção de planejamento e acompanhamento de RTs por pavimento e serviço.</p>
+      <!-- Conteúdo será adicionado aqui -->
+    </div>
+  </section>
+
+  <!-- ── RT DIA A DIA ── -->
+  <section id="rt-dia-dia">
+    <div class="card">
+      <h2>📅 RT Dia a Dia</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">Registro rápido de necessidades imediatas e acompanhamento de status de aprovação.</p>
+      <!-- Conteúdo será adicionado aqui -->
+    </div>
+  </section>
+
+  <!-- ── GERENCIAR REGISTROS ── -->
+  <section id="registros">
+    <div class="card">
+      <h2>📝 Gerenciar Registros</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">Gestão completa de registros de materiais e romaneios.</p>
+      <!-- Conteúdo será adicionado aqui -->
+    </div>
+  </section>
+
+  <!-- ── RELATÓRIO VISUAL ── -->
+  <section id="relatorio">
+    <div class="card">
+      <h2>📊 Relatório Visual</h2>
+      <div class="chart-wrap" style="height:400px"><canvas id="chartRelatorio"></canvas></div>
+    </div>
+  </section>
+
+  <!-- ── CONTROLE DE MATERIAIS ── -->
+  <section id="materiais-obra">
+    <div class="card">
+      <h2>🔨 Controle de Materiais</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">Gestão de materiais disponíveis na obra.</p>
+      <!-- Conteúdo será adicionado aqui -->
+    </div>
+  </section>
+
+  <!-- ── RASTREABILIDADE ── -->
+  <section id="rastreabilidade">
+    <div class="card">
+      <h2>🔍 Rastreabilidade</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">Histórico completo de movimentações de materiais.</p>
+      <!-- Conteúdo será adicionado aqui -->
+    </div>
+  </section>
+
+  <!-- ── RELATÓRIO DO DIA ── -->
+  <section id="relatorio-dia">
+    <div class="card">
+      <h2>📋 Relatório do Dia</h2>
+      <p style="color:var(--muted); margin-bottom:1rem;">Resumo diário automático para alinhamento das equipes.</p>
+      <!-- Conteúdo será adicionado aqui -->
+    </div>
+  </section>
+
+</main>
+
+<script>
+  // ── MENU HAMBÚRGUER ──
+  function toggleMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const toggle = document.getElementById('menuToggle');
+    menu.classList.toggle('active');
+    toggle.classList.toggle('active');
+  }
+
+  function closeMobileMenu() {
+    const menu = document.getElementById('mobileMenu');
+    const toggle = document.getElementById('menuToggle');
+    menu.classList.remove('active');
+    toggle.classList.remove('active');
+  }
+
+  // ── NAVEGAÇÃO INTELIGENTE (Scroll) ──
+  let lastScrollTop = 0;
+  const desktopNav = document.getElementById('desktopNav');
+
+  window.addEventListener('scroll', () => {
+    let currentScroll = window.pageYOffset || document.documentElement.scrollTop;
+    
+    if (currentScroll > lastScrollTop && currentScroll > 100) {
+      // Scrolling DOWN - Hide nav
+      desktopNav.classList.add('hidden-on-scroll');
+    } else {
+      // Scrolling UP - Show nav
+      desktopNav.classList.remove('hidden-on-scroll');
+    }
+    
+    lastScrollTop = currentScroll <= 0 ? 0 : currentScroll;
+  });
+
+  // ── APP LOGIC ──
+  const app = {
+    showSection: function(sectionId, button) {
+      // Hide all sections
+      document.querySelectorAll('section').forEach(s => s.classList.remove('active'));
+      
+      // Show selected section
+      const section = document.getElementById(sectionId);
+      if (section) {
+        section.classList.add('active');
+      }
+      
+      // Update button states (Desktop)
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+      if (button) {
+        button.classList.add('active');
+      }
+      
+      // Update button states (Mobile)
+      document.querySelectorAll('.mobile-nav-button').forEach(b => b.classList.remove('active'));
+      const mobileBtn = document.querySelector(`.mobile-nav-button[data-section="${sectionId}"]`);
+      if (mobileBtn) {
+        mobileBtn.classList.add('active');
+      }
+    }
+  };
+
+  // ── AUTH MOCK ──
+  const auth = {
+    login: function(event) {
+      event.preventDefault();
+      const login = document.getElementById('login-input').value;
+      const password = document.getElementById('password-input').value;
+      
+      if (login === 'admin' && password === '1234') {
+        document.getElementById('login-screen').classList.add('hidden');
+        document.getElementById('currentUserLabel').textContent = 'Olá, ' + login;
+        document.getElementById('currentUserRole').textContent = 'Administrador';
+      } else {
+        document.getElementById('login-error').classList.add('show');
+      }
+    },
+    logout: function() {
+      document.getElementById('login-screen').classList.remove('hidden');
+      document.getElementById('login-input').value = '';
+      document.getElementById('password-input').value = '';
+      document.getElementById('login-error').classList.remove('show');
+    },
+    toggleSenha: function() {
+      const input = document.getElementById('password-input');
+      input.type = input.type === 'password' ? 'text' : 'password';
+    }
+  };
+
+  // ── INICIALIZAÇÃO ──
+  window.addEventListener('load', () => {
+    // Simular dados dos KPIs
+    document.getElementById('kpiTotal').textContent = '156';
+    document.getElementById('kpiEmpresas').textContent = '8';
+    document.getElementById('kpiMateriais').textContent = '24';
+    document.getElementById('kpiConcluidos').textContent = '89';
+  });
+</script>
+
+</body>
+</html>

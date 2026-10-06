@@ -1,0 +1,1 @@
+Formulário do Controle de Materiais atualizado com dois botões separados: Galeria e Câmera, em estilo app.

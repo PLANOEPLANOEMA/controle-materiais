@@ -1,0 +1,5 @@
+V26
+- Torre A fixada com 18 andares (Térreo + 1º ao 18º)
+- Torre B fixada com 20 andares (Térreo + 1º ao 20º)
+- Pavimentos aparecem mesmo sem itens, ficando em cinza
+- Cores automáticas continuam ligadas à escadinha/RTs
