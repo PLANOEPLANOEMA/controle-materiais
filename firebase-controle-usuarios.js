@@ -1,24 +1,17 @@
 /**
- * Firebase - Controle de Materiais / Obra
- *
- * CORREÇÃO DE LIMITE DE IMAGENS:
- * - Antes, todos os materiais ficavam dentro de um único documento Firestore.
- * - Agora cada material é salvo em seu próprio documento em controle_materiais.
- * - Fotos novas são enviadas ao Firebase Storage quando disponível.
- * - Se o Storage não estiver habilitado/permissões impedirem o upload, a foto
- *   continua sendo salva como Base64 no documento individual (máx. ~350 KB),
- *   evitando o limite acumulado do documento antigo.
- * - O documento antigo controle/materiais é usado apenas para migração inicial.
+ * Firebase Firestore (sem build / sem npm)
+ * - Funciona em site estático (GitHub Pages / Vercel)
+ * - Salva/Carrega em 2 documentos: controle/dados e controle/materiais
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import {
-  getFirestore, doc, setDoc, getDoc, onSnapshot,
-  collection, getDocs, deleteDoc
+  getFirestore, doc, setDoc, getDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 import {
-  getStorage, ref, uploadString, getDownloadURL
+  getStorage, ref as storageRef, uploadString, getDownloadURL
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
+// ✅ Config do seu app
 const firebaseConfig = {
   apiKey: "AIzaSyBNeTqTWbvakrz2KiVABPWezxoqZePuBms",
   authDomain: "planoeplano.firebaseapp.com",
@@ -30,19 +23,15 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-let storage = null;
-try { storage = getStorage(app); } catch (e) { console.warn('Firebase Storage indisponível:', e); }
+const storage = getStorage(app);
 
-// Documentos existentes do sistema
+// Documentos para empréstimos, materiais da obra e rastreabilidade
 const REF_EMPRESTIMOS = doc(db, "controle", "dados");
-const REF_MATERIAIS_ANTIGO = doc(db, "controle", "materiais");
+const REF_MATERIAIS = doc(db, "controle", "materiais");
 const REF_MOVIMENTACOES = doc(db, "controle", "movimentacoes");
 const REF_PLANEJAMENTO_RT = doc(db, "controle", "planejamento_rt");
 const REF_RT_DIA_DIA = doc(db, "controle", "rt_dia_dia");
 const REF_SALDO_NF = doc(db, "controle", "saldo_nf");
-
-// NOVO: um documento por material. Não existe mais limite acumulado de 1 MB.
-const REF_MATERIAIS_COLLECTION = collection(db, "controle_materiais");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
@@ -61,98 +50,107 @@ export function escutarMudancas(callback) {
   });
 }
 
-// ── FOTOS DOS MATERIAIS ──
-async function armazenarFotoMaterial(materialId, foto) {
-  if (!foto || typeof foto !== 'string') return foto || null;
-  if (!foto.startsWith('data:image/')) return foto;
-
-  // Tenta Storage primeiro. Se não estiver habilitado/permissão negar,
-  // mantém Base64 no documento individual como fallback seguro.
-  if (storage) {
-    try {
-      const fotoRef = ref(storage, `materiais/${materialId}.jpg`);
-      await uploadString(fotoRef, foto, 'data_url', {
-        contentType: 'image/jpeg',
-        cacheControl: 'public,max-age=31536000'
-      });
-      return await getDownloadURL(fotoRef);
-    } catch (e) {
-      console.warn('Não foi possível enviar a foto ao Storage. Usando Base64 no documento individual.', e);
-    }
-  }
-
-  return foto;
-}
-
-async function prepararMaterial(material) {
-  const preparado = { ...material };
-  if (preparado.foto && preparado.foto.startsWith('data:image/')) {
-    preparado.foto = await armazenarFotoMaterial(preparado.id, preparado.foto);
-  }
-  return preparado;
-}
-
 // ── MATERIAIS DA OBRA ──
-export async function salvarMateriaisNaNuvem(materiais) {
-  if (!Array.isArray(materiais)) return;
+// Mantemos a mesma estrutura pública (controle/materiais), mas as fotos
+// deixam de ocupar espaço dentro do documento. Isso preserva a sincronização
+// entre celular e computador e elimina o limite de ~1 MB do Firestore.
+const REF_MATERIAIS_IMAGENS = (id) => doc(db, "controle", "materiais_imagens", "itens", String(id));
 
-  const atuais = new Set();
+function ehDataUrlImagem(valor) {
+  return typeof valor === "string" && valor.startsWith("data:image/");
+}
 
-  // Salva cada material separadamente.
-  for (const material of materiais) {
-    const id = String(material.id);
-    atuais.add(id);
-    const preparado = await prepararMaterial(material);
-    await setDoc(doc(REF_MATERIAIS_COLLECTION, id), {
-      ...preparado,
-      _updatedAt: Date.now()
+async function salvarFotoSeparada(material) {
+  if (!material || !material.foto) return null;
+  if (!ehDataUrlImagem(material.foto)) return material.foto;
+
+  const id = String(material.id);
+  try {
+    const destino = storageRef(storage, `materiais/${id}.jpg`);
+    await uploadString(destino, material.foto, "data_url", { contentType: "image/jpeg" });
+    return await getDownloadURL(destino);
+  } catch (erroStorage) {
+    // Fallback: uma imagem por documento. Assim, mesmo sem Storage habilitado,
+    // a foto não volta a ocupar o documento único dos materiais.
+    await setDoc(REF_MATERIAIS_IMAGENS(id), {
+      foto: material.foto,
+      updatedAt: Date.now()
     }, { merge: true });
+    return `firestore-image:${id}`;
   }
+}
 
-  // Remove da nuvem materiais que foram deletados no aplicativo.
-  const existentes = await getDocs(REF_MATERIAIS_COLLECTION);
-  const exclusoes = [];
-  existentes.forEach(snap => {
-    if (!atuais.has(snap.id)) exclusoes.push(deleteDoc(snap.ref));
-  });
-  if (exclusoes.length) await Promise.all(exclusoes);
+async function hidratarFotos(materiais) {
+  const lista = Array.isArray(materiais) ? materiais.map(m => ({ ...m })) : [];
+  await Promise.all(lista.map(async (m) => {
+    // Se a migração falhar, preservamos a foto Base64 antiga em memória.
+    if (m.foto) return;
+    if (!m.id) return;
+    const id = String(m.id);
+    if (m.fotoRef && m.fotoRef !== `firestore-image:${id}` && m.fotoRef.startsWith("http")) {
+      m.foto = m.fotoRef;
+      return;
+    }
+    try {
+      const imgSnap = await getDoc(REF_MATERIAIS_IMAGENS(id));
+      if (imgSnap.exists()) m.foto = imgSnap.data().foto || null;
+    } catch (e) {
+      console.warn("Não foi possível carregar a foto do material", id, e);
+    }
+  }));
+  return lista;
+}
+
+async function prepararMateriaisParaSalvar(materiais) {
+  const lista = Array.isArray(materiais) ? materiais.map(m => ({ ...m })) : [];
+  for (const material of lista) {
+    if (!ehDataUrlImagem(material.foto)) continue;
+    const fotoOriginal = material.foto;
+    const fotoExterna = await salvarFotoSeparada(material);
+    material.fotoRef = fotoExterna;
+    // Nunca mais gravar Base64 no documento principal.
+    material.foto = null;
+    // Se o upload para Storage falhar, o fallback já foi salvo em Firestore.
+    if (!fotoExterna && fotoOriginal) material.fotoRef = `firestore-image:${material.id}`;
+  }
+  return lista;
+}
+
+export async function salvarMateriaisNaNuvem(materiais) {
+  const prontos = await prepararMateriaisParaSalvar(materiais);
+  await setDoc(REF_MATERIAIS, { materiais: prontos, updatedAt: Date.now() }, { merge: true });
 }
 
 export async function carregarMateriaisDaNuvem() {
-  // Primeiro tenta a nova estrutura.
-  const snapNovo = await getDocs(REF_MATERIAIS_COLLECTION);
-  if (!snapNovo.empty) {
-    return snapNovo.docs.map(d => d.data());
+  const snap = await getDoc(REF_MATERIAIS);
+  if (!snap.exists()) return null;
+  const materiais = snap.data().materiais ?? null;
+  if (!Array.isArray(materiais)) return materiais;
+
+  // Compatibilidade com os 11 materiais já existentes: se ainda houver
+  // Base64 no documento antigo, migramos as fotos automaticamente.
+  const possuiFotosLegadas = materiais.some(m => ehDataUrlImagem(m?.foto));
+  if (possuiFotosLegadas) {
+    try {
+      await salvarMateriaisNaNuvem(materiais);
+      const atualizado = await getDoc(REF_MATERIAIS);
+      const dados = atualizado.exists() ? (atualizado.data().materiais ?? materiais) : materiais;
+      return await hidratarFotos(dados);
+    } catch (e) {
+      console.warn("Migração das fotos antigas não concluída; mantendo leitura compatível.", e);
+    }
   }
-
-  // Migração automática do formato antigo, se ainda existir.
-  const snapAntigo = await getDoc(REF_MATERIAIS_ANTIGO);
-  if (!snapAntigo.exists()) return null;
-
-  const antigos = snapAntigo.data().materiais ?? null;
-  if (!Array.isArray(antigos) || !antigos.length) return antigos;
-
-  console.log('Migrando materiais para a nova estrutura...', antigos.length);
-  try {
-    await salvarMateriaisNaNuvem(antigos);
-    console.log('Migração dos materiais concluída.');
-  } catch (e) {
-    console.error('Falha na migração automática dos materiais:', e);
-  }
-
-  return antigos;
+  return await hidratarFotos(materiais);
 }
 
 export function escutarMudancasMateriais(callback) {
-  return onSnapshot(REF_MATERIAIS_COLLECTION, (snap) => {
-    const materiais = snap.docs.map(d => d.data());
-    // Enquanto a migração ainda não populou a coleção, não apaga os dados
-    // que já estão carregados no navegador.
-    if (materiais.length) callback(materiais);
-  }, (error) => {
-    console.error('Erro no sincronismo dos materiais:', error);
+  return onSnapshot(REF_MATERIAIS, async (snap) => {
+    if (!snap.exists()) return;
+    const materiais = snap.data().materiais ?? [];
+    callback(await hidratarFotos(materiais));
   });
 }
+
 
 // ── RASTREABILIDADE / MOVIMENTAÇÕES ──
 export async function salvarMovimentacoesNaNuvem(movimentacoes) {
@@ -171,6 +169,7 @@ export function escutarMudancasMovimentacoes(callback) {
   });
 }
 
+
 // ── PLANEJAMENTO RT ──
 export async function salvarPlanejamentoRTNaNuvem(itens) {
   await setDoc(REF_PLANEJAMENTO_RT, { itens, updatedAt: Date.now() }, { merge: true });
@@ -188,6 +187,7 @@ export function escutarMudancasPlanejamentoRT(callback) {
   });
 }
 
+
 // ── RT DIA A DIA ──
 export async function salvarRTDiaDiaNaNuvem(itens) {
   await setDoc(REF_RT_DIA_DIA, { itens, updatedAt: Date.now() }, { merge: true });
@@ -204,6 +204,7 @@ export function escutarMudancasRTDiaDia(callback) {
     callback(snap.data().itens ?? []);
   });
 }
+
 
 // ── CONTROLE DE SALDO POR NF ──
 export async function salvarSaldoNFNaNuvem(dados) {
