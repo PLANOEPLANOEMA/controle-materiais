@@ -1891,6 +1891,7 @@
     carregarSaldoNFDaNuvem,
     escutarMudancasSaldoNF
   };
+  window.dispatchEvent(new Event('firebase-ready'));
 </script>
 
 <script>
@@ -5155,17 +5156,30 @@ const appRT = {
   }
 };
 
-// ── Inicializar ao carregar a página ──
-document.addEventListener('DOMContentLoaded', () => {
+// ── Inicializar somente depois que o módulo Firebase estiver pronto ──
+function inicializarAplicacao() {
+  if (window.__appInicializada) return;
+  window.__appInicializada = true;
   window.auth = auth;
-window.app = app;
-window.appMateriais = appMateriais;
-window.appSaldoNF = appSaldoNF;
-window.appRT = appRT;
-window.floorRooms = floorRooms;
-floorRooms.init();
-auth.verificarSessao();
-handleMediaChange();
+  window.app = app;
+  window.appMateriais = appMateriais;
+  window.appSaldoNF = appSaldoNF;
+  window.appRT = appRT;
+  window.floorRooms = floorRooms;
+  floorRooms.init();
+  auth.verificarSessao();
+  handleMediaChange();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.__fb) {
+    inicializarAplicacao();
+  } else {
+    window.addEventListener('firebase-ready', inicializarAplicacao, { once: true });
+    setTimeout(() => {
+      if (!window.__appInicializada) inicializarAplicacao();
+    }, 5000);
+  }
 });
 
 // ── MENU HAMBÚRGUER ──
