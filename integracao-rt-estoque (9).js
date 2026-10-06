@@ -1200,7 +1200,7 @@
     <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">💰 Voltar para início</button></div>
     <div class="card">
       <h2>💰 Controle de Saldo por NF</h2>
-      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p>
+      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo físico e financeiro de cada contrato/material e lance NF por NF. O sistema abate quantidade e valor, mostra o saldo disponível do contrato e avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p>
       <div class="btn-group">
         <button class="btn btn-primary" onclick="appSaldoNF.abrirModalMaterial()">➕ Cadastrar Material/Contrato</button>
         <button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">🧾 Lançar NF</button>
@@ -1221,8 +1221,8 @@
       <div id="saldoAlertas"></div>
     </div>
     <div class="card">
-      <h2>📦 Saldos por Material</h2>
-      <div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div>
+      <h2>📦 Saldos por Material / Contrato</h2>
+      <div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Valor contrato</th><th>Valor NF lançado</th><th>Valor disponível</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div>
     </div>
     <div class="card">
       <h2>🧾 Histórico de NFs lançadas</h2>
@@ -1471,8 +1471,9 @@
     <form id="formSaldoMaterial" onsubmit="appSaldoNF.salvarMaterial(event)">
       <div class="form-group"><label for="saldoMaterialNome">Material *</label><input type="text" id="saldoMaterialNome" required placeholder="Ex: Concreto FCK 30, Areia média, Brita 1..." /></div>
       <div class="form-group"><label for="saldoMaterialUnidade">Unidade *</label><input type="text" id="saldoMaterialUnidade" required placeholder="Ex: m³, un, kg, ton, mês" /></div>
-      <div class="form-group"><label for="saldoMaterialContrato">Saldo contratado *</label><input type="number" step="0.001" min="0" id="saldoMaterialContrato" required placeholder="Ex: 500" /></div>
-      <div class="form-group"><label for="saldoMaterialMargem">Margem de segurança (%) *</label><input type="number" step="0.01" min="0" max="100" id="saldoMaterialMargem" required value="20" /></div>
+      <div class="form-group"><label for="saldoMaterialContrato">Saldo contratado físico *</label><input type="number" step="0.001" min="0" id="saldoMaterialContrato" required placeholder="Ex: 500" /></div>
+      <div class="form-group"><label for="saldoMaterialValorContrato">Valor total do contrato (R$)</label><input type="number" step="0.01" min="0" id="saldoMaterialValorContrato" placeholder="Ex: 250000,00" /></div>
+      <div class="form-group"><label for="saldoMaterialMargem">Margem de segurança física (%) *</label><input type="number" step="0.01" min="0" max="100" id="saldoMaterialMargem" required value="20" /></div>
       <div class="form-group"><label for="saldoMaterialObs">Observação</label><textarea id="saldoMaterialObs" rows="3" placeholder="Ex: Alinhar nova RT quando chegar em 20% de saldo."></textarea></div>
       <div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div>
     </form>
@@ -4084,11 +4085,11 @@ const appSaldoNF = {
       const local = localStorage.getItem(this.STORAGE_KEY);
       if (local) { this.dados = JSON.parse(local); return; }
       this.dados = { materiais: [
-        { id: Date.now()+1, nome:'Concreto', unidade:'m³', contrato:500, margem:20, obs:'Exemplo: pedir nova RT/RS ao atingir a margem.' },
-        { id: Date.now()+2, nome:'Areia média', unidade:'m³', contrato:200, margem:15, obs:'' },
-        { id: Date.now()+3, nome:'Brita', unidade:'m³', contrato:150, margem:15, obs:'' },
-        { id: Date.now()+4, nome:'Bloco', unidade:'un', contrato:10000, margem:20, obs:'' },
-        { id: Date.now()+5, nome:'Aço', unidade:'kg', contrato:5000, margem:20, obs:'' }
+        { id: Date.now()+1, nome:'Concreto', unidade:'m³', contrato:500, valorContrato:250000, margem:20, obs:'Exemplo: pedir nova RT/RS ao atingir a margem.' },
+        { id: Date.now()+2, nome:'Areia média', unidade:'m³', contrato:200, valorContrato:30000, margem:15, obs:'' },
+        { id: Date.now()+3, nome:'Brita', unidade:'m³', contrato:150, valorContrato:25000, margem:15, obs:'' },
+        { id: Date.now()+4, nome:'Bloco', unidade:'un', contrato:10000, valorContrato:60000, margem:20, obs:'' },
+        { id: Date.now()+5, nome:'Aço', unidade:'kg', contrato:5000, valorContrato:45000, margem:20, obs:'' }
       ], nfs: [] };
       this.salvar();
     } catch(e) { console.error(e); this.dados = { materiais: [], nfs: [] }; }
@@ -4104,7 +4105,9 @@ const appSaldoNF = {
   esc(v){ return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); },
 
   totalLancado(materialId) { return this.dados.nfs.filter(n => String(n.materialId) === String(materialId)).reduce((s,n)=>s+Number(n.quantidade||0),0); },
+  valorLancado(materialId) { return this.dados.nfs.filter(n => String(n.materialId) === String(materialId)).reduce((s,n)=>s+Number(n.valor||0),0); },
   saldoAtual(mat) { return Number(mat.contrato||0) - this.totalLancado(mat.id); },
+  saldoFinanceiro(mat) { return Number(mat.valorContrato||0) - this.valorLancado(mat.id); },
   margemQtd(mat) { return Number(mat.contrato||0) * (Number(mat.margem||0)/100); },
   percentualUsado(mat) { const c=Number(mat.contrato||0); return c>0 ? Math.min(100, (this.totalLancado(mat.id)/c)*100) : 0; },
   status(mat) {
@@ -4127,6 +4130,7 @@ const appSaldoNF = {
         document.getElementById('saldoMaterialNome').value = m.nome || '';
         document.getElementById('saldoMaterialUnidade').value = m.unidade || '';
         document.getElementById('saldoMaterialContrato').value = m.contrato || 0;
+        document.getElementById('saldoMaterialValorContrato').value = m.valorContrato || 0;
         document.getElementById('saldoMaterialMargem').value = m.margem || 0;
         document.getElementById('saldoMaterialObs').value = m.obs || '';
       }
@@ -4142,6 +4146,7 @@ const appSaldoNF = {
       nome: document.getElementById('saldoMaterialNome').value.trim(),
       unidade: document.getElementById('saldoMaterialUnidade').value.trim(),
       contrato: Number(document.getElementById('saldoMaterialContrato').value||0),
+      valorContrato: Number(document.getElementById('saldoMaterialValorContrato').value||0),
       margem: Number(document.getElementById('saldoMaterialMargem').value||0),
       obs: document.getElementById('saldoMaterialObs').value.trim()
     };
@@ -4220,22 +4225,24 @@ const appSaldoNF = {
     const totalContrato=this.dados.materiais.reduce((s,m)=>s+Number(m.contrato||0),0);
     const totalLancado=this.dados.materiais.reduce((s,m)=>s+this.totalLancado(m.id),0);
     const criticos=this.dados.materiais.filter(m=>['critico','zerado'].includes(this.status(m).key)).length;
+    const valorContrato=this.dados.materiais.reduce((s,m)=>s+Number(m.valorContrato||0),0);
     const valorNF=this.dados.nfs.reduce((s,n)=>s+Number(n.valor||0),0);
+    const valorDisponivel=valorContrato-valorNF;
     const resumo=document.getElementById('saldoResumo');
-    if(resumo) resumo.innerHTML=`<div class="saldo-card"><div class="label">Materiais cadastrados</div><div class="value">${this.dados.materiais.length}</div></div><div class="saldo-card"><div class="label">Total lançado</div><div class="value">${this.num(totalLancado)}</div></div><div class="saldo-card"><div class="label">Materiais em RT/RS</div><div class="value">${criticos}</div></div><div class="saldo-card"><div class="label">Valor total das NFs</div><div class="value">${this.moeda(valorNF)}</div></div>`;
+    if(resumo) resumo.innerHTML=`<div class="saldo-card"><div class="label">Materiais cadastrados</div><div class="value">${this.dados.materiais.length}</div></div><div class="saldo-card"><div class="label">Total lançado</div><div class="value">${this.num(totalLancado)}</div></div><div class="saldo-card"><div class="label">Materiais em RT/RS</div><div class="value">${criticos}</div></div><div class="saldo-card"><div class="label">Valor contrato</div><div class="value">${this.moeda(valorContrato)}</div></div><div class="saldo-card"><div class="label">Valor NF lançado</div><div class="value">${this.moeda(valorNF)}</div></div><div class="saldo-card"><div class="label">Saldo financeiro disponível</div><div class="value">${this.moeda(valorDisponivel)}</div></div>`;
     const alertas=document.getElementById('saldoAlertas');
     const matsCrit=this.dados.materiais.filter(m=>['critico','zerado'].includes(this.status(m).key));
     if(alertas) alertas.innerHTML=matsCrit.length?matsCrit.map(m=>`<div class="saldo-alert-box"><strong>${this.esc(m.nome)}</strong> está com saldo atual de <strong>${this.num(this.saldoAtual(m))} ${this.esc(m.unidade)}</strong>. Alinhar com a engenharia para avaliar nova RT/RS.</div>`).join(''):'';
     const tbody=document.getElementById('saldoTabelaMateriais');
-    if(tbody) tbody.innerHTML=lista.length?lista.map(m=>{ const usado=this.percentualUsado(m); return `<tr><td data-label="Material"><strong>${this.esc(m.nome)}</strong>${m.obs?`<div style="color:#6b7a99;font-size:12px;">${this.esc(m.obs)}</div>`:''}<div class="saldo-progress"><span style="width:${usado}%"></span></div></td><td data-label="Unid.">${this.esc(m.unidade)}</td><td data-label="Saldo contratado">${this.num(m.contrato)}</td><td data-label="Total lançado">${this.num(this.totalLancado(m.id))}</td><td data-label="Saldo atual"><strong>${this.num(this.saldoAtual(m))}</strong></td><td data-label="Margem">${this.num(this.margemQtd(m))} (${this.num(m.margem)}%)</td><td data-label="Status">${this.badge(m)}</td><td data-label="Ações"><div class="saldo-actions"><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">NF</button><button class="btn btn-secondary" onclick="appSaldoNF.abrirModalMaterial(${m.id})">Editar</button><button class="btn btn-danger" onclick="appSaldoNF.excluirMaterial(${m.id})">Excluir</button></div></td></tr>`}).join(''):'<tr><td colspan="8">Nenhum material encontrado.</td></tr>';
+    if(tbody) tbody.innerHTML=lista.length?lista.map(m=>{ const usado=this.percentualUsado(m); return `<tr><td data-label="Material"><strong>${this.esc(m.nome)}</strong>${m.obs?`<div style="color:#6b7a99;font-size:12px;">${this.esc(m.obs)}</div>`:''}<div class="saldo-progress"><span style="width:${usado}%"></span></div></td><td data-label="Unid.">${this.esc(m.unidade)}</td><td data-label="Saldo contratado">${this.num(m.contrato)}</td><td data-label="Total lançado">${this.num(this.totalLancado(m.id))}</td><td data-label="Saldo atual"><strong>${this.num(this.saldoAtual(m))}</strong></td><td data-label="Valor contrato">${this.moeda(m.valorContrato)}</td><td data-label="Valor NF lançado">${this.moeda(this.valorLancado(m.id))}</td><td data-label="Valor disponível"><strong>${this.moeda(this.saldoFinanceiro(m))}</strong></td><td data-label="Margem">${this.num(this.margemQtd(m))} (${this.num(m.margem)}%)</td><td data-label="Status">${this.badge(m)}</td><td data-label="Ações"><div class="saldo-actions"><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">NF</button><button class="btn btn-secondary" onclick="appSaldoNF.abrirModalMaterial(${m.id})">Editar</button><button class="btn btn-danger" onclick="appSaldoNF.excluirMaterial(${m.id})">Excluir</button></div></td></tr>`}).join(''):'<tr><td colspan="11">Nenhum material encontrado.</td></tr>';
     const nfs=[...this.dados.nfs].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
     const tbodyN=document.getElementById('saldoTabelaNFs');
     if(tbodyN) tbodyN.innerHTML=nfs.length?nfs.map(n=>{ const m=this.dados.materiais.find(x=>String(x.id)===String(n.materialId)); return `<tr><td data-label="Data">${n.data?new Date(n.data+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</td><td data-label="NF"><strong>${this.esc(n.numero)}</strong></td><td data-label="Fornecedor">${this.esc(n.fornecedor||'-')}</td><td data-label="Material">${this.esc(m?.nome||'Material excluído')}</td><td data-label="Qtd.">${this.num(n.quantidade)} ${this.esc(m?.unidade||'')}</td><td data-label="Valor">${n.valor?this.moeda(n.valor):'-'}</td><td data-label="Obs.">${this.esc(n.obs||'-')}</td><td data-label="Ações"><div class="saldo-actions"><button class="btn btn-secondary" onclick="appSaldoNF.abrirModalNF(${n.id})">Editar</button><button class="btn btn-danger" onclick="appSaldoNF.excluirNF(${n.id})">Excluir</button></div></td></tr>`}).join(''):'<tr><td colspan="8">Nenhuma NF lançada.</td></tr>';
   },
 
   exportarCSV(){
-    const linhas=[['Data','NF','Fornecedor','Material','Unidade','Quantidade','Valor','Observacao']];
-    this.dados.nfs.forEach(n=>{ const m=this.dados.materiais.find(x=>String(x.id)===String(n.materialId)); linhas.push([n.data,n.numero,n.fornecedor,m?.nome||'',m?.unidade||'',n.quantidade,n.valor,n.obs]); });
+    const linhas=[['Data','NF','Fornecedor','Material','Unidade','Quantidade','Valor NF','Valor Contrato','Saldo Financeiro Disponivel','Observacao']];
+    this.dados.nfs.forEach(n=>{ const m=this.dados.materiais.find(x=>String(x.id)===String(n.materialId)); linhas.push([n.data,n.numero,n.fornecedor,m?.nome||'',m?.unidade||'',n.quantidade,n.valor,m?.valorContrato||0,m?this.saldoFinanceiro(m):0,n.obs]); });
     const csv=linhas.map(l=>l.map(v=>`"${String(v??'').replace(/"/g,'""')}"`).join(';')).join('\n');
     const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download='controle-saldo-nfs.csv'; a.click(); URL.revokeObjectURL(url);
   }
