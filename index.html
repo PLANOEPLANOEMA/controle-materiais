@@ -1869,7 +1869,7 @@
     salvarSaldoNFNaNuvem,
     carregarSaldoNFDaNuvem,
     escutarMudancasSaldoNF
-  } from "./firebase-controle-usuarios.js?v=2.0.0";
+  } from "./firebase-controle-usuarios.js?v=1.0.2";
 
   window.__fb = {
     salvarNaNuvem,
@@ -3376,25 +3376,15 @@ const appMateriais = {
   },
 
   async salvarMateriais() {
-    let erroLocal = null;
-
-    // O localStorage é apenas um cache. Nunca deixe uma falha por limite
-    // de armazenamento local impedir o salvamento no Firebase.
     try {
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
-    } catch (e) {
-      erroLocal = e;
-      console.warn('Cache local cheio. O material continuará sendo salvo na nuvem.', e);
-    }
-
-    try {
       if (window.__fb && window.__fb.salvarMateriaisNaNuvem) {
         await window.__fb.salvarMateriaisNaNuvem(this.materiais);
       }
       console.log('Materiais salvos com sucesso!');
     } catch (e) {
-      console.error('Erro ao salvar materiais na nuvem:', e);
-      app.mostrarAlerta('Erro ao salvar materiais na nuvem. Verifique a conexão.', 'error');
+      console.error('Erro ao salvar materiais:', e);
+      app.mostrarAlerta('Erro ao salvar materiais!', 'error');
     }
   },
 
