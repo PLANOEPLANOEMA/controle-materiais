@@ -3399,7 +3399,16 @@ return {key:'ok', label:'Saldo tranquilo', cls:'saldo-ok', icon:'🟢'};
 },
 badge(mat){ const st=this.status(mat); return `<span class="saldo-status ${st.cls}">${st.icon} ${st.label}</span>`; },
 
+somenteLeitura(){ return (window.currentUser?.role || '') !== 'admin'; },
+bloquearAlteracao(event){
+if (!this.somenteLeitura()) return false;
+event?.preventDefault?.();
+app.mostrarAlerta('Somente o perfil Administrador pode alterar o Saldo NF.', 'error');
+return true;
+},
+
 abrirModalMaterial(id=null) {
+if (this.bloquearAlteracao()) return;
 this.editandoMaterialId = id;
 document.getElementById('formSaldoMaterial').reset();
 document.getElementById('saldoMaterialMargem').value = 20;
@@ -3419,6 +3428,7 @@ document.getElementById('modalSaldoMaterial').classList.add('active');
 fecharModalMaterial(){ document.getElementById('modalSaldoMaterial').classList.remove('active'); this.editandoMaterialId=null; },
 
 salvarMaterial(e) {
+if (this.bloquearAlteracao(e)) return;
 e.preventDefault();
 const item = {
 id: this.editandoMaterialId || Date.now(),
@@ -3434,6 +3444,7 @@ this.salvar(); this.fecharModalMaterial(); this.renderizar(); app.mostrarAlerta(
 },
 
 excluirMaterial(id) {
+if (this.bloquearAlteracao()) return;
 if (!confirm('Excluir este material/contrato? As NFs vinculadas também serão removidas.')) return;
 this.dados.materiais = this.dados.materiais.filter(m => String(m.id)!==String(id));
 this.dados.nfs = this.dados.nfs.filter(n => String(n.materialId)!==String(id));
@@ -3446,6 +3457,7 @@ if (!sel) return;
 sel.innerHTML = '<option value="">Selecione...</option>' + this.dados.materiais.map(m => `<option value="${m.id}">${this.esc(m.nome)} (${this.esc(m.unidade)})</option>`).join('');
 },
 abrirModalNF(id=null) {
+if (this.bloquearAlteracao()) return;
 if (!this.dados.materiais.length) return app.mostrarAlerta('Cadastre um material/contrato antes de lançar NF.', 'error');
 this.editandoNFId = id;
 this.preencherSelectMateriais();
@@ -3467,6 +3479,7 @@ document.getElementById('modalSaldoNF').classList.add('active');
 },
 fecharModalNF(){ document.getElementById('modalSaldoNF').classList.remove('active'); this.editandoNFId=null; },
 salvarNF(e) {
+if (this.bloquearAlteracao(e)) return;
 e.preventDefault();
 const item = {
 id: this.editandoNFId || Date.now(),
@@ -3485,7 +3498,7 @@ const mat = this.dados.materiais.find(m => String(m.id)===String(item.materialId
 const st = mat ? this.status(mat) : null;
 app.mostrarAlerta(st?.key === 'critico' || st?.key === 'zerado' ? 'NF lançada. Atenção: material na margem de RT/RS!' : 'NF lançada com sucesso!', st?.key === 'critico' || st?.key === 'zerado' ? 'error' : 'success');
 },
-excluirNF(id){ if(!confirm('Excluir este lançamento de NF?')) return; this.dados.nfs=this.dados.nfs.filter(n=>String(n.id)!==String(id)); this.salvar(); this.renderizar(); app.mostrarAlerta('NF excluída.', 'success'); },
+excluirNF(id){ if(this.bloquearAlteracao()) return; if(!confirm('Excluir este lançamento de NF?')) return; this.dados.nfs=this.dados.nfs.filter(n=>String(n.id)!==String(id)); this.salvar(); this.renderizar(); app.mostrarAlerta('NF excluída.', 'success'); },
 
 listaMateriaisFiltrada(){
 const busca=(document.getElementById('saldoBusca')?.value||'').toLowerCase();
@@ -3513,6 +3526,9 @@ if(tbody) tbody.innerHTML=lista.length?lista.map(m=>{ const usado=this.percentua
 const nfs=[...this.dados.nfs].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
 const tbodyN=document.getElementById('saldoTabelaNFs');
 if(tbodyN) tbodyN.innerHTML=nfs.length?nfs.map(n=>{ const m=this.dados.materiais.find(x=>String(x.id)===String(n.materialId)); return `<tr><td data-label="Data">${n.data?new Date(n.data+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</td><td data-label="NF"><strong>${this.esc(n.numero)}</strong></td><td data-label="Fornecedor">${this.esc(n.fornecedor||'-')}</td><td data-label="Material">${this.esc(m?.nome||'Material excluído')}</td><td data-label="Qtd.">${this.num(n.quantidade)} ${this.esc(m?.unidade||'')}</td><td data-label="Valor">${n.valor?this.moeda(n.valor):'-'}</td><td data-label="Obs.">${this.esc(n.obs||'-')}</td><td data-label="Ações"><div class="saldo-actions"><button class="btn btn-secondary" onclick="appSaldoNF.abrirModalNF(${n.id})">Editar</button><button class="btn btn-danger" onclick="appSaldoNF.excluirNF(${n.id})">Excluir</button></div></td></tr>`}).join(''):'<tr><td colspan="8">Nenhuma NF lançada.</td></tr>';
+const somenteConsulta = this.somenteLeitura();
+document.querySelectorAll('#saldo-nf .saldo-actions button').forEach(button => { button.hidden = somenteConsulta; });
+document.querySelectorAll('#saldo-nf .btn-group > button[onclick^="appSaldoNF.abrirModalMaterial"], #saldo-nf .btn-group > button[onclick^="appSaldoNF.abrirModalNF"]').forEach(button => { button.hidden = somenteConsulta; });
 },
 
 exportarCSV(){
