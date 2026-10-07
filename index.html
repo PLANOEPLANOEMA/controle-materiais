@@ -1052,7 +1052,7 @@
 <div id="login-screen">
   <div class="login-container">
     <div class="login-logo">
-      <img src="./logo.png" alt="Plano & Plano" />
+      <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
     </div>
     <h1>Acesso Restrito</h1>
     <p>Faça login para acessar o controle de materiais</p>
@@ -1078,7 +1078,7 @@
 <header>
   <div class="header-content">
     <div class="logo-container">
-      <img src="./logo.png" alt="Plano & Plano" />
+      <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
     </div>
     <div class="header-text">
       <h1>Controle de Materiais</h1>
@@ -1097,8 +1097,6 @@
   <!-- Seção RT e Controle de Materiais -->
   <div class="nav-section">
     <div class="nav-section-title">📋 RT & Materiais</div>
-    <button class="active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
-    <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
     <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
     <button data-section="saldo-nf" onclick="app.showSection('saldo-nf', this)">Saldo por NF</button>
   </div>
@@ -1301,93 +1299,6 @@
     <div class="card">
       <h2>🧾 Histórico de NFs lançadas</h2>
       <div class="table-wrap"><table><thead><tr><th>Data</th><th>NF</th><th>Fornecedor</th><th>Material</th><th>Qtd.</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody id="saldoTabelaNFs"></tbody></table></div>
-    </div>
-  </section>
-
-  <!-- ── PLANEJAMENTO RT ── -->
-  <section id="planejamento-rt">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📅 Voltar para início</button></div>
-    <div class="card">
-      <h2>📅 Planejamento RT da Escadinha</h2>
-      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Acesso liberado para Admin, GO e Almoxarife (somente entrega).</p>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="appRT.abrirModalNovo()">➕ Novo Planejamento</button>
-        <button class="btn btn-warning" onclick="appRT.verPrioridadesDoMes()">🚨 Ver Prioridades do Mês</button>
-        <button class="btn btn-secondary" onclick="appRT.renderizar()">🔄 Atualizar</button>
-        <button class="btn btn-danger" onclick="appRT.excluirTudoPlanejamento()">🗑️ Excluir todo planejamento</button>
-        <button class="btn btn-success" onclick="appRT.gerarPdfPlanejamento()">📄 PDF dos Status</button>
-      </div>
-      <div class="filter-bar">
-        <select id="rtMesFiltro" onchange="appRT.renderizar()">
-          <option value="">Todos os meses</option>
-        </select>
-        <select id="rtStatusFiltro" onchange="appRT.renderizar()">
-          <option value="">Todos os status</option>
-          <option value="Planejado">Planejado</option>
-          <option value="Pedir agora">Pedir agora</option>
-          <option value="RT lançada">RT lançada</option>
-          <option value="Em suprimentos">Em suprimentos</option>
-                    <option value="Aguardando entrega">Aguardando entrega</option>
-          <option value="Entregue">Entregue</option>
-          <option value="Concluído">Concluído</option>
-        </select>
-        <select id="rtTorreFiltro" onchange="appRT.renderizar()">
-          <option value="">Todas as torres</option>
-        </select>
-        <select id="rtServicoFiltro" onchange="appRT.renderizar()">
-          <option value="">Todos os serviços</option>
-        </select>
-        <input type="text" id="rtBusca" placeholder="🔍 Buscar serviço, material ou pavimento..." oninput="appRT.renderizar()" />
-      </div>
-      <div id="rtResumo" class="kpi-grid" style="margin-top:1rem;"></div>
-      <div id="rtPrioridadesMes" style="margin-top:1rem;"></div>
-    </div>
-
-    <div class="card">
-      <h2>🗂️ Planejamento por Mês</h2>
-      <div id="rtPlanejamentoContainer"></div>
-    </div>
-  </section>
-
-
-  <!-- ── RT DIA A DIA ── -->
-
-  <section id="rt-dia-dia">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📝 Voltar para início</button></div>
-    <div class="card">
-      <h2>📝 RT do Dia a Dia</h2>
-      <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Use esta área para RTs avulsas, emergenciais e acompanhamentos fora da escadinha. Acesso liberado para Admin, GO e Almoxarife (somente entrega).</p>
-      <div class="btn-group">
-        <button class="btn btn-primary" onclick="appRT.abrirModalNovoDiaDia()">➕ Nova RT Dia a Dia</button>
-        <button class="btn btn-warning" onclick="appRT.verPrioridadesDiaDia()">🚨 Ver RTs Críticas</button>
-        <button class="btn btn-secondary" onclick="appRT.renderizarDiaDia()">🔄 Atualizar</button>
-        <button class="btn btn-success" onclick="appRT.gerarPdfDiaDia()">📄 PDF dos Status</button>
-      </div>
-      <div class="filter-bar">
-        <select id="rtDiaStatusFiltro" onchange="appRT.renderizarDiaDia()">
-          <option value="">Todos os status</option>
-          <option value="Planejado">Planejado</option>
-          <option value="Pedir agora">Pedir agora</option>
-          <option value="RT lançada">RT lançada</option>
-          <option value="Em suprimentos">Em suprimentos</option>
-                    <option value="Aguardando entrega">Aguardando entrega</option>
-          <option value="Entregue">Entregue</option>
-          <option value="Concluído">Concluído</option>
-        </select>
-        <select id="rtDiaTorreFiltro" onchange="appRT.renderizarDiaDia()">
-          <option value="">Todas as torres</option>
-        </select>
-        <select id="rtDiaServicoFiltro" onchange="appRT.renderizarDiaDia()">
-          <option value="">Todos os serviços</option>
-        </select>
-        <input type="text" id="rtDiaBusca" placeholder="🔍 Buscar RT avulsa, material, torre ou observação..." oninput="appRT.renderizarDiaDia()" />
-      </div>
-      <div id="rtDiaResumo" class="kpi-grid" style="margin-top:1rem;"></div>
-      <div id="rtDiaCriticas" style="margin-top:1rem;"></div>
-    </div>
-    <div class="card">
-      <h2>📋 Acompanhamento Diário de RTs</h2>
-      <div id="rtDiaDiaContainer"></div>
     </div>
   </section>
 
@@ -1711,170 +1622,6 @@
   </div>
 </div>
 
-<!-- ── MODAL RT DIA A DIA ── -->
-<div id="modalRTDiaDia" class="modal">
-  <div class="modal-content">
-    <div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appRT.fecharModalDiaDia()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">RT Dia a Dia</span></div>
-    <h3 id="modalRTDiaDiaTitle">Nova RT Dia a Dia</h3>
-    <form id="formRTDiaDia" onsubmit="appRT.salvarDiaDia(event)">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDiaServico">Serviço *</label>
-          <select id="rtDiaServico" required></select>
-        </div>
-        <div class="form-group">
-          <label for="rtDiaMaterial">Material / RT *</label>
-          <input type="text" id="rtDiaMaterial" required placeholder="Ex: Argamassa AC2 / Porta de Madeira" />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDiaTorre">Torre</label>
-          <select id="rtDiaTorre" onchange="appRT.atualizarPavimentosDiaDia()"></select>
-        </div>
-        <div class="form-group">
-          <label for="rtDiaPavimento">Pavimento</label>
-          <select id="rtDiaPavimento"></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDiaQuantidade">Quantidade</label>
-          <input type="number" id="rtDiaQuantidade" min="0" step="1" placeholder="Ex: 100" />
-        </div>
-        <div class="form-group">
-          <label for="rtDiaDataNecessidade">Data da necessidade *</label>
-          <input type="date" id="rtDiaDataNecessidade" required />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDiaLeadTime">Lead time (dias) *</label>
-          <input type="number" id="rtDiaLeadTime" min="1" step="1" value="20" required />
-        </div>
-        <div class="form-group">
-          <label for="rtDiaStatus">Status *</label>
-          <select id="rtDiaStatus" required></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDiaPrioridadeManual">Prioridade manual</label>
-          <select id="rtDiaPrioridadeManual">
-            <option value="">Automática</option>
-            <option value="Alta">Alta</option>
-            <option value="Média">Média</option>
-            <option value="Baixa">Baixa</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Datas automáticas</label>
-          <div id="rtDiaStatusResumo" class="status-resumo-box">As datas serão registradas automaticamente conforme você alterar o status.</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="rtDiaObservacoes">Observações</label>
-        <textarea id="rtDiaObservacoes" rows="3" placeholder="Ex: necessidade emergencial identificada na obra / acompanhamento via e-mail"></textarea>
-      </div>
-      <div class="modal-buttons">
-        <button type="button" class="btn btn-secondary" onclick="appRT.fecharModalDiaDia()">Cancelar</button>
-        <button type="submit" class="btn btn-success">Salvar RT Dia a Dia</button>
-      </div>
-    </form>
-  </div>
-</div>
-
-<!-- ── MODAL PLANEJAMENTO RT ── -->
-<div id="modalPlanejamentoRT" class="modal">
-  <div class="modal-content">
-    <div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appRT.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Planejamento RT</span></div>
-    <h3 id="modalPlanejamentoRTTitle">Novo Planejamento RT</h3>
-    <form id="formPlanejamentoRT" onsubmit="appRT.salvar(event)">
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtMes">Mês da Escadinha *</label>
-          <select id="rtMes" required></select>
-        </div>
-        <div class="form-group">
-          <label for="rtServico">Serviço *</label>
-          <select id="rtServico" required></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtTorre">Torre</label>
-          <select id="rtTorre" onchange="appRT.atualizarPavimentosPlanejamento()"></select>
-        </div>
-        <div class="form-group">
-          <label for="rtPavimento">Pavimento</label>
-          <select id="rtPavimento"></select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group" style="position:relative;">
-          <label for="rtCodigoMaterial">Codigo ou Nome do Material *</label>
-          <input type="text" id="rtCodigoMaterial" required placeholder="Ex: TQ0-1001 ou Tela Q138" oninput="appRT.buscarMaterialPorCodigoOuNome()" autocomplete="off" />
-          <div id="rtMaterialSugestoes" style="position:absolute;top:100%;left:0;right:0;background:#fff;border:1px solid #ddd;border-top:none;max-height:200px;overflow-y:auto;z-index:10;display:none;border-radius:0 0 8px 8px;"></div>
-        </div>
-        <div class="form-group">
-          <label for="rtQuantidade">Quantidade</label>
-          <input type="number" id="rtQuantidade" min="0" step="1" placeholder="Ex: 100" />
-        </div>
-      </div>
-      <div class="form-row" style="display:none;" id="rtMaterialInfoRow">
-        <div class="form-group">
-          <label>Material Selecionado</label>
-          <div id="rtMaterialInfo" style="padding:0.75rem;background:#f0f8ff;border-radius:8px;border:1px solid #cfe0fb;color:#1f3864;"></div>
-        </div>
-      </div>
-      <input type="hidden" id="rtMaterial" />
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDataServico">Data prevista do serviço *</label>
-          <input type="date" id="rtDataServico" required />
-        </div>
-        <div class="form-group">
-          <label for="rtLeadTime">Lead time (dias) *</label>
-          <input type="number" id="rtLeadTime" min="1" step="1" value="20" required />
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtStatus">Status *</label>
-          <select id="rtStatus" required></select>
-        </div>
-        <div class="form-group">
-          <label for="rtPrioridadeManual">Prioridade manual</label>
-          <select id="rtPrioridadeManual">
-            <option value="">Automática</option>
-            <option value="Alta">Alta</option>
-            <option value="Média">Média</option>
-            <option value="Baixa">Baixa</option>
-          </select>
-        </div>
-      </div>
-      <div class="form-row">
-        <div class="form-group">
-          <label for="rtDataRT">Data da RT</label>
-          <input type="date" id="rtDataRT" />
-        </div>
-        <div class="form-group">
-          <label>Datas automáticas do acompanhamento</label>
-          <div id="rtStatusResumo" class="status-resumo-box">Aprovação de suprimentos, autorização e entrega serão registradas automaticamente conforme você alterar o status.</div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label for="rtObservacoes">Observações</label>
-        <textarea id="rtObservacoes" rows="3" placeholder="Ex: antecipado para não travar a escadinha"></textarea>
-      </div>
-      <div class="modal-buttons">
-        <button type="button" class="btn btn-secondary" onclick="appRT.fecharModal()">Cancelar</button>
-        <button type="submit" class="btn btn-success">Salvar Planejamento</button>
-      </div>
-    </form>
-  </div>
-</div>
-
 
 <footer>
   Controle de Materiais de Empréstimo e Estoque — Plano & Plano &mdash; Dados salvos automaticamente
@@ -2031,9 +1778,9 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','saldo-nf','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','saldo-nf','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      go: ['materiais-obra','saldo-nf','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia'],
+      almoxarife: ['materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia'],
+      go: ['materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia'],
       engenharia: ['materiais-obra','saldo-nf','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
@@ -2768,7 +2515,7 @@ const app = {
 
     const globalKpiGrid = document.getElementById('globalKpiGrid');
     if (globalKpiGrid) {
-      globalKpiGrid.style.display = ['planejamento-rt','rt-dia-dia','materiais-obra','saldo-nf','rastreabilidade'].includes(id) ? 'none' : 'grid';
+      globalKpiGrid.style.display = ['materiais-obra','saldo-nf','rastreabilidade'].includes(id) ? 'none' : 'grid';
     }
 
     if (id === 'relatorio') {
@@ -3079,7 +2826,7 @@ const app = {
 
     let html = `
       <div class="pdf-header">
-        <img src="./logo.png" alt="Plano & Plano" />
+        <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
         <div class="pdf-header-text">
           <h2>Relatório de Materiais em Empréstimo</h2>
           <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
@@ -3960,7 +3707,7 @@ const appMateriais = {
     </div>
 
     <div class="header">
-      <img src="./logo.png" alt="Plano & Plano" />
+      <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
       <div>
         <h1>${titulo}</h1>
         <div class="muted">${subtitulo}</div>
@@ -5276,8 +5023,6 @@ window.addEventListener('resize', handleMediaChange);
   <!-- Seção RT e Controle de Materiais -->
   <div class="mobile-nav-section">
     <div class="mobile-nav-section-title">📋 RT & Materiais</div>
-    <button class="mobile-nav-button active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this); closeMobileMenu()">Planejamento RT</button>
-    <button class="mobile-nav-button" data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this); closeMobileMenu()">RT Dia a Dia</button>
     <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
     <button class="mobile-nav-button" data-section="saldo-nf" onclick="app.showSection('saldo-nf', this); closeMobileMenu()">Saldo por NF</button>
   </div>
