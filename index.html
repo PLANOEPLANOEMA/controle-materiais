@@ -1044,7 +1044,7 @@
     body { overflow-x: hidden; }
     .mobile-home-btn { position: fixed; right: 1rem; bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 120; display: none; align-items: center; justify-content: center; min-height: 44px; padding: .7rem 1rem; border: 1px solid #cfe0f3; border-radius: 999px; background: rgba(255,255,255,.96); color: var(--blue-dark); font-weight: 800; box-shadow: 0 10px 26px rgba(13,45,87,.18); cursor: pointer; }
     .mobile-home-btn:hover { background: #eef5ff; transform: translateY(-1px); }
-    @media (min-width: 769px) { .menu-toggle, .mobile-menu, .mobile-menu-overlay, .mobile-home-btn { display: none !important; } #desktopNav { display: flex !important; } }
+    @media (min-width: 769px) { .menu-toggle { display: flex !important; } .mobile-menu-overlay, .mobile-home-btn { display: none !important; } #desktopNav { display: none !important; } header { padding-left: 5.5rem; } }
     @media (max-width: 768px) {
       #desktopNav { display: none !important; }
       header { min-height: 78px; height: auto; padding: .75rem 1rem .75rem 4.35rem; }
@@ -4433,10 +4433,8 @@ function handleMediaChange() {
 const menuToggle = document.getElementById('menuToggle');
 const desktopNav = document.getElementById('desktopNav');
 if (!menuToggle || !desktopNav) return;
-const isMobile = window.innerWidth <= 768;
-menuToggle.style.display = isMobile ? 'flex' : 'none';
-desktopNav.style.display = isMobile ? 'none' : 'flex';
-if (!isMobile) closeMobileMenu();
+menuToggle.style.display = 'flex';
+desktopNav.style.display = 'none';
 atualizarBotaoMobile();
 }
 window.addEventListener('resize', handleMediaChange);
