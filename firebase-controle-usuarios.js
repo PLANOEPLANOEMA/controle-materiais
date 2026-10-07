@@ -104,35 +104,69 @@ async function fotoParaStorage(foto, materialId) {
 
 // Fotos ficam no Storage quando disponível; o Firestore guarda um identificador
 // compartilhado quando o Storage não aceita o upload.
+// Materiais também são espelhados no documento que já funciona para as retiradas.
+// Isso mantém compatibilidade mesmo quando as regras do documento antigo de materiais
+// estiverem bloqueando a gravação.
+const REF_MATERIAIS_COMPAT = doc(db, "controle", "movimentacoes");
+
 export async function salvarMateriaisNaNuvem(materiais) {
   const lista = Array.isArray(materiais) ? materiais : [];
   const materiaisParaNuvem = await Promise.all(lista.map(async (material) => {
     const foto = await fotoParaStorage(material?.foto, material?.id);
     return { ...material, foto };
   }));
-  await setDoc(REF_MATERIAIS, { materiais: materiaisParaNuvem, updatedAt: Date.now() }, { merge: true });
-  // Retorna as fotos originais/URLs para o aparelho atual; a nuvem guarda o ponteiro.
+  const agora = Date.now();
+  let salvo = false;
+  try {
+    await setDoc(REF_MATERIAIS, { materiais: materiaisParaNuvem, updatedAt: agora }, { merge: true });
+    salvo = true;
+  } catch (error) {
+    console.warn('Documento principal de materiais recusou a gravação; usando compatibilidade:', error);
+  }
+  try {
+    await setDoc(REF_MATERIAIS_COMPAT, { materiais: materiaisParaNuvem, materiaisUpdatedAt: agora }, { merge: true });
+    salvo = true;
+  } catch (error) {
+    console.warn('Documento compatível de materiais também recusou a gravação:', error);
+  }
+  if (!salvo) throw new Error('Não foi possível sincronizar materiais com o Firebase.');
   return lista.map((material, i) => ({ ...material, foto: material?.foto || materiaisParaNuvem[i]?.foto || null }));
 }
 
-export async function carregarMateriaisDaNuvem() {
-  const snap = await getDoc(REF_MATERIAIS);
+async function lerMateriaisDoSnapshot(snap, compat = false) {
   if (!snap.exists()) return null;
-  const materiais = snap.data().materiais ?? null;
-  return Array.isArray(materiais)
-    ? await Promise.all(materiais.map(async (material) => ({ ...material, foto: await resolverFoto(material?.foto) })))
-    : materiais;
+  const dados = snap.data() || {};
+  const materiais = compat ? dados.materiais : dados.materiais;
+  if (!Array.isArray(materiais)) return null;
+  const resolvidos = await Promise.all(materiais.map(async (material) => ({ ...material, foto: await resolverFoto(material?.foto) })));
+  return { materiais: resolvidos, atualizadoEm: Number(compat ? dados.materiaisUpdatedAt : dados.updatedAt) || 0 };
+}
+
+export async function carregarMateriaisDaNuvem() {
+  const [principal, compat] = await Promise.all([
+    getDoc(REF_MATERIAIS).then(s => lerMateriaisDoSnapshot(s, false)).catch(() => null),
+    getDoc(REF_MATERIAIS_COMPAT).then(s => lerMateriaisDoSnapshot(s, true)).catch(() => null)
+  ]);
+  const escolhido = (compat && (!principal || compat.atualizadoEm > principal.atualizadoEm)) ? compat : principal;
+  return escolhido ? escolhido.materiais : null;
 }
 
 export function escutarMudancasMateriais(callback) {
-  return onSnapshot(REF_MATERIAIS, async (snap) => {
-    if (!snap.exists()) return;
-    const materiais = snap.data().materiais ?? [];
-    const resolvidos = Array.isArray(materiais)
-      ? await Promise.all(materiais.map(async (material) => ({ ...material, foto: await resolverFoto(material?.foto) })))
-      : [];
-    callback(resolvidos);
+  let principal = null;
+  let compat = null;
+  const emitir = async () => {
+    const escolhido = (compat && (!principal || compat.atualizadoEm > principal.atualizadoEm)) ? compat : principal;
+    if (escolhido) callback(escolhido.materiais);
+  };
+  const unsubPrincipal = onSnapshot(REF_MATERIAIS, async (snap) => {
+    principal = await lerMateriaisDoSnapshot(snap, false);
+    await emitir();
   });
+  const unsubCompat = onSnapshot(REF_MATERIAIS_COMPAT, async (snap) => {
+    compat = await lerMateriaisDoSnapshot(snap, true);
+    await emitir();
+  });
+  return () => { unsubPrincipal(); unsubCompat(); };
 }
 
 
