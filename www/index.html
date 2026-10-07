@@ -969,7 +969,82 @@
 .saldo-alert-box{border-left:5px solid #e84545;background:#fff5f5;padding:.85rem 1rem;border-radius:12px;margin:.6rem 0;color:#7f1d1d}
 .saldo-actions{display:flex;gap:.45rem;flex-wrap:wrap}
 
-</style>
+
+    /* ── POLIMENTO VISUAL V2 ── */
+    :root {
+      --bg: #f4f7fb;
+      --card: #ffffff;
+      --text: #17233d;
+      --muted: #6b7891;
+      --blue-dark: #163b72;
+      --blue-mid: #1769aa;
+      --blue-light: #eaf3ff;
+      --line: #e5ebf4;
+      --shadow: 0 12px 34px rgba(19, 49, 91, .08);
+      --shadow-hover: 0 18px 42px rgba(19, 49, 91, .13);
+      --radius: 18px;
+    }
+    html { background: var(--bg); }
+    body { background: radial-gradient(circle at 0 0, #edf5ff 0, var(--bg) 34rem); color: var(--text); letter-spacing: .005em; }
+    header { min-height: 92px; padding: 1.15rem clamp(1rem, 4vw, 4rem); background: linear-gradient(110deg, #102f5d 0%, #1769aa 66%, #2787c4 100%); box-shadow: 0 8px 24px rgba(16,47,93,.16); }
+    .header-content { gap: 1rem; }
+    .logo-container img { height: 48px; width: auto; filter: drop-shadow(0 4px 8px rgba(0,0,0,.12)); }
+    .header-text h1 { font-size: clamp(1.15rem, 2.4vw, 1.65rem); letter-spacing: -.02em; }
+    .header-text p { font-size: .86rem; opacity: .78; }
+    .user-area { min-width: 0 !important; }
+    .user-area .btn { border-color: rgba(255,255,255,.3); background: rgba(255,255,255,.14); color: #fff; }
+    main { width: min(1440px, calc(100% - 2rem)); margin: 1.25rem auto 3rem; }
+    section { animation: sectionIn .22s ease both; }
+    @keyframes sectionIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: none; } }
+    .card { border: 1px solid var(--line); border-radius: var(--radius); box-shadow: var(--shadow); padding: clamp(1rem, 2vw, 1.5rem); background: rgba(255,255,255,.96); }
+    .card + .card { margin-top: 1rem; }
+    .card h2 { color: var(--blue-dark); font-size: clamp(1.05rem, 2vw, 1.35rem); letter-spacing: -.02em; }
+    .btn { min-height: 42px; border-radius: 12px; padding: .65rem 1rem; font-weight: 750; border: 1px solid transparent; box-shadow: none; transition: transform .18s ease, box-shadow .18s ease, filter .18s ease; }
+    .btn:hover { transform: translateY(-1px); box-shadow: 0 8px 18px rgba(19,49,91,.12); filter: brightness(1.02); }
+    .btn-group { gap: .65rem; }
+    input, select, textarea { border: 1px solid #d7e1ee !important; border-radius: 12px !important; min-height: 42px; background: #fbfdff !important; color: var(--text); transition: border-color .18s, box-shadow .18s; }
+    input:focus, select:focus, textarea:focus { border-color: #3c91d0 !important; box-shadow: 0 0 0 4px rgba(60,145,208,.12) !important; outline: none; }
+    .filter-bar { gap: .65rem; padding: .85rem; border: 1px solid var(--line); border-radius: 14px; background: #f8fbff; }
+    .kpi-grid { gap: .85rem; }
+    .kpi, .saldo-card { border: 1px solid var(--line); border-radius: 16px; box-shadow: 0 8px 24px rgba(19,49,91,.06); }
+    .table-wrap { border: 1px solid var(--line); border-radius: 14px; background: #fff; }
+    table th { background: #f5f8fc; color: var(--blue-dark); font-size: .78rem; letter-spacing: .04em; text-transform: uppercase; }
+    table td, table th { border-bottom-color: var(--line); }
+    .modal { backdrop-filter: blur(7px); background: rgba(11, 28, 55, .52); }
+    .modal-content { border: 1px solid rgba(255,255,255,.7); border-radius: 22px; box-shadow: 0 28px 80px rgba(10,32,69,.24); padding: clamp(1rem, 3vw, 1.6rem); }
+    .modal-topbar { border-bottom: 1px solid var(--line); padding-bottom: .85rem; margin-bottom: 1rem; }
+    .mobile-menu { width: min(360px, 92vw); background: #fbfdff; border-right: 1px solid var(--line); box-shadow: 14px 0 36px rgba(12,39,77,.18); }
+    .mobile-nav-section { padding: 1.1rem; border-bottom: 1px solid var(--line); }
+    .mobile-nav-button { border: 1px solid transparent; border-radius: 12px; background: transparent; padding: .8rem .9rem; color: #3a4b69; }
+    .mobile-nav-button:hover, .mobile-nav-button.active { background: var(--blue-light); color: var(--blue-dark); border-color: #cfe2f8; box-shadow: 0 5px 14px rgba(23,105,170,.09); }
+    .menu-toggle { width: 46px; height: 46px; border-radius: 14px; box-shadow: 0 8px 20px rgba(0,0,0,.18); }
+    .mobile-home-btn { border-radius: 12px; box-shadow: var(--shadow); }
+    @media (max-width: 768px) {
+      header { min-height: 84px; padding: .9rem 1rem .9rem 4.75rem; text-align: left; }
+      .header-content { flex-direction: row; align-items: center; gap: .7rem; }
+      .logo-container img { height: 38px; }
+      .header-text h1 { font-size: 1.08rem; }
+      .header-text p { font-size: .72rem; line-height: 1.25; }
+      .user-area { display: flex; align-items: center; gap: .5rem; }
+      .user-area > div { display: none; }
+      .user-area .btn { margin-top: 0 !important; min-height: 38px; padding: .5rem .72rem; font-size: .78rem; }
+      main { width: min(100% - 1rem, 720px); margin-top: .75rem; }
+      .card { padding: .95rem; border-radius: 16px; }
+      .btn-group { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); }
+      .btn-group .btn { width: 100%; justify-content: center; }
+      .filter-bar { grid-template-columns: 1fr !important; }
+      .modal-content { width: calc(100% - 1rem); max-height: calc(100vh - 1rem); border-radius: 18px; }
+      .modal-buttons { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+      .modal-buttons .btn { width: 100%; justify-content: center; }
+      .table-wrap { overflow-x: auto; }
+    }
+    @media (max-width: 430px) {
+      .btn-group, .modal-buttons { grid-template-columns: 1fr; }
+      .header-text p { display: none; }
+      .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
+    }
+
+  </style>
 </head>
 <body>
 
@@ -1023,7 +1098,6 @@
   <div class="nav-section">
     <div class="nav-section-title">📋 RT & Materiais</div>
     <button class="active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this)">Planejamento RT</button>
-    <button data-section="predio-3d" onclick="app.showSection('predio-3d', this)">3D PRÉDIO</button>
     <button data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this)">RT Dia a Dia</button>
     <button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button>
     <button data-section="saldo-nf" onclick="app.showSection('saldo-nf', this)">Saldo por NF</button>
@@ -1278,47 +1352,6 @@
 
   <!-- ── RT DIA A DIA ── -->
 
-  <!-- ── 3D PRÉDIO ── -->
-  <section id="predio-3d">
-    <div class="card">
-      <h2>🏢 3D PRÉDIO</h2>
-      <div class="predio3d-legend">
-        <div class="predio3d-legend-item"><span class="predio3d-dot verde"></span> Concluído</div>
-        <div class="predio3d-legend-item"><span class="predio3d-dot amarelo"></span> Em andamento</div>
-        <div class="predio3d-legend-item"><span class="predio3d-dot vermelho"></span> Atrasado</div>
-        <div class="predio3d-legend-item"><span class="predio3d-dot cinza"></span> Sem dados</div>
-      </div>
-      <div class="predio3d-toolbar">
-        <div class="form-group" style="min-width:220px; margin:0;">
-          <label for="predio3dTower">Torre</label>
-          <select id="predio3dTower" onchange="predio3D.render()"></select>
-        </div>
-        <button class="btn btn-secondary" onclick="predio3D.resetView()">↺ Resetar visão</button>
-        <button class="btn btn-success" onclick="predio3D.gerarPdf()">📄 PDF do 3D PRÉDIO</button>
-      </div>
-      <div class="predio3d-layout">
-        <div class="predio3d-stage">
-          <div class="predio3d-help">Arraste para girar • Role para zoom • Clique no pavimento</div>
-          <div id="predio3dViewport" class="predio3d-viewport">
-            <div id="predio3dBuilding" class="predio3d-building"></div>
-          </div>
-        </div>
-        <div class="card predio3d-panel" style="margin:0;">
-          <h2 style="margin-bottom:.9rem;">Detalhes do Pavimento</h2>
-          <div class="metric">
-            <div class="metric-card"><div class="num" id="predio3dCountFloors">0</div><div class="label">Pavimentos</div></div>
-            <div class="metric-card"><div class="num" id="predio3dCountCritical">0</div><div class="label">Atrasados</div></div>
-          </div>
-          <div class="predio3d-floor-list" id="predio3dFloorList"></div>
-          <div style="margin-top:1rem;">
-            <div class="predio3d-badge" id="predio3dSelectedLabel">Selecione um pavimento</div>
-            <div class="predio3d-details-list" id="predio3dDetails" style="margin-top:.85rem;"></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
   <section id="rt-dia-dia">
     <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📝 Voltar para início</button></div>
     <div class="card">
@@ -1488,7 +1521,6 @@
       <div class="form-group"><label for="saldoNFNumero">Número da NF *</label><input type="text" id="saldoNFNumero" required placeholder="Ex: 109765" /></div>
       <div class="form-group"><label for="saldoNFFornecedor">Fornecedor</label><input type="text" id="saldoNFFornecedor" placeholder="Ex: Concremix, Pedreira, Blocos..." /></div>
       <div class="form-group"><label for="saldoNFMaterial">Material *</label><select id="saldoNFMaterial" required></select></div>
-      <div class="form-group"><label for="saldoNFQuantidade">Quantidade da NF *</label><input type="number" step="0.001" min="0" id="saldoNFQuantidade" required placeholder="Ex: 35" /></div>
       <div class="form-group"><label for="saldoNFValor">Valor da NF</label><input type="number" step="0.01" min="0" id="saldoNFValor" placeholder="Ex: 12500,00" /></div>
       <div class="form-group"><label for="saldoNFObs">Observação</label><textarea id="saldoNFObs" rows="3" placeholder="Ex: referente ao pedido/contrato..."></textarea></div>
       <div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">Cancelar</button><button type="submit" class="btn btn-success">Salvar NF</button></div>
@@ -1891,6 +1923,7 @@
     carregarSaldoNFDaNuvem,
     escutarMudancasSaldoNF
   };
+  window.dispatchEvent(new Event('firebase-ready'));
 </script>
 
 <script>
@@ -1998,10 +2031,10 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','saldo-nf','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','saldo-nf','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
       almoxarife: ['materiais-obra','saldo-nf','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      go: ['materiais-obra','saldo-nf','planejamento-rt','predio-3d','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
-      engenharia: ['materiais-obra','saldo-nf','predio-3d','relatorio','relatorio-dia']
+      go: ['materiais-obra','saldo-nf','planejamento-rt','rt-dia-dia','rastreabilidade','relatorio','relatorio-dia'],
+      engenharia: ['materiais-obra','saldo-nf','relatorio','relatorio-dia']
     }[role] || ['relatorio-dia'];
 
     document.querySelectorAll('nav button').forEach((btn) => {
@@ -2041,7 +2074,6 @@ const auth = {
     appSaldoNF.init();
     appRT.init();
     appRT.carregarMateriais();
-    predio3D.render();
     setTimeout(() => atualizarBotaoMobile('visao-geral'), 50);
   },
 
@@ -2736,7 +2768,7 @@ const app = {
 
     const globalKpiGrid = document.getElementById('globalKpiGrid');
     if (globalKpiGrid) {
-      globalKpiGrid.style.display = ['planejamento-rt','predio-3d','rt-dia-dia','materiais-obra','saldo-nf','rastreabilidade'].includes(id) ? 'none' : 'grid';
+      globalKpiGrid.style.display = ['planejamento-rt','rt-dia-dia','materiais-obra','saldo-nf','rastreabilidade'].includes(id) ? 'none' : 'grid';
     }
 
     if (id === 'relatorio') {
@@ -4176,7 +4208,6 @@ const appSaldoNF = {
         document.getElementById('saldoNFNumero').value = n.numero || '';
         document.getElementById('saldoNFFornecedor').value = n.fornecedor || '';
         document.getElementById('saldoNFMaterial').value = n.materialId || '';
-        document.getElementById('saldoNFQuantidade').value = n.quantidade || 0;
         document.getElementById('saldoNFValor').value = n.valor || '';
         document.getElementById('saldoNFObs').value = n.obs || '';
       }
@@ -4192,7 +4223,7 @@ const appSaldoNF = {
       numero: document.getElementById('saldoNFNumero').value.trim(),
       fornecedor: document.getElementById('saldoNFFornecedor').value.trim(),
       materialId: document.getElementById('saldoNFMaterial').value,
-      quantidade: Number(document.getElementById('saldoNFQuantidade').value||0),
+      quantidade: 0,
       valor: Number(document.getElementById('saldoNFValor').value||0),
       obs: document.getElementById('saldoNFObs').value.trim()
     };
@@ -5155,17 +5186,30 @@ const appRT = {
   }
 };
 
-// ── Inicializar ao carregar a página ──
-document.addEventListener('DOMContentLoaded', () => {
+// ── Inicializar somente depois que o módulo Firebase estiver pronto ──
+function inicializarAplicacao() {
+  if (window.__appInicializada) return;
+  window.__appInicializada = true;
   window.auth = auth;
-window.app = app;
-window.appMateriais = appMateriais;
-window.appSaldoNF = appSaldoNF;
-window.appRT = appRT;
-window.floorRooms = floorRooms;
-floorRooms.init();
-auth.verificarSessao();
-handleMediaChange();
+  window.app = app;
+  window.appMateriais = appMateriais;
+  window.appSaldoNF = appSaldoNF;
+  window.appRT = appRT;
+  window.floorRooms = floorRooms;
+  floorRooms.init();
+  auth.verificarSessao();
+  handleMediaChange();
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  if (window.__fb) {
+    inicializarAplicacao();
+  } else {
+    window.addEventListener('firebase-ready', inicializarAplicacao, { once: true });
+    setTimeout(() => {
+      if (!window.__appInicializada) inicializarAplicacao();
+    }, 5000);
+  }
 });
 
 // ── MENU HAMBÚRGUER ──
@@ -5233,7 +5277,6 @@ window.addEventListener('resize', handleMediaChange);
   <div class="mobile-nav-section">
     <div class="mobile-nav-section-title">📋 RT & Materiais</div>
     <button class="mobile-nav-button active" data-section="planejamento-rt" onclick="app.showSection('planejamento-rt', this); closeMobileMenu()">Planejamento RT</button>
-    <button class="mobile-nav-button" data-section="predio-3d" onclick="app.showSection('predio-3d', this); closeMobileMenu()">3D PRÉDIO</button>
     <button class="mobile-nav-button" data-section="rt-dia-dia" onclick="app.showSection('rt-dia-dia', this); closeMobileMenu()">RT Dia a Dia</button>
     <button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()">Controle de Materiais</button>
     <button class="mobile-nav-button" data-section="saldo-nf" onclick="app.showSection('saldo-nf', this); closeMobileMenu()">Saldo por NF</button>
