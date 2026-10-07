@@ -129,8 +129,8 @@ async function prepararFotoSemBloquear(foto, materialId) {
   try {
     return await comPrazo(fotoParaStorage(foto, materialId));
   } catch (error) {
-    console.warn('Foto não pôde ser sincronizada; o material será salvo sem bloquear:', error);
-    return null;
+    console.warn('Foto não pôde ir para o Storage/Firebase; usando a cópia comprimida no próprio material:', error);
+    return foto;
   }
 }
 
