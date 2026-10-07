@@ -1136,7 +1136,7 @@
     salvarSaldoNFNaNuvem,
     carregarSaldoNFDaNuvem,
     escutarMudancasSaldoNF
-  } from "./firebase-controle-usuarios.js?v=1.0.7";
+  } from "./firebase-controle-usuarios.js?v=1.0.8";
 
   window.__fb = {
     salvarNaNuvem,
@@ -2687,8 +2687,8 @@ const appMateriais = {
         reader.onload = (event) => {
           const img = new Image();
           img.onload = () => {
-            const maxWidth = 900;
-            const maxHeight = 900;
+            const maxWidth = 640;
+            const maxHeight = 640;
             let { width, height } = img;
 
             if (width > maxWidth || height > maxHeight) {
