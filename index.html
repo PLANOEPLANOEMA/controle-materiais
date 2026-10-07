@@ -2477,7 +2477,7 @@ const appMateriais = {
       if (window.__fb && window.__fb.escutarMudancasMateriais) {
         if (this._unsub) this._unsub();
         this._unsub = window.__fb.escutarMudancasMateriais((materiais) => {
-          this.materiais = Array.isArray(materiais) ? materiais : [];
+          this.materiais = this.mesclarMateriaisPreservandoFotos(materiais);
           try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
           this.buscarMateriais();
           this.preencherMateriaisRastreabilidade();
@@ -2517,12 +2517,30 @@ const appMateriais = {
     if (fotoInputCamera) fotoInputCamera.addEventListener('change', (e) => this.previewImagem(e));
   },
 
+  mesclarMateriaisPreservandoFotos(remotos) {
+    const locais = (() => {
+      try {
+        const salvo = localStorage.getItem(this.STORAGE_KEY);
+        return salvo ? JSON.parse(salvo) : [];
+      } catch (e) { return []; }
+    })();
+    const fotosLocais = new Map((Array.isArray(locais) ? locais : [])
+      .filter(m => m && m.id != null && m.foto)
+      .map(m => [String(m.id), m.foto]));
+    return (Array.isArray(remotos) ? remotos : []).map(material => ({
+      ...material,
+      // A nuvem pode conter uma versão antiga sem foto; nunca use essa versão
+      // para apagar uma foto que ainda existe neste aparelho.
+      foto: material?.foto || fotosLocais.get(String(material?.id)) || null
+    }));
+  },
+
   async carregarMateriais() {
     try {
       if (window.__fb && window.__fb.carregarMateriaisDaNuvem) {
         const cloud = await window.__fb.carregarMateriaisDaNuvem();
         if (Array.isArray(cloud) && cloud.length) {
-          this.materiais = cloud;
+          this.materiais = this.mesclarMateriaisPreservandoFotos(cloud);
           try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); } catch(e) {}
           console.log('Materiais carregados do Firebase:', this.materiais.length);
           return;
