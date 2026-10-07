@@ -7,6 +7,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/fireba
 import {
   getFirestore, doc, setDoc, getDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import {
+  getStorage, ref, uploadString, getDownloadURL
+} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
 // ✅ Config do seu app
 const firebaseConfig = {
@@ -20,6 +23,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage(app);
 
 // Documentos para empréstimos, materiais da obra e rastreabilidade
 const REF_EMPRESTIMOS = doc(db, "controle", "dados");
@@ -47,8 +51,24 @@ export function escutarMudancas(callback) {
 }
 
 // ── MATERIAIS DA OBRA ──
+async function fotoParaStorage(foto, materialId) {
+  if (!foto || typeof foto !== 'string' || !foto.startsWith('data:image/')) return foto || null;
+  const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+  const destino = ref(storage, nome);
+  await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
+  return getDownloadURL(destino);
+}
+
+// Fotos ficam no Firebase Storage; o Firestore guarda apenas URLs pequenas.
+// Isso evita estourar o limite de aproximadamente 1 MiB do documento controle/materiais.
 export async function salvarMateriaisNaNuvem(materiais) {
-  await setDoc(REF_MATERIAIS, { materiais, updatedAt: Date.now() }, { merge: true });
+  const lista = Array.isArray(materiais) ? materiais : [];
+  const materiaisComUrls = await Promise.all(lista.map(async (material) => {
+    const foto = await fotoParaStorage(material?.foto, material?.id);
+    return { ...material, foto };
+  }));
+  await setDoc(REF_MATERIAIS, { materiais: materiaisComUrls, updatedAt: Date.now() }, { merge: true });
+  return materiaisComUrls;
 }
 
 export async function carregarMateriaisDaNuvem() {
