@@ -7,9 +7,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/fireba
 import {
   getFirestore, doc, setDoc, getDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import {
-  getStorage, ref, uploadString, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+// O projeto está no plano Spark; as fotos usam documentos separados no Firestore.
 
 // ✅ Config do seu app
 const firebaseConfig = {
@@ -23,18 +21,6 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-let storage = null;
-
-function obterStorage() {
-  if (storage) return storage;
-  try {
-    storage = getStorage(app, `gs://${firebaseConfig.storageBucket}`);
-    return storage;
-  } catch (error) {
-    console.warn('Firebase Storage indisponível; tentando fallback compartilhado no Firestore:', error);
-    return null;
-  }
-}
 
 // Documentos para empréstimos, materiais da obra e rastreabilidade
 const REF_EMPRESTIMOS = doc(db, "controle", "dados");
@@ -64,31 +50,28 @@ export function escutarMudancas(callback) {
 // ── MATERIAIS DA OBRA ──
 async function salvarFotoNoFirestore(foto, materialId) {
   const id = String(materialId || 'sem-id');
-  try {
-    // Um documento por foto evita que várias imagens excedam o limite de 1 MiB.
-    await setDoc(doc(db, "controle_fotos", id), {
-      foto,
-      materialId: id,
-      updatedAt: Date.now()
-    }, { merge: true });
-    return `firestore-photo:${id}`;
-  } catch (error) {
-    console.warn('Coleção compartilhada de fotos indisponível; tentando compatibilidade:', error);
-    // Compatibilidade com instalações antigas e regras já existentes no documento de movimentações.
-    await setDoc(REF_MOVIMENTACOES, {
-      fotos: { [id]: foto },
-      fotosUpdatedAt: Date.now()
-    }, { merge: true });
-    return `mov-photo:${id}`;
-  }
+  const idSeguro = id.replace(/[^a-zA-Z0-9_-]/g, '_') || 'sem-id';
+  const fotoDocId = `foto_${idSeguro}`;
+  // Um documento na coleção existente `controle` evita Storage pago e o limite
+  // de 1 MiB do documento principal. A interface limita cada foto a 350 KB.
+  await setDoc(doc(db, "controle", fotoDocId), {
+    foto,
+    materialId: id,
+    updatedAt: Date.now()
+  }, { merge: true });
+  return `controle-photo:${fotoDocId}`;
 }
 
 async function resolverFoto(foto) {
   if (!foto || typeof foto !== 'string') return foto || null;
-  const prefix = foto.startsWith('mov-photo:') ? 'mov-photo:' : (foto.startsWith('firestore-photo:') ? 'firestore-photo:' : null);
+  const prefix = foto.startsWith('controle-photo:') ? 'controle-photo:' : (foto.startsWith('mov-photo:') ? 'mov-photo:' : (foto.startsWith('firestore-photo:') ? 'firestore-photo:' : null));
   if (!prefix) return foto;
   const id = foto.slice(prefix.length);
   try {
+    if (prefix === 'controle-photo:') {
+      const snap = await getDoc(doc(db, "controle", id));
+      return snap.exists() ? (snap.data().foto || null) : null;
+    }
     if (prefix === 'mov-photo:') {
       const snap = await getDoc(REF_MOVIMENTACOES);
       return snap.exists() ? (snap.data().fotos?.[id] || null) : null;
@@ -101,30 +84,14 @@ async function resolverFoto(foto) {
   }
 }
 
-async function fotoParaStorage(foto, materialId) {
+async function fotoParaNuvem(foto, materialId) {
   if (!foto || typeof foto !== 'string' || !foto.startsWith('data:image/')) return foto || null;
-  const storageAtual = obterStorage();
-  if (storageAtual) {
-    try {
-      const idSeguro = String(materialId || 'sem-id').replace(/[^a-zA-Z0-9_-]/g, '_');
-      const nome = `materiais/${idSeguro}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
-      const destino = ref(storageAtual, nome);
-      await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
-      const url = await getDownloadURL(destino);
-      if (url && /^https?:\/\//.test(url)) return url;
-    } catch (error) {
-      console.warn('Storage recusou a foto; usando o armazenamento compartilhado do Firestore:', error);
-    }
-  }
-  // Fallback compartilhado: não deixa a foto ficar presa somente no PC/celular.
+  // Caminho direto no Firestore: o Storage do projeto exige upgrade para Blaze.
   return await salvarFotoNoFirestore(foto, materialId);
 }
 
-// Fotos ficam no Storage quando disponível; o Firestore guarda um identificador
-// compartilhado quando o Storage não aceita o upload.
-// Materiais também são espelhados no documento que já funciona para as retiradas.
-// Isso mantém compatibilidade mesmo quando as regras do documento antigo de materiais
-// estiverem bloqueando a gravação.
+// As imagens e os materiais são gravados na coleção `controle` existente.
+// O caminho compartilhado evita o Storage, que exige plano Blaze neste projeto.
 const REF_MATERIAIS_COMPAT = doc(db, "controle", "movimentacoes");
 
 function comPrazo(promise, ms = 60000) {
@@ -141,7 +108,7 @@ async function prepararFotoSemBloquear(foto, materialId) {
   if (!foto || typeof foto !== 'string') return null;
   if (!foto.startsWith('data:image/')) return foto;
   try {
-    return await comPrazo(fotoParaStorage(foto, materialId));
+    return await comPrazo(fotoParaNuvem(foto, materialId));
   } catch (error) {
     console.error('Foto não foi sincronizada no Firebase; o material não será marcado como sincronizado:', error);
     throw error;
