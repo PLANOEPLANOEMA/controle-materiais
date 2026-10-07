@@ -64,13 +64,23 @@ export function escutarMudancas(callback) {
 // ── MATERIAIS DA OBRA ──
 async function salvarFotoNoFirestore(foto, materialId) {
   const id = String(materialId || 'sem-id');
-  // Usa o documento que já aceita as retiradas; isso evita regras diferentes
-  // para uma coleção exclusiva de fotos.
-  await setDoc(REF_MOVIMENTACOES, {
-    fotos: { [id]: foto },
-    fotosUpdatedAt: Date.now()
-  }, { merge: true });
-  return `mov-photo:${id}`;
+  try {
+    // Um documento por foto evita que várias imagens excedam o limite de 1 MiB.
+    await setDoc(doc(db, "controle_fotos", id), {
+      foto,
+      materialId: id,
+      updatedAt: Date.now()
+    }, { merge: true });
+    return `firestore-photo:${id}`;
+  } catch (error) {
+    console.warn('Coleção compartilhada de fotos indisponível; tentando compatibilidade:', error);
+    // Compatibilidade com instalações antigas e regras já existentes no documento de movimentações.
+    await setDoc(REF_MOVIMENTACOES, {
+      fotos: { [id]: foto },
+      fotosUpdatedAt: Date.now()
+    }, { merge: true });
+    return `mov-photo:${id}`;
+  }
 }
 
 async function resolverFoto(foto) {
@@ -116,11 +126,14 @@ async function fotoParaStorage(foto, materialId) {
 // estiverem bloqueando a gravação.
 const REF_MATERIAIS_COMPAT = doc(db, "controle", "movimentacoes");
 
-function comPrazo(promise, ms = 12000) {
-  return Promise.race([
-    promise,
-    new Promise((_, reject) => setTimeout(() => reject(new Error('Operação de foto excedeu o tempo limite')), ms))
-  ]);
+function comPrazo(promise, ms = 30000) {
+  return new Promise((resolve, reject) => {
+    const timer = setTimeout(() => reject(new Error('Operação de foto excedeu o tempo limite')), ms);
+    promise.then(
+      value => { clearTimeout(timer); resolve(value); },
+      error => { clearTimeout(timer); reject(error); }
+    );
+  });
 }
 
 async function prepararFotoSemBloquear(foto, materialId) {
@@ -129,8 +142,8 @@ async function prepararFotoSemBloquear(foto, materialId) {
   try {
     return await comPrazo(fotoParaStorage(foto, materialId));
   } catch (error) {
-    console.warn('Foto não pôde ir para o Storage/Firebase; usando a cópia comprimida no próprio material:', error);
-    return foto;
+    console.error('Foto não foi sincronizada no Firebase; o material não será marcado como sincronizado:', error);
+    throw error;
   }
 }
 
@@ -158,9 +171,9 @@ export async function salvarMateriaisNaNuvem(materiais) {
     }
   }
   if (!salvo) throw (ultimoErro || new Error('Não foi possível sincronizar materiais com o Firebase.'));
-  // O retorno usa a lista local para não substituir uma foto local por null enquanto
-  // o upload isolado ainda estiver em andamento ou indisponível.
-  return lista.map((material, i) => ({ ...material, foto: material?.foto || materiaisParaNuvem[i]?.foto || null }));
+  // Use URLs/identificadores remotos também no cache local para reduzir espaço e
+  // garantir que celular e computador apontem para a mesma foto persistida.
+  return materiaisParaNuvem;
 }
 
 async function lerMateriaisDoSnapshot(snap, compat = false) {
