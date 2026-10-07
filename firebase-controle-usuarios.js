@@ -65,15 +65,16 @@ export function escutarMudancas(callback) {
 async function fotoParaStorage(foto, materialId) {
   if (!foto || typeof foto !== 'string' || !foto.startsWith('data:image/')) return foto || null;
   const storageAtual = obterStorage();
-  if (!storageAtual) return null;
+  // Nunca descarte a imagem local apenas porque o Storage está indisponível.
+  if (!storageAtual) return foto;
   try {
     const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
     const destino = ref(storageAtual, nome);
     await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
     return await getDownloadURL(destino);
   } catch (error) {
-    console.warn('Não foi possível salvar a foto; o material será salvo sem foto:', error);
-    return null;
+    console.warn('Não foi possível sincronizar a foto; mantendo a cópia local:', error);
+    return foto;
   }
 }
 
