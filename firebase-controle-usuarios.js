@@ -23,7 +23,18 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
+let storage = null;
+
+function obterStorage() {
+  if (storage) return storage;
+  try {
+    storage = getStorage(app);
+    return storage;
+  } catch (error) {
+    console.warn('Firebase Storage indisponível; o cadastro seguirá sem foto:', error);
+    return null;
+  }
+}
 
 // Documentos para empréstimos, materiais da obra e rastreabilidade
 const REF_EMPRESTIMOS = doc(db, "controle", "dados");
@@ -53,10 +64,17 @@ export function escutarMudancas(callback) {
 // ── MATERIAIS DA OBRA ──
 async function fotoParaStorage(foto, materialId) {
   if (!foto || typeof foto !== 'string' || !foto.startsWith('data:image/')) return foto || null;
-  const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
-  const destino = ref(storage, nome);
-  await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
-  return getDownloadURL(destino);
+  const storageAtual = obterStorage();
+  if (!storageAtual) return null;
+  try {
+    const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+    const destino = ref(storageAtual, nome);
+    await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
+    return await getDownloadURL(destino);
+  } catch (error) {
+    console.warn('Não foi possível salvar a foto; o material será salvo sem foto:', error);
+    return null;
+  }
 }
 
 // Fotos ficam no Firebase Storage; o Firestore guarda apenas URLs pequenas.
@@ -67,7 +85,11 @@ export async function salvarMateriaisNaNuvem(materiais) {
     const foto = await fotoParaStorage(material?.foto, material?.id);
     return { ...material, foto };
   }));
-  await setDoc(REF_MATERIAIS, { materiais: materiaisComUrls, updatedAt: Date.now() }, { merge: true });
+  try {
+    await setDoc(REF_MATERIAIS, { materiais: materiaisComUrls, updatedAt: Date.now() }, { merge: true });
+  } catch (error) {
+    console.warn('Nuvem indisponível; materiais mantidos no armazenamento local:', error);
+  }
   return materiaisComUrls;
 }
 
