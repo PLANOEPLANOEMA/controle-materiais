@@ -1136,7 +1136,7 @@
     salvarSaldoNFNaNuvem,
     carregarSaldoNFDaNuvem,
     escutarMudancasSaldoNF
-  } from "./firebase-controle-usuarios.js?v=1.0.6";
+  } from "./firebase-controle-usuarios.js?v=1.0.11";
 
   window.__fb = {
     salvarNaNuvem,
@@ -2456,6 +2456,7 @@ const appMateriais = {
   materiais: [],
   movimentacoes: [],
   editandoId: null,
+  arquivoFotoSelecionado: null,
   _unsub: null,
   _unsubMov: null,
 
@@ -2524,15 +2525,25 @@ const appMateriais = {
         return salvo ? JSON.parse(salvo) : [];
       } catch (e) { return []; }
     })();
-    const fotosLocais = new Map((Array.isArray(locais) ? locais : [])
-      .filter(m => m && m.id != null && m.foto)
-      .map(m => [String(m.id), m.foto]));
-    return (Array.isArray(remotos) ? remotos : []).map(material => ({
-      ...material,
-      // A nuvem pode conter uma versão antiga sem foto; nunca use essa versão
-      // para apagar uma foto que ainda existe neste aparelho.
-      foto: material?.foto || fotosLocais.get(String(material?.id)) || null
-    }));
+    const locaisPorId = new Map((Array.isArray(locais) ? locais : [])
+      .filter(m => m && m.id != null)
+      .map(m => [String(m.id), m]));
+    const versao = (material) => {
+      const valor = material?.dataAtualizacao || material?.dataCriacao;
+      const numero = typeof valor === 'number' ? valor : Date.parse(valor || '');
+      return Number.isFinite(numero) ? numero : 0;
+    };
+    return (Array.isArray(remotos) ? remotos : []).map(material => {
+      const local = locaisPorId.get(String(material?.id));
+      if (!local) return { ...material, foto: material?.foto || null };
+      // Um snapshot antigo não pode sobrescrever uma edição local mais recente.
+      const localMaisNovo = versao(local) > versao(material);
+      const mesclado = localMaisNovo ? { ...material, ...local } : { ...local, ...material };
+      mesclado.foto = localMaisNovo
+        ? (local.foto || material?.foto || null)
+        : (material?.foto || local.foto || null);
+      return mesclado;
+    });
   },
 
   async carregarMateriais() {
@@ -2661,16 +2672,18 @@ const appMateriais = {
 
   async salvarMateriais() {
     // Persistência local-first: o cadastro não pode desaparecer se a nuvem estiver indisponível.
-    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
+    try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); }
+    catch (e) { console.warn('Cache local cheio/indisponível; continuando com a sincronização em nuvem:', e); }
     try {
-      let materiaisPersistidos = this.materiais;
-      if (window.__fb && window.__fb.salvarMateriaisNaNuvem) {
-        // A ponte envia data URLs novas/antigas para o Storage e retorna somente URLs.
-        materiaisPersistidos = await window.__fb.salvarMateriaisNaNuvem(this.materiais);
-        if (Array.isArray(materiaisPersistidos)) {
-          this.materiais = materiaisPersistidos;
-          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
-        }
+      if (!window.__fb || !window.__fb.salvarMateriaisNaNuvem) {
+        throw new Error('A conexão com a nuvem não está pronta.');
+      }
+      // A ponte envia fotos ao armazenamento compartilhado e retorna referências pequenas.
+      const materiaisPersistidos = await window.__fb.salvarMateriaisNaNuvem(this.materiais);
+      if (Array.isArray(materiaisPersistidos)) {
+        this.materiais = materiaisPersistidos;
+        try { localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais)); }
+        catch (e) { console.warn('Nuvem sincronizada; cache local cheio/indisponível:', e); }
       }
       console.log('Materiais salvos com sucesso e sincronizados com a nuvem.');
       return true;
@@ -2728,11 +2741,13 @@ const appMateriais = {
     const previewImg = document.getElementById('imagemPreviewImg');
 
     if (!file) {
+      this.arquivoFotoSelecionado = null;
       previewImg.src = '';
       preview.style.display = 'none';
       return;
     }
 
+    this.arquivoFotoSelecionado = file;
     const reader = new FileReader();
     reader.onload = (event) => {
       previewImg.src = event.target.result;
@@ -2747,6 +2762,7 @@ const appMateriais = {
       return;
     }
     this.editandoId = null;
+    this.arquivoFotoSelecionado = null;
     document.getElementById('modalMateriaisTitle').textContent = 'Novo Material';
     document.getElementById('formMateriais').reset();
     const fotoInput = document.getElementById('fotoMaterial');
@@ -2768,6 +2784,9 @@ const appMateriais = {
     if (!mat) return;
     
     this.editandoId = id;
+    this.arquivoFotoSelecionado = null;
+    document.getElementById('fotoMaterial').value = '';
+    document.getElementById('fotoMaterialCamera').value = '';
     document.getElementById('modalMateriaisTitle').textContent = 'Editar Material';
     document.getElementById('nomeMaterial').value = mat.nome;
     document.getElementById('quantidadeMaterial').value = mat.quantidade;
@@ -2791,6 +2810,7 @@ const appMateriais = {
     if (fotoInput) fotoInput.value = '';
     if (fotoInputCamera) fotoInputCamera.value = '';
     this.editandoId = null;
+    this.arquivoFotoSelecionado = null;
   },
 
   async salvarMaterial(e) {
@@ -2810,7 +2830,7 @@ const appMateriais = {
       return;
     }
 
-    const arquivoSelecionado =
+    const arquivoSelecionado = this.arquivoFotoSelecionado ||
       (fotoInput && fotoInput.files && fotoInput.files[0]) ||
       (fotoInputCamera && fotoInputCamera.files && fotoInputCamera.files[0]);
 
@@ -2818,7 +2838,7 @@ const appMateriais = {
     if (arquivoSelecionado) {
       try {
         foto = await this.comprimirImagem(arquivoSelecionado);
-        this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
+        await this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
       } catch (error) {
         console.error('Erro ao comprimir imagem:', error);
         app.mostrarAlerta('Não foi possível processar a imagem.', 'error');
@@ -2826,13 +2846,14 @@ const appMateriais = {
     } else if (this.editandoId) {
       const mat = this.materiais.find(m => m.id === this.editandoId);
       foto = mat?.foto || null;
-      this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
+      await this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
     } else {
-      this.finalizarSalvamento(nome, quantidade, especificacoes, null);
+      await this.finalizarSalvamento(nome, quantidade, especificacoes, null);
     }
   },
 
-  finalizarSalvamento(nome, quantidade, especificacoes, foto) {
+  async finalizarSalvamento(nome, quantidade, especificacoes, foto) {
+    const fotoNova = typeof foto === 'string' && foto.startsWith('data:image/');
     if (this.editandoId) {
       const idx = this.materiais.findIndex(m => m.id === this.editandoId);
       if (idx !== -1) {
@@ -2858,16 +2879,16 @@ const appMateriais = {
       });
     }
 
+    const sincronizado = await this.salvarMateriais();
+    this.buscarMateriais();
     this.fecharModal();
-    this.salvarMateriais().then((sincronizado) => {
-      this.buscarMateriais();
-      app.mostrarAlerta(
-        sincronizado
-          ? 'Material salvo com sucesso!'
-          : 'Material salvo neste aparelho. A sincronização com a nuvem será retomada quando estiver disponível.',
-        sincronizado ? 'success' : 'warning'
-      );
-    });
+    app.mostrarAlerta(
+      sincronizado
+        ? (fotoNova ? 'Material e imagem salvos na nuvem e disponíveis nos outros dispositivos.' : 'Material salvo com sucesso!')
+        : (fotoNova ? 'A nuvem não confirmou a nova imagem. Ela ficou apenas neste aparelho; conecte-se e salve novamente.' : 'Material salvo apenas neste aparelho. Conecte-se e salve novamente para sincronizar.'),
+      sincronizado ? 'success' : 'warning'
+    );
+    return sincronizado;
   },
 
   deletarMaterial(id) {

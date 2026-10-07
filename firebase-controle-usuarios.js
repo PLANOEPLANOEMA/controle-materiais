@@ -28,10 +28,10 @@ let storage = null;
 function obterStorage() {
   if (storage) return storage;
   try {
-    storage = getStorage(app);
+    storage = getStorage(app, `gs://${firebaseConfig.storageBucket}`);
     return storage;
   } catch (error) {
-    console.warn('Firebase Storage indisponível; o cadastro seguirá sem foto:', error);
+    console.warn('Firebase Storage indisponível; tentando fallback compartilhado no Firestore:', error);
     return null;
   }
 }
@@ -106,7 +106,8 @@ async function fotoParaStorage(foto, materialId) {
   const storageAtual = obterStorage();
   if (storageAtual) {
     try {
-      const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+      const idSeguro = String(materialId || 'sem-id').replace(/[^a-zA-Z0-9_-]/g, '_');
+      const nome = `materiais/${idSeguro}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
       const destino = ref(storageAtual, nome);
       await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
       const url = await getDownloadURL(destino);
@@ -126,7 +127,7 @@ async function fotoParaStorage(foto, materialId) {
 // estiverem bloqueando a gravação.
 const REF_MATERIAIS_COMPAT = doc(db, "controle", "movimentacoes");
 
-function comPrazo(promise, ms = 30000) {
+function comPrazo(promise, ms = 60000) {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => reject(new Error('Operação de foto excedeu o tempo limite')), ms);
     promise.then(
