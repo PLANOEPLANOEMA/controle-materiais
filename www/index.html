@@ -1136,7 +1136,7 @@
     salvarSaldoNFNaNuvem,
     carregarSaldoNFDaNuvem,
     escutarMudancasSaldoNF
-  } from "./firebase-controle-usuarios.js?v=1.0.6";
+  } from "./firebase-controle-usuarios.js?v=1.0.7";
 
   window.__fb = {
     salvarNaNuvem,
@@ -2818,7 +2818,7 @@ const appMateriais = {
     if (arquivoSelecionado) {
       try {
         foto = await this.comprimirImagem(arquivoSelecionado);
-        this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
+        await this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
       } catch (error) {
         console.error('Erro ao comprimir imagem:', error);
         app.mostrarAlerta('Não foi possível processar a imagem.', 'error');
@@ -2826,13 +2826,13 @@ const appMateriais = {
     } else if (this.editandoId) {
       const mat = this.materiais.find(m => m.id === this.editandoId);
       foto = mat?.foto || null;
-      this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
+      await this.finalizarSalvamento(nome, quantidade, especificacoes, foto);
     } else {
-      this.finalizarSalvamento(nome, quantidade, especificacoes, null);
+      await this.finalizarSalvamento(nome, quantidade, especificacoes, null);
     }
   },
 
-  finalizarSalvamento(nome, quantidade, especificacoes, foto) {
+  async finalizarSalvamento(nome, quantidade, especificacoes, foto) {
     if (this.editandoId) {
       const idx = this.materiais.findIndex(m => m.id === this.editandoId);
       if (idx !== -1) {
