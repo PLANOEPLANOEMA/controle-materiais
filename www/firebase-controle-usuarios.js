@@ -1,156 +1,40 @@
-/**
- * Firebase Firestore (sem build / sem npm)
- * - Funciona em site estático (GitHub Pages / Vercel)
- * - Salva/Carrega em 2 documentos: controle/dados e controle/materiais
- */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
-import {
-  getFirestore, doc, setDoc, getDoc, onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
-import {
-  getStorage, ref, uploadString, getDownloadURL
-} from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
+import { getFirestore, doc, setDoc, getDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
+import { getStorage, ref, uploadString, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-storage.js";
 
-// ✅ Config do seu app
-const firebaseConfig = {
-  apiKey: "AIzaSyBNeTqTWbvakrz2KiVABPWezxoqZePuBms",
-  authDomain: "planoeplano.firebaseapp.com",
-  projectId: "planoeplano",
-  storageBucket: "planoeplano.firebasestorage.app",
-  messagingSenderId: "813813625915",
-  appId: "1:813813625915:web:d5996961e50747eb9c181e"
-};
-
+const firebaseConfig = { apiKey: "AIzaSyBNeTqTWbvakrz2KiVABPWezxoqZePuBms", authDomain: "planoeplano.firebaseapp.com", projectId: "planoeplano", storageBucket: "planoeplano.firebasestorage.app", messagingSenderId: "813813625915", appId: "1:813813625915:web:d5996961e50747eb9c181e" };
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
-const storage = getStorage(app);
-
-// Documentos para empréstimos, materiais da obra e rastreabilidade
-const REF_EMPRESTIMOS = doc(db, "controle", "dados");
-const REF_MATERIAIS = doc(db, "controle", "materiais");
-const REF_MOVIMENTACOES = doc(db, "controle", "movimentacoes");
-const REF_PLANEJAMENTO_RT = doc(db, "controle", "planejamento_rt");
-const REF_RT_DIA_DIA = doc(db, "controle", "rt_dia_dia");
-const REF_SALDO_NF = doc(db, "controle", "saldo_nf");
-
-// ── EMPRÉSTIMOS ──
-export async function salvarNaNuvem(registros) {
-  await setDoc(REF_EMPRESTIMOS, { registros, updatedAt: Date.now() }, { merge: true });
+let storage = null;
+function obterStorage() { try { return storage || (storage = getStorage(app)); } catch (e) { console.warn("Storage indisponível; cadastro seguirá sem foto.", e); return null; } }
+const refs = { registros: doc(db,"controle","dados"), materiais: doc(db,"controle","materiais"), movimentacoes: doc(db,"controle","movimentacoes"), planejamento: doc(db,"controle","planejamento_rt"), diaDia: doc(db,"controle","rt_dia_dia"), saldoNF: doc(db,"controle","saldo_nf") };
+const carregar = async (r, chave, padrao=null) => { const snap = await getDoc(r); return snap.exists() ? (snap.data()[chave] ?? padrao) : padrao; };
+const observar = (r, chave, cb, padrao=[]) => onSnapshot(r, snap => { if (snap.exists()) cb(snap.data()[chave] ?? padrao); });
+const salvar = (r, chave, valor) => setDoc(r, { [chave]: valor, updatedAt: Date.now() }, { merge: true });
+export const salvarNaNuvem = v => salvar(refs.registros,"registros",v);
+export const carregarDaNuvem = () => carregar(refs.registros,"registros");
+export const escutarMudancas = cb => observar(refs.registros,"registros",cb);
+async function fotoParaStorage(foto, id) {
+  if (!foto || typeof foto !== "string" || !foto.startsWith("data:image/")) return foto || null;
+  const s = obterStorage(); if (!s) return null;
+  try { const destino = ref(s, `materiais/${id || "sem-id"}/${Date.now()}-${Math.random().toString(36).slice(2,10)}.jpg`); await uploadString(destino, foto, "data_url", { contentType:"image/jpeg", cacheControl:"public,max-age=31536000" }); return await getDownloadURL(destino); } catch (e) { console.warn("Foto não sincronizada; material será salvo sem foto.", e); return null; }
 }
-
-export async function carregarDaNuvem() {
-  const snap = await getDoc(REF_EMPRESTIMOS);
-  return snap.exists() ? (snap.data().registros ?? null) : null;
+export async function salvarMateriaisNaNuvem(lista) {
+  const materiais = await Promise.all((Array.isArray(lista) ? lista : []).map(async m => ({ ...m, foto: await fotoParaStorage(m?.foto, m?.id) })));
+  try { await salvar(refs.materiais,"materiais",materiais); } catch (e) { console.warn("Nuvem indisponível; materiais mantidos localmente.", e); }
+  return materiais;
 }
-
-export function escutarMudancas(callback) {
-  return onSnapshot(REF_EMPRESTIMOS, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().registros ?? []);
-  });
-}
-
-// ── MATERIAIS DA OBRA ──
-async function fotoParaStorage(foto, materialId) {
-  if (!foto || typeof foto !== 'string' || !foto.startsWith('data:image/')) return foto || null;
-  const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
-  const destino = ref(storage, nome);
-  await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
-  return getDownloadURL(destino);
-}
-
-// Fotos ficam no Firebase Storage; o Firestore guarda apenas URLs pequenas.
-// Isso evita estourar o limite de aproximadamente 1 MiB do documento controle/materiais.
-export async function salvarMateriaisNaNuvem(materiais) {
-  const lista = Array.isArray(materiais) ? materiais : [];
-  const materiaisComUrls = await Promise.all(lista.map(async (material) => {
-    const foto = await fotoParaStorage(material?.foto, material?.id);
-    return { ...material, foto };
-  }));
-  await setDoc(REF_MATERIAIS, { materiais: materiaisComUrls, updatedAt: Date.now() }, { merge: true });
-  return materiaisComUrls;
-}
-
-export async function carregarMateriaisDaNuvem() {
-  const snap = await getDoc(REF_MATERIAIS);
-  return snap.exists() ? (snap.data().materiais ?? null) : null;
-}
-
-export function escutarMudancasMateriais(callback) {
-  return onSnapshot(REF_MATERIAIS, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().materiais ?? []);
-  });
-}
-
-
-// ── RASTREABILIDADE / MOVIMENTAÇÕES ──
-export async function salvarMovimentacoesNaNuvem(movimentacoes) {
-  await setDoc(REF_MOVIMENTACOES, { movimentacoes, updatedAt: Date.now() }, { merge: true });
-}
-
-export async function carregarMovimentacoesDaNuvem() {
-  const snap = await getDoc(REF_MOVIMENTACOES);
-  return snap.exists() ? (snap.data().movimentacoes ?? null) : null;
-}
-
-export function escutarMudancasMovimentacoes(callback) {
-  return onSnapshot(REF_MOVIMENTACOES, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().movimentacoes ?? []);
-  });
-}
-
-
-// ── PLANEJAMENTO RT ──
-export async function salvarPlanejamentoRTNaNuvem(itens) {
-  await setDoc(REF_PLANEJAMENTO_RT, { itens, updatedAt: Date.now() }, { merge: true });
-}
-
-export async function carregarPlanejamentoRTDaNuvem() {
-  const snap = await getDoc(REF_PLANEJAMENTO_RT);
-  return snap.exists() ? (snap.data().itens ?? null) : null;
-}
-
-export function escutarMudancasPlanejamentoRT(callback) {
-  return onSnapshot(REF_PLANEJAMENTO_RT, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().itens ?? []);
-  });
-}
-
-
-// ── RT DIA A DIA ──
-export async function salvarRTDiaDiaNaNuvem(itens) {
-  await setDoc(REF_RT_DIA_DIA, { itens, updatedAt: Date.now() }, { merge: true });
-}
-
-export async function carregarRTDiaDiaDaNuvem() {
-  const snap = await getDoc(REF_RT_DIA_DIA);
-  return snap.exists() ? (snap.data().itens ?? null) : null;
-}
-
-export function escutarMudancasRTDiaDia(callback) {
-  return onSnapshot(REF_RT_DIA_DIA, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().itens ?? []);
-  });
-}
-
-
-// ── CONTROLE DE SALDO POR NF ──
-export async function salvarSaldoNFNaNuvem(dados) {
-  await setDoc(REF_SALDO_NF, { dados, updatedAt: Date.now() }, { merge: true });
-}
-
-export async function carregarSaldoNFDaNuvem() {
-  const snap = await getDoc(REF_SALDO_NF);
-  return snap.exists() ? (snap.data().dados ?? null) : null;
-}
-
-export function escutarMudancasSaldoNF(callback) {
-  return onSnapshot(REF_SALDO_NF, (snap) => {
-    if (!snap.exists()) return;
-    callback(snap.data().dados ?? { materiais: [], nfs: [] });
-  });
-}
+export const carregarMateriaisDaNuvem = () => carregar(refs.materiais,"materiais");
+export const escutarMudancasMateriais = cb => observar(refs.materiais,"materiais",cb);
+export const salvarMovimentacoesNaNuvem = v => salvar(refs.movimentacoes,"movimentacoes",v);
+export const carregarMovimentacoesDaNuvem = () => carregar(refs.movimentacoes,"movimentacoes");
+export const escutarMudancasMovimentacoes = cb => observar(refs.movimentacoes,"movimentacoes",cb);
+export const salvarPlanejamentoRTNaNuvem = v => salvar(refs.planejamento,"itens",v);
+export const carregarPlanejamentoRTDaNuvem = () => carregar(refs.planejamento,"itens");
+export const escutarMudancasPlanejamentoRT = cb => observar(refs.planejamento,"itens",cb);
+export const salvarRTDiaDiaNaNuvem = v => salvar(refs.diaDia,"itens",v);
+export const carregarRTDiaDiaDaNuvem = () => carregar(refs.diaDia,"itens");
+export const escutarMudancasRTDiaDia = cb => observar(refs.diaDia,"itens",cb);
+export const salvarSaldoNFNaNuvem = v => salvar(refs.saldoNF,"dados",v);
+export const carregarSaldoNFDaNuvem = () => carregar(refs.saldoNF,"dados");
+export const escutarMudancasSaldoNF = cb => observar(refs.saldoNF,"dados",cb,{ materiais:[], nfs:[] });
