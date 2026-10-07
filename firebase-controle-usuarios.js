@@ -64,18 +64,25 @@ export function escutarMudancas(callback) {
 // ── MATERIAIS DA OBRA ──
 async function salvarFotoNoFirestore(foto, materialId) {
   const id = String(materialId || 'sem-id');
-  await setDoc(doc(db, "controle_fotos", id), {
-    foto,
-    materialId: id,
-    updatedAt: Date.now()
+  // Usa o documento que já aceita as retiradas; isso evita regras diferentes
+  // para uma coleção exclusiva de fotos.
+  await setDoc(REF_MOVIMENTACOES, {
+    fotos: { [id]: foto },
+    fotosUpdatedAt: Date.now()
   }, { merge: true });
-  return `firestore-photo:${id}`;
+  return `mov-photo:${id}`;
 }
 
 async function resolverFoto(foto) {
-  if (!foto || typeof foto !== 'string' || !foto.startsWith('firestore-photo:')) return foto || null;
-  const id = foto.slice('firestore-photo:'.length);
+  if (!foto || typeof foto !== 'string') return foto || null;
+  const prefix = foto.startsWith('mov-photo:') ? 'mov-photo:' : (foto.startsWith('firestore-photo:') ? 'firestore-photo:' : null);
+  if (!prefix) return foto;
+  const id = foto.slice(prefix.length);
   try {
+    if (prefix === 'mov-photo:') {
+      const snap = await getDoc(REF_MOVIMENTACOES);
+      return snap.exists() ? (snap.data().fotos?.[id] || null) : null;
+    }
     const snap = await getDoc(doc(db, "controle_fotos", id));
     return snap.exists() ? (snap.data().foto || null) : null;
   } catch (error) {
