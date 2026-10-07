@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><title>Controle de Materiais de Empréstimo - Plano & Plano</title>
+<!DOCTYPE html><html lang="pt-BR"><head><meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="theme-color" content="#1F3864" /><meta name="apple-mobile-web-app-capable" content="yes" /><meta name="apple-mobile-web-app-status-bar-style" content="default" /><meta name="apple-mobile-web-app-title" content="Controle de Materiais" /><link rel="manifest" href="manifest.json" /><link rel="apple-touch-icon" href="logo.png" /><title>Controle de Materiais de Empréstimo - Plano & Plano</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <style>
@@ -71,9 +71,9 @@
       font-size: 0.95rem;
     }
     .login-signature { margin: .25rem auto 1.8rem; padding: .95rem 1rem 1.05rem; border-top: 1px solid #dbe7f7; border-bottom: 1px solid #dbe7f7; text-align: center; background: linear-gradient(180deg, rgba(221,238,255,.32), rgba(255,255,255,0)); }
-    .login-signature span, .footer-signature span, .mobile-menu-signature span { display: block; color: var(--muted); font-size: .66rem; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
-    .login-signature strong, .footer-signature strong, .mobile-menu-signature strong { display: block; margin-top: .25rem; color: var(--blue-dark); font-family: Georgia, 'Times New Roman', serif; font-size: 1.22rem; font-style: italic; letter-spacing: .035em; }
-    .login-signature small, .footer-signature em, .mobile-menu-signature em { display: block; margin-top: .22rem; color: var(--blue-mid); font-size: .72rem; font-style: normal; letter-spacing: .04em; }
+    .login-signature span, .footer-signature span, .mobile-menu-signature span { display: block; color: var(--muted); font-size: .62rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+    .login-signature strong, .footer-signature strong, .mobile-menu-signature strong { display: block; margin-top: .25rem; color: var(--blue-dark); font-family: inherit; font-size: .96rem; font-style: normal; font-weight: 700; letter-spacing: .01em; }
+    .login-signature small, .footer-signature em, .mobile-menu-signature em { display: block; margin-top: .22rem; color: var(--blue-mid); font-size: .68rem; font-style: normal; letter-spacing: .01em; }
     .login-form {
       display: flex;
       flex-direction: column;
@@ -799,7 +799,7 @@
     }
 
     /* ── Footer ── */
-    footer { text-align: center; padding: 1.7rem 1rem 2rem; color: var(--muted); font-size: .82rem; border-top: 1px solid #dde4f0; margin-top: 2rem; } .footer-signature { display:inline-block; min-width:260px; padding:.85rem 1.4rem; border-top:2px solid var(--blue-mid); border-bottom:1px solid #dbe7f7; } .footer-signature strong { font-size:1.35rem; }
+    footer { text-align: center; padding: 1.7rem 1rem 2rem; color: var(--muted); font-size: .82rem; border-top: 1px solid #dde4f0; margin-top: 2rem; } .footer-signature { display:inline-block; min-width:260px; padding:.85rem 1.4rem; border-top:2px solid var(--blue-mid); border-bottom:1px solid #dbe7f7; } .footer-signature strong { font-size:.98rem; font-family:inherit; font-style:normal; }
 
     /* ── Print ── */
     @media print {
@@ -2642,23 +2642,23 @@ const appMateriais = {
   },
 
   async salvarMateriais() {
+    // Persistência local-first: o cadastro não pode desaparecer se a nuvem estiver indisponível.
+    localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
     try {
       let materiaisPersistidos = this.materiais;
       if (window.__fb && window.__fb.salvarMateriaisNaNuvem) {
         // A ponte envia data URLs novas/antigas para o Storage e retorna somente URLs.
         materiaisPersistidos = await window.__fb.salvarMateriaisNaNuvem(this.materiais);
-        if (Array.isArray(materiaisPersistidos)) this.materiais = materiaisPersistidos;
+        if (Array.isArray(materiaisPersistidos)) {
+          this.materiais = materiaisPersistidos;
+          localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
+        }
       }
-      // O cache local também guarda apenas URLs, evitando estourar o limite do navegador.
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
-      console.log('Materiais salvos com sucesso; fotos armazenadas no Firebase Storage.');
+      console.log('Materiais salvos com sucesso e sincronizados com a nuvem.');
+      return true;
     } catch (e) {
-      console.error('Erro ao salvar materiais/fotos:', e);
-      const msg = String(e?.code || e?.message || '').toLowerCase().includes('storage')
-        ? 'A foto não pôde ser armazenada. Verifique as regras do Firebase Storage.'
-        : 'Erro ao salvar materiais!';
-      app.mostrarAlerta(msg, 'error');
-      throw e;
+      console.error('Sincronização de materiais indisponível; cadastro mantido localmente:', e);
+      return false;
     }
   },
 
@@ -2841,9 +2841,14 @@ const appMateriais = {
     }
 
     this.fecharModal();
-    this.salvarMateriais().then(() => {
+    this.salvarMateriais().then((sincronizado) => {
       this.buscarMateriais();
-      app.mostrarAlerta('Material salvo com sucesso!', 'success');
+      app.mostrarAlerta(
+        sincronizado
+          ? 'Material salvo com sucesso!'
+          : 'Material salvo neste aparelho. A sincronização com a nuvem será retomada quando estiver disponível.',
+        sincronizado ? 'success' : 'warning'
+      );
     });
   },
 
