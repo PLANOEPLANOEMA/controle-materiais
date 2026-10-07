@@ -62,47 +62,76 @@ export function escutarMudancas(callback) {
 }
 
 // ── MATERIAIS DA OBRA ──
-async function fotoParaStorage(foto, materialId) {
-  if (!foto || typeof foto !== 'string' || !foto.startsWith('data:image/')) return foto || null;
-  const storageAtual = obterStorage();
-  // Nunca descarte a imagem local apenas porque o Storage está indisponível.
-  if (!storageAtual) return foto;
+async function salvarFotoNoFirestore(foto, materialId) {
+  const id = String(materialId || 'sem-id');
+  await setDoc(doc(db, "controle_fotos", id), {
+    foto,
+    materialId: id,
+    updatedAt: Date.now()
+  }, { merge: true });
+  return `firestore-photo:${id}`;
+}
+
+async function resolverFoto(foto) {
+  if (!foto || typeof foto !== 'string' || !foto.startsWith('firestore-photo:')) return foto || null;
+  const id = foto.slice('firestore-photo:'.length);
   try {
-    const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
-    const destino = ref(storageAtual, nome);
-    await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
-    return await getDownloadURL(destino);
+    const snap = await getDoc(doc(db, "controle_fotos", id));
+    return snap.exists() ? (snap.data().foto || null) : null;
   } catch (error) {
-    console.warn('Não foi possível sincronizar a foto; mantendo a cópia local:', error);
-    return foto;
+    console.warn('Não foi possível carregar a foto compartilhada:', error);
+    return null;
   }
 }
 
-// Fotos ficam no Firebase Storage; o Firestore guarda apenas URLs pequenas.
-// Isso evita estourar o limite de aproximadamente 1 MiB do documento controle/materiais.
+async function fotoParaStorage(foto, materialId) {
+  if (!foto || typeof foto !== 'string' || !foto.startsWith('data:image/')) return foto || null;
+  const storageAtual = obterStorage();
+  if (storageAtual) {
+    try {
+      const nome = `materiais/${materialId || 'sem-id'}/${Date.now()}-${Math.random().toString(36).slice(2, 10)}.jpg`;
+      const destino = ref(storageAtual, nome);
+      await uploadString(destino, foto, 'data_url', { contentType: 'image/jpeg', cacheControl: 'public,max-age=31536000' });
+      const url = await getDownloadURL(destino);
+      if (url && /^https?:\/\//.test(url)) return url;
+    } catch (error) {
+      console.warn('Storage recusou a foto; usando o armazenamento compartilhado do Firestore:', error);
+    }
+  }
+  // Fallback compartilhado: não deixa a foto ficar presa somente no PC/celular.
+  return await salvarFotoNoFirestore(foto, materialId);
+}
+
+// Fotos ficam no Storage quando disponível; o Firestore guarda um identificador
+// compartilhado quando o Storage não aceita o upload.
 export async function salvarMateriaisNaNuvem(materiais) {
   const lista = Array.isArray(materiais) ? materiais : [];
-  const materiaisComUrls = await Promise.all(lista.map(async (material) => {
+  const materiaisParaNuvem = await Promise.all(lista.map(async (material) => {
     const foto = await fotoParaStorage(material?.foto, material?.id);
     return { ...material, foto };
   }));
-  try {
-    await setDoc(REF_MATERIAIS, { materiais: materiaisComUrls, updatedAt: Date.now() }, { merge: true });
-  } catch (error) {
-    console.warn('Nuvem indisponível; materiais mantidos no armazenamento local:', error);
-  }
-  return materiaisComUrls;
+  await setDoc(REF_MATERIAIS, { materiais: materiaisParaNuvem, updatedAt: Date.now() }, { merge: true });
+  // Retorna as fotos originais/URLs para o aparelho atual; a nuvem guarda o ponteiro.
+  return lista.map((material, i) => ({ ...material, foto: material?.foto || materiaisParaNuvem[i]?.foto || null }));
 }
 
 export async function carregarMateriaisDaNuvem() {
   const snap = await getDoc(REF_MATERIAIS);
-  return snap.exists() ? (snap.data().materiais ?? null) : null;
+  if (!snap.exists()) return null;
+  const materiais = snap.data().materiais ?? null;
+  return Array.isArray(materiais)
+    ? await Promise.all(materiais.map(async (material) => ({ ...material, foto: await resolverFoto(material?.foto) })))
+    : materiais;
 }
 
 export function escutarMudancasMateriais(callback) {
-  return onSnapshot(REF_MATERIAIS, (snap) => {
+  return onSnapshot(REF_MATERIAIS, async (snap) => {
     if (!snap.exists()) return;
-    callback(snap.data().materiais ?? []);
+    const materiais = snap.data().materiais ?? [];
+    const resolvidos = Array.isArray(materiais)
+      ? await Promise.all(materiais.map(async (material) => ({ ...material, foto: await resolverFoto(material?.foto) })))
+      : [];
+    callback(resolvidos);
   });
 }
 
