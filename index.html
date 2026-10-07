@@ -1044,6 +1044,37 @@
       .kpi-grid { grid-template-columns: repeat(2, minmax(0,1fr)); }
     }
 
+  
+    /* ── NAVEGAÇÃO MOBILE V3 ── */
+    body { overflow-x: hidden; }
+    .mobile-home-btn { position: fixed; right: 1rem; bottom: max(1rem, env(safe-area-inset-bottom)); z-index: 120; display: none; align-items: center; justify-content: center; min-height: 44px; padding: .7rem 1rem; border: 1px solid #cfe0f3; border-radius: 999px; background: rgba(255,255,255,.96); color: var(--blue-dark); font-weight: 800; box-shadow: 0 10px 26px rgba(13,45,87,.18); cursor: pointer; }
+    .mobile-home-btn:hover { background: #eef5ff; transform: translateY(-1px); }
+    @media (min-width: 769px) { .menu-toggle, .mobile-menu, .mobile-menu-overlay, .mobile-home-btn { display: none !important; } #desktopNav { display: flex !important; } }
+    @media (max-width: 768px) {
+      #desktopNav { display: none !important; }
+      header { min-height: 78px; height: auto; padding: .75rem 1rem .75rem 4.35rem; }
+      .header-content { width: 100%; min-width: 0; gap: .55rem; }
+      .logo-container { width: 42px; height: 42px; display: grid; place-items: center; }
+      .logo-container img { width: 42px; height: 42px; object-fit: contain; }
+      .header-text { min-width: 0; flex: 1; }
+      .header-text h1 { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 1.02rem; }
+      .header-text p { display: none; }
+      .user-area { flex: 0 0 auto; }
+      .user-area .btn { min-height: 36px; padding: .45rem .7rem; }
+      .menu-toggle { display: flex !important; top: 16px; left: 12px; width: 42px; height: 42px; border-radius: 13px; }
+      .mobile-menu { top: 0; left: -100%; width: min(86vw, 340px); max-width: 340px; padding-top: 78px; padding-bottom: 1.5rem; }
+      .mobile-menu.active { left: 0; }
+      .mobile-nav-section { padding: .75rem .8rem; }
+      .mobile-nav-section-title { padding: 0 .35rem; margin-bottom: .45rem; font-size: .72rem; }
+      .mobile-nav-button { min-height: 42px; padding: .62rem .75rem; margin-bottom: .35rem; font-size: .88rem; }
+      .mobile-nav-button:last-child { margin-bottom: 0; }
+      main { width: calc(100% - 1rem); margin: .75rem auto 4.5rem; }
+      .mobile-section-back { display: none !important; }
+      .card { padding: .85rem; }
+      .btn-group { grid-template-columns: 1fr !important; }
+      .btn-group .btn { min-height: 44px; }
+    }
+
   </style>
 </head>
 <body>
@@ -1052,7 +1083,7 @@
 <div id="login-screen">
   <div class="login-container">
     <div class="login-logo">
-      <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
+      <img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" />
     </div>
     <h1>Acesso Restrito</h1>
     <p>Faça login para acessar o controle de materiais</p>
@@ -1078,7 +1109,7 @@
 <header>
   <div class="header-content">
     <div class="logo-container">
-      <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
+      <img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" />
     </div>
     <div class="header-text">
       <h1>Controle de Materiais</h1>
@@ -1187,7 +1218,6 @@
 
   <!-- ── REGISTROS ── -->
   <section id="registros">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📝 Voltar para início</button></div>
     <div class="card">
       <h2>📝 Gerenciar Registros</h2>
       <div class="btn-group">
@@ -1240,7 +1270,6 @@
 
   <!-- ── CONTROLE DE MATERIAIS DA OBRA ── -->
   <section id="materiais-obra">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📦 Voltar para início</button></div>
     <div class="card">
       <h2>🏗️ Controle de Materiais da Obra</h2>
       <div class="btn-group">
@@ -1269,7 +1298,6 @@
 
   <!-- ── CONTROLE DE SALDO POR NF ── -->
   <section id="saldo-nf">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">💰 Voltar para início</button></div>
     <div class="card">
       <h2>💰 Controle de Saldo por NF</h2>
       <p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p>
@@ -1305,7 +1333,6 @@
 
   <!-- ── RELATÓRIO DO DIA ── -->
   <section id="relatorio-dia">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📋 Voltar para início</button></div>
     <div class="card">
       <h2>📋 Relatório do Dia</h2>
       <div class="btn-group">
@@ -1319,7 +1346,6 @@
 
   <!-- ── RASTREABILIDADE COMPLETA ── -->
   <section id="rastreabilidade">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">🧾 Voltar para início</button></div>
     <div class="card">
       <h2>🧾 Lançamento de Rastreabilidade</h2>
       <form id="formRastreabilidade" onsubmit="appMateriais.salvarRastreabilidadeManual(event)">
@@ -1387,7 +1413,6 @@
 
   <!-- ── RELATÓRIO VISUAL ── -->
   <section id="relatorio">
-    <div class="mobile-section-back"><button class="btn btn-secondary" type="button" onclick="voltarParaInicio()">📊 Voltar para início</button></div>
     <div class="card">
       <h2>📊 Relatório Visual para Apresentação</h2>
       <div class="btn-group">
@@ -2826,7 +2851,7 @@ const app = {
 
     let html = `
       <div class="pdf-header">
-        <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
+        <img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" />
         <div class="pdf-header-text">
           <h2>Relatório de Materiais em Empréstimo</h2>
           <p>Gerado em: ${new Date().toLocaleDateString('pt-BR')} às ${new Date().toLocaleTimeString('pt-BR')}</p>
@@ -3715,7 +3740,7 @@ const appMateriais = {
     </div>
 
     <div class="header">
-      <img src="./images.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./www/logo.png';" />
+      <img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" />
       <div>
         <h1>${titulo}</h1>
         <div class="muted">${subtitulo}</div>
@@ -5007,15 +5032,13 @@ window.addEventListener('scroll', () => {
 function handleMediaChange() {
   const menuToggle = document.getElementById('menuToggle');
   const desktopNav = document.getElementById('desktopNav');
-  
   if (!menuToggle || !desktopNav) return;
-  
-  // Mostrar menu hambúrguer em TODOS os dispositivos
-  menuToggle.style.display = 'flex';
-  desktopNav.style.display = 'none';
-  closeMobileMenu();
+  const isMobile = window.innerWidth <= 768;
+  menuToggle.style.display = isMobile ? 'flex' : 'none';
+  desktopNav.style.display = isMobile ? 'none' : 'flex';
+  if (!isMobile) closeMobileMenu();
+  atualizarBotaoMobile();
 }
-
 window.addEventListener('resize', handleMediaChange);
 </script>
 
@@ -5053,6 +5076,7 @@ window.addEventListener('resize', handleMediaChange);
   </div>
 </nav>
 <div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+<script>handleMediaChange();</script>
 
 </body>
 </html>
