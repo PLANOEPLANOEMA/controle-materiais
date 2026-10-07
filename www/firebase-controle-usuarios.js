@@ -109,34 +109,57 @@ async function fotoParaStorage(foto, materialId) {
 // estiverem bloqueando a gravação.
 const REF_MATERIAIS_COMPAT = doc(db, "controle", "movimentacoes");
 
+function comPrazo(promise, ms = 12000) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => setTimeout(() => reject(new Error('Operação de foto excedeu o tempo limite')), ms))
+  ]);
+}
+
+async function prepararFotoSemBloquear(foto, materialId) {
+  if (!foto || typeof foto !== 'string') return null;
+  if (!foto.startsWith('data:image/')) return foto;
+  try {
+    return await comPrazo(fotoParaStorage(foto, materialId));
+  } catch (error) {
+    console.warn('Foto não pôde ser sincronizada; o material será salvo sem bloquear:', error);
+    return null;
+  }
+}
+
 export async function salvarMateriaisNaNuvem(materiais) {
   const lista = Array.isArray(materiais) ? materiais : [];
+  // Cada foto é tratada separadamente. Uma foto problemática nunca cancela o cadastro.
   const materiaisParaNuvem = await Promise.all(lista.map(async (material) => {
-    const foto = await fotoParaStorage(material?.foto, material?.id);
-    return { ...material, foto };
+    const fotoOriginal = material?.foto || null;
+    const foto = await prepararFotoSemBloquear(fotoOriginal, material?.id);
+    return { ...material, foto: foto || (fotoOriginal?.startsWith('data:image/') ? null : fotoOriginal) };
   }));
   const agora = Date.now();
   let salvo = false;
-  try {
-    await setDoc(REF_MATERIAIS, { materiais: materiaisParaNuvem, updatedAt: agora }, { merge: true });
-    salvo = true;
-  } catch (error) {
-    console.warn('Documento principal de materiais recusou a gravação; usando compatibilidade:', error);
+  let ultimoErro = null;
+  for (const [nome, refDoc, campoData] of [
+    ['principal', REF_MATERIAIS, 'updatedAt'],
+    ['compatibilidade', REF_MATERIAIS_COMPAT, 'materiaisUpdatedAt']
+  ]) {
+    try {
+      await setDoc(refDoc, { materiais: materiaisParaNuvem, [campoData]: agora }, { merge: true });
+      salvo = true;
+    } catch (error) {
+      ultimoErro = error;
+      console.warn(`Documento ${nome} de materiais recusou a gravação:`, error);
+    }
   }
-  try {
-    await setDoc(REF_MATERIAIS_COMPAT, { materiais: materiaisParaNuvem, materiaisUpdatedAt: agora }, { merge: true });
-    salvo = true;
-  } catch (error) {
-    console.warn('Documento compatível de materiais também recusou a gravação:', error);
-  }
-  if (!salvo) throw new Error('Não foi possível sincronizar materiais com o Firebase.');
+  if (!salvo) throw (ultimoErro || new Error('Não foi possível sincronizar materiais com o Firebase.'));
+  // O retorno usa a lista local para não substituir uma foto local por null enquanto
+  // o upload isolado ainda estiver em andamento ou indisponível.
   return lista.map((material, i) => ({ ...material, foto: material?.foto || materiaisParaNuvem[i]?.foto || null }));
 }
 
 async function lerMateriaisDoSnapshot(snap, compat = false) {
   if (!snap.exists()) return null;
   const dados = snap.data() || {};
-  const materiais = compat ? dados.materiais : dados.materiais;
+  const materiais = dados.materiais;
   if (!Array.isArray(materiais)) return null;
   const resolvidos = await Promise.all(materiais.map(async (material) => ({ ...material, foto: await resolverFoto(material?.foto) })));
   return { materiais: resolvidos, atualizadoEm: Number(compat ? dados.materiaisUpdatedAt : dados.updatedAt) || 0 };
@@ -161,14 +184,13 @@ export function escutarMudancasMateriais(callback) {
   const unsubPrincipal = onSnapshot(REF_MATERIAIS, async (snap) => {
     principal = await lerMateriaisDoSnapshot(snap, false);
     await emitir();
-  });
+  }, error => console.warn('Sincronização principal de materiais indisponível:', error));
   const unsubCompat = onSnapshot(REF_MATERIAIS_COMPAT, async (snap) => {
     compat = await lerMateriaisDoSnapshot(snap, true);
     await emitir();
-  });
+  }, error => console.warn('Sincronização compatível de materiais indisponível:', error));
   return () => { unsubPrincipal(); unsubCompat(); };
 }
-
 
 // ── RASTREABILIDADE / MOVIMENTAÇÕES ──
 export async function salvarMovimentacoesNaNuvem(movimentacoes) {
