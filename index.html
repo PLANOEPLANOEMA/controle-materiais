@@ -2589,15 +2589,20 @@ const appMateriais = {
     }
   },
 
-  async salvarMovimentacoes() {
+  async salvarMovimentacoes(alertarErro = true) {
     try {
       localStorage.setItem(this.STORAGE_KEY_MOV, JSON.stringify(this.movimentacoes));
-      if (window.__fb && window.__fb.salvarMovimentacoesNaNuvem) {
-        await window.__fb.salvarMovimentacoesNaNuvem(this.movimentacoes);
-      }
+    } catch (e) {
+      console.warn('Cache local de movimentações indisponível; tentando sincronizar com a nuvem:', e);
+    }
+    try {
+      if (!window.__fb || !window.__fb.salvarMovimentacoesNaNuvem) return false;
+      await window.__fb.salvarMovimentacoesNaNuvem(this.movimentacoes);
+      return true;
     } catch (e) {
       console.error('Erro ao salvar movimentações:', e);
-      app.mostrarAlerta('Erro ao salvar rastreabilidade!', 'error');
+      if (alertarErro) app.mostrarAlerta('Erro ao salvar rastreabilidade!', 'error');
+      return false;
     }
   },
 
@@ -3035,11 +3040,17 @@ const appMateriais = {
 
     this.movimentacoes.unshift(novaMov);
     await this.salvarMateriais();
-    await this.salvarMovimentacoes();
+    const rastreabilidadeSincronizada = await this.salvarMovimentacoes(false);
     this.fecharModalRetirada();
     this.buscarMateriais();
     this.renderizarRelatorioDia();
-    app.mostrarAlerta('Retirada registrada com sucesso!', 'success');
+    this.renderizarRastreabilidadeCompleta();
+    app.mostrarAlerta(
+      rastreabilidadeSincronizada
+        ? 'Retirada registrada com sucesso!'
+        : 'O saldo foi atualizado, mas a rastreabilidade não foi confirmada na nuvem. Não repita a retirada; conecte-se e peça ao administrador para conferir o registro.',
+      rastreabilidadeSincronizada ? 'success' : 'warning'
+    );
   },
 
   renderizarMovimentacoes() {
