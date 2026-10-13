@@ -2589,15 +2589,20 @@ const appMateriais = {
     }
   },
 
-  async salvarMovimentacoes() {
+  async salvarMovimentacoes(alertarErro = true) {
     try {
       localStorage.setItem(this.STORAGE_KEY_MOV, JSON.stringify(this.movimentacoes));
-      if (window.__fb && window.__fb.salvarMovimentacoesNaNuvem) {
-        await window.__fb.salvarMovimentacoesNaNuvem(this.movimentacoes);
-      }
+    } catch (e) {
+      console.warn('Cache local de movimentações indisponível; tentando sincronizar com a nuvem:', e);
+    }
+    try {
+      if (!window.__fb || !window.__fb.salvarMovimentacoesNaNuvem) return false;
+      await window.__fb.salvarMovimentacoesNaNuvem(this.movimentacoes);
+      return true;
     } catch (e) {
       console.error('Erro ao salvar movimentações:', e);
-      app.mostrarAlerta('Erro ao salvar rastreabilidade!', 'error');
+      if (alertarErro) app.mostrarAlerta('Erro ao salvar rastreabilidade!', 'error');
+      return false;
     }
   },
 
@@ -3035,11 +3040,17 @@ const appMateriais = {
 
     this.movimentacoes.unshift(novaMov);
     await this.salvarMateriais();
-    await this.salvarMovimentacoes();
+    const rastreabilidadeSincronizada = await this.salvarMovimentacoes(false);
     this.fecharModalRetirada();
     this.buscarMateriais();
     this.renderizarRelatorioDia();
-    app.mostrarAlerta('Retirada registrada com sucesso!', 'success');
+    this.renderizarRastreabilidadeCompleta();
+    app.mostrarAlerta(
+      rastreabilidadeSincronizada
+        ? 'Retirada registrada com sucesso!'
+        : 'O saldo foi atualizado, mas a rastreabilidade não foi confirmada na nuvem. Não repita a retirada; conecte-se e peça ao administrador para conferir o registro.',
+      rastreabilidadeSincronizada ? 'success' : 'warning'
+    );
   },
 
   renderizarMovimentacoes() {
@@ -3398,8 +3409,16 @@ if (saldo <= margem*1.5) return {key:'atencao', label:'Atenção', cls:'saldo-at
 return {key:'ok', label:'Saldo tranquilo', cls:'saldo-ok', icon:'🟢'};
 },
 badge(mat){ const st=this.status(mat); return `<span class="saldo-status ${st.cls}">${st.icon} ${st.label}</span>`; },
+somenteLeitura(){ return (window.currentUser?.role || '') !== 'admin'; },
+bloquearAlteracao(event){
+if (!this.somenteLeitura()) return false;
+event?.preventDefault?.();
+app.mostrarAlerta('Somente o perfil Administrador pode alterar o Saldo NF.', 'error');
+return true;
+},
 
 abrirModalMaterial(id=null) {
+if (this.bloquearAlteracao()) return;
 this.editandoMaterialId = id;
 document.getElementById('formSaldoMaterial').reset();
 document.getElementById('saldoMaterialMargem').value = 20;
@@ -3419,6 +3438,7 @@ document.getElementById('modalSaldoMaterial').classList.add('active');
 fecharModalMaterial(){ document.getElementById('modalSaldoMaterial').classList.remove('active'); this.editandoMaterialId=null; },
 
 salvarMaterial(e) {
+if (this.bloquearAlteracao(e)) return;
 e.preventDefault();
 const item = {
 id: this.editandoMaterialId || Date.now(),
@@ -3434,6 +3454,7 @@ this.salvar(); this.fecharModalMaterial(); this.renderizar(); app.mostrarAlerta(
 },
 
 excluirMaterial(id) {
+if (this.bloquearAlteracao()) return;
 if (!confirm('Excluir este material/contrato? As NFs vinculadas também serão removidas.')) return;
 this.dados.materiais = this.dados.materiais.filter(m => String(m.id)!==String(id));
 this.dados.nfs = this.dados.nfs.filter(n => String(n.materialId)!==String(id));
@@ -3446,6 +3467,7 @@ if (!sel) return;
 sel.innerHTML = '<option value="">Selecione...</option>' + this.dados.materiais.map(m => `<option value="${m.id}">${this.esc(m.nome)} (${this.esc(m.unidade)})</option>`).join('');
 },
 abrirModalNF(id=null) {
+if (this.bloquearAlteracao()) return;
 if (!this.dados.materiais.length) return app.mostrarAlerta('Cadastre um material/contrato antes de lançar NF.', 'error');
 this.editandoNFId = id;
 this.preencherSelectMateriais();
@@ -3467,6 +3489,7 @@ document.getElementById('modalSaldoNF').classList.add('active');
 },
 fecharModalNF(){ document.getElementById('modalSaldoNF').classList.remove('active'); this.editandoNFId=null; },
 salvarNF(e) {
+if (this.bloquearAlteracao(e)) return;
 e.preventDefault();
 const item = {
 id: this.editandoNFId || Date.now(),
@@ -3485,7 +3508,7 @@ const mat = this.dados.materiais.find(m => String(m.id)===String(item.materialId
 const st = mat ? this.status(mat) : null;
 app.mostrarAlerta(st?.key === 'critico' || st?.key === 'zerado' ? 'NF lançada. Atenção: material na margem de RT/RS!' : 'NF lançada com sucesso!', st?.key === 'critico' || st?.key === 'zerado' ? 'error' : 'success');
 },
-excluirNF(id){ if(!confirm('Excluir este lançamento de NF?')) return; this.dados.nfs=this.dados.nfs.filter(n=>String(n.id)!==String(id)); this.salvar(); this.renderizar(); app.mostrarAlerta('NF excluída.', 'success'); },
+excluirNF(id){ if(this.bloquearAlteracao()) return; if(!confirm('Excluir este lançamento de NF?')) return; this.dados.nfs=this.dados.nfs.filter(n=>String(n.id)!==String(id)); this.salvar(); this.renderizar(); app.mostrarAlerta('NF excluída.', 'success'); },
 
 listaMateriaisFiltrada(){
 const busca=(document.getElementById('saldoBusca')?.value||'').toLowerCase();
