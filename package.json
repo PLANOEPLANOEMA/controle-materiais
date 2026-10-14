@@ -1,6 +1,6 @@
 {
   "name": "controle-materiais-app",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "private": true,
   "description": "Controle de Materiais - pacote pronto para Capacitor",
   "scripts": {

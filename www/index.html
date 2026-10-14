@@ -3039,8 +3039,10 @@ const appMateriais = {
     };
 
     this.movimentacoes.unshift(novaMov);
-    await this.salvarMateriais();
+    // O sync compatível de materiais grava no mesmo documento controle/movimentacoes.
+    // Salvar primeiro evita que o snapshot antigo substitua a retirada recém-inserida.
     const rastreabilidadeSincronizada = await this.salvarMovimentacoes(false);
+    await this.salvarMateriais();
     this.fecharModalRetirada();
     this.buscarMateriais();
     this.renderizarRelatorioDia();
