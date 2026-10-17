@@ -5,7 +5,7 @@
  */
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-app.js";
 import {
-  getFirestore, doc, setDoc, getDoc, onSnapshot
+  getFirestore, doc, setDoc, getDoc, onSnapshot, deleteDoc
 } from "https://www.gstatic.com/firebasejs/10.12.4/firebase-firestore.js";
 // O projeto está no plano Spark; as fotos usam documentos separados no Firestore.
 
@@ -30,6 +30,7 @@ const REF_PLANEJAMENTO_RT = doc(db, "controle", "planejamento_rt");
 const REF_RT_DIA_DIA = doc(db, "controle", "rt_dia_dia");
 const REF_SALDO_NF = doc(db, "controle", "saldo_nf");
 const REF_GRUPOS_MATERIAIS = doc(db, "controle", "grupos_materiais");
+const REF_ENTREGAS_MATERIAIS = doc(db, "controle", "entregas_materiais");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
@@ -215,6 +216,48 @@ export function escutarMudancasGruposMateriais(callback) {
   }, (error) => console.warn('Sincronização de grupos de materiais indisponível:', error));
 }
 
+// ── ENTREGAS / EMPRÉSTIMOS DE MATERIAIS ──
+export async function salvarEntregasMateriaisNaNuvem(registros) {
+  const lista = Array.isArray(registros) ? registros : [];
+  const prontas = await Promise.all(lista.map(async (registro) => {
+    const id = String(registro?.id || 'sem-id');
+    const assinaturaOriginal = registro?.assinatura || null;
+    const assinatura = await prepararFotoSemBloquear(assinaturaOriginal, `entrega_${id}_assinatura`);
+    const itens = await Promise.all((Array.isArray(registro?.itens) ? registro.itens : []).map(async (item, indice) => {
+      const itemId = String(item?.id || indice);
+      const imagemOriginal = item?.imagem || null;
+      const imagem = await prepararFotoSemBloquear(imagemOriginal, `entrega_${id}_item_${itemId}`);
+      return { ...item, imagem };
+    }));
+    return { ...registro, assinatura, itens };
+  }));
+  await setDoc(REF_ENTREGAS_MATERIAIS, { registros: prontas, updatedAt: Date.now() }, { merge: true });
+  return prontas;
+}
+
+export async function carregarEntregasMateriaisDaNuvem() {
+  const snap = await getDoc(REF_ENTREGAS_MATERIAIS);
+  return snap.exists() ? (snap.data().registros ?? null) : null;
+}
+
+export function escutarMudancasEntregasMateriais(callback) {
+  return onSnapshot(REF_ENTREGAS_MATERIAIS, (snap) => {
+    if (!snap.exists()) return;
+    const registros = snap.data().registros;
+    callback(Array.isArray(registros) ? registros : []);
+  }, (error) => console.warn('Sincronização de entregas indisponível:', error));
+}
+
+export async function resolverImagemAnexoDaNuvem(imagem) {
+  return resolverFoto(imagem);
+}
+
+export async function excluirImagemAnexoDaNuvem(imagem) {
+  if (typeof imagem !== 'string' || !imagem.startsWith('controle-photo:')) return;
+  const id = imagem.slice('controle-photo:'.length);
+  if (!id) return;
+  await deleteDoc(doc(db, "controle", id));
+}
 
 // ── PLANEJAMENTO RT ──
 export async function salvarPlanejamentoRTNaNuvem(itens) {

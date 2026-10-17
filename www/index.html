@@ -1094,8 +1094,36 @@
     .mobile-menu-signature { margin:1.2rem .9rem 0; padding:1.15rem .5rem .35rem; border-top:2px solid var(--blue-mid); text-align:center; color:var(--muted); font-size:.7rem; letter-spacing:.02em; } .mobile-menu-signature strong { font-size:1.05rem; }
     @media (max-width:768px) { .mobile-menu { overflow-y:auto; } }
 
-  </style>
-</head><body><!-- ── LOGIN SCREEN ── --><div id="login-screen"><div class="login-container"><div class="login-logo"><img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" /></div><h1>Acesso Restrito</h1><p>Faça login para acessar o controle de materiais</p><div class="login-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><small>Gestão com propósito e excelência</small></div><form class="login-form" onsubmit="auth.login(event)"><div class="form-group"><label for="login-input">Login</label><input type="text" id="login-input" required autocomplete="off" /></div><div class="form-group"><label for="password-input">Senha</label><div style="display: flex; gap: 0.5rem; align-items: center;"><input type="password" id="password-input" placeholder="Digite sua senha" required autocomplete="off" style="flex: 1;" /><button type="button" onclick="auth.toggleSenha()" style="padding: 0.6rem 0.8rem; background: #ddeeff; border: 1px solid #c8d6ea; border-radius: 8px; cursor: pointer; font-size: 1rem;">👁️</button></div></div><button type="submit">Acessar Sistema</button><div id="login-error" class="login-error">❌ Login ou senha incorretos! Tente novamente.</div></form></div></div><!-- ── MAIN APP ── --><header><div class="header-content"><div class="logo-container"><img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" /></div><div class="header-text"><h1>Controle de Materiais</h1><p>Gestão profissional de empréstimos e estoque - Plano & Plano</p></div></div><div class="user-area" id="userArea" style="position:relative; z-index:1; text-align:right; min-width:220px;"><div id="currentUserLabel" style="font-weight:700; font-size:0.95rem;"></div><div id="currentUserRole" style="opacity:.85; font-size:0.85rem; margin-top:0.25rem;"></div><button class="btn btn-secondary" style="margin-top:0.6rem;" onclick="auth.logout()">Sair</button></div></header><nav id="desktopNav"><!-- Seção RT e Controle de Materiais --><div class="nav-section"><div class="nav-section-title">📋 RT & Materiais</div><button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button><button data-section="saldo-nf" onclick="app.showSection('saldo-nf', this)">Saldo por NF</button></div><!-- Seção Controle de Romaneios --><div class="nav-section"><div class="nav-section-title">📦 Controle de Romaneios</div><button data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button><button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button><button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button><button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button><button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button></div><!-- Rastreabilidade e Relatórios --><div class="nav-section"><div class="nav-section-title">📊 Rastreabilidade & Relatórios</div><button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button><button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button></div></nav><button id="mobileHomeBtn" class="mobile-home-btn" onclick="voltarParaInicio()">← Voltar ao início</button><main><!-- Alert ── --><div id="alert" class="alert"></div><!-- KPIs sempre visíveis --><div id="globalKpiGrid" class="kpi-grid"><div class="kpi"><div class="icon">📦</div><div class="value" id="kpiTotal">0</div><div class="label">Total de Itens</div></div><div class="kpi"><div class="icon">🏢</div><div class="value" id="kpiEmpresas">0</div><div class="label">Empresas</div></div><div class="kpi"><div class="icon">🔨</div><div class="value" id="kpiMateriais">0</div><div class="label">Tipos de Material</div></div><div class="kpi"><div class="icon">✅</div><div class="value" id="kpiConcluidos">0</div><div class="label">Concluídos</div></div></div><!-- ── VISÃO GERAL ── --><section id="visao-geral" class="active"><div class="card"><h2>📊 Resumo Geral</h2><div class="chart-grid"><div class="chart-wrap"><canvas id="chartData"></canvas></div><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div></div></section><!-- ── POR EMPRESA ── --><section id="por-empresa"><div class="card"><h2>🏢 Participação por Empresa</h2><div class="progress-list" id="progressEmpresas"></div></div><div class="card"><h2>📈 Comparativo de Empresas</h2><div class="chart-wrap" style="height:320px"><canvas id="chartEmpresaBar"></canvas></div></div></section><!-- ── POR MATERIAL ── --><section id="por-material"><div class="card"><h2>🔨 Participação por Material</h2><div class="progress-list" id="progressMateriais"></div></div><div class="card"><h2>📈 Comparativo de Materiais</h2><div class="chart-wrap" style="height:300px"><canvas id="chartMaterialBar"></canvas></div></div></section><!-- ── REGISTROS ── --><section id="registros"><div class="card"><h2>📝 Gerenciar Registros</h2><div class="btn-group"><button class="btn btn-primary" onclick="app.abrirModalNovo()">
+
+/* Checklist de grupos alinhada: a regra global dos campos não deve esticar checkboxes. */
+.material-group-checklist{display:flex;flex-direction:column;gap:.15rem;max-height:180px;overflow:auto;padding:.45rem .65rem;border:1px solid #d7e1ee;border-radius:12px;background:#fff}
+.material-group-option{display:flex!important;align-items:center;justify-content:flex-start!important;gap:.65rem;width:100%;min-height:38px;padding:.35rem .4rem;margin:0;cursor:pointer;text-align:left!important;color:var(--text)}
+.material-group-option input[type="checkbox"]{width:18px!important;height:18px!important;min-height:18px!important;flex:0 0 18px;margin:0;accent-color:var(--blue);border-radius:4px!important}
+.material-group-option span{flex:1;text-align:left!important}
+.delivery-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap}
+.delivery-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:1rem}
+.delivery-item-card{border:1px solid var(--line);border-radius:14px;background:#f8fbff;padding:1rem;margin:.8rem 0}
+.delivery-item-head{display:flex;align-items:center;justify-content:space-between;gap:.75rem;margin-bottom:.7rem}
+.delivery-photo-actions,.delivery-signature-actions{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap}
+.delivery-photo-preview{display:block;max-width:180px;max-height:140px;object-fit:contain;border:1px solid var(--line);border-radius:10px;background:#fff;margin:.55rem 0}
+.delivery-signature-wrap{width:100%;border:1px solid #cbd5e1;border-radius:12px;background:#fff;overflow:hidden}
+#entregaAssinaturaCanvas{display:block;width:100%;height:190px;touch-action:none;cursor:crosshair;background:#fff}
+.delivery-record{border:1px solid var(--line);border-radius:16px;background:#fff;padding:1rem;margin:.85rem 0;box-shadow:0 6px 18px rgba(19,49,91,.05)}
+.delivery-record-head{display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:.7rem;margin-bottom:.7rem}
+.delivery-record-head h3{margin:0;color:var(--blue-dark)}
+.delivery-record-head p{margin:.25rem 0;color:#64748b}
+.delivery-item-row{display:flex;align-items:center;justify-content:space-between;gap:1rem;padding:.65rem 0;border-bottom:1px solid #edf1f6}
+.delivery-item-row:last-child{border-bottom:0}
+.delivery-item-row strong{display:block;color:var(--text)}
+.delivery-item-row small{display:block;color:#64748b;margin-top:.18rem}
+.delivery-record-photo{width:76px;height:66px;object-fit:contain;border:1px solid var(--line);border-radius:9px;background:#fff;flex:0 0 auto}
+.delivery-record-signature{display:flex;align-items:center;gap:.7rem;margin-top:.8rem;color:#64748b;font-size:.85rem}
+.delivery-record-signature img{width:180px;height:66px;object-fit:contain;border:1px solid var(--line);border-radius:9px;background:#fff}
+.delivery-record-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.85rem}
+@media(max-width:680px){.delivery-form-grid{grid-template-columns:1fr}.delivery-item-row{align-items:flex-start}.delivery-record-signature{align-items:flex-start;flex-direction:column}.delivery-record-signature img{max-width:100%}}
+
+</style>
+</head><body><!-- ── LOGIN SCREEN ── --><div id="login-screen"><div class="login-container"><div class="login-logo"><img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" /></div><h1>Acesso Restrito</h1><p>Faça login para acessar o controle de materiais</p><div class="login-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><small>Gestão com propósito e excelência</small></div><form class="login-form" onsubmit="auth.login(event)"><div class="form-group"><label for="login-input">Login</label><input type="text" id="login-input" required autocomplete="off" /></div><div class="form-group"><label for="password-input">Senha</label><div style="display: flex; gap: 0.5rem; align-items: center;"><input type="password" id="password-input" placeholder="Digite sua senha" required autocomplete="off" style="flex: 1;" /><button type="button" onclick="auth.toggleSenha()" style="padding: 0.6rem 0.8rem; background: #ddeeff; border: 1px solid #c8d6ea; border-radius: 8px; cursor: pointer; font-size: 1rem;">👁️</button></div></div><button type="submit">Acessar Sistema</button><div id="login-error" class="login-error">❌ Login ou senha incorretos! Tente novamente.</div></form></div></div><!-- ── MAIN APP ── --><header><div class="header-content"><div class="logo-container"><img src="./logo.png" alt="Plano & Plano" onerror="this.onerror=null;this.src='./logo.png';" /></div><div class="header-text"><h1>Controle de Materiais</h1><p>Gestão profissional de empréstimos e estoque - Plano & Plano</p></div></div><div class="user-area" id="userArea" style="position:relative; z-index:1; text-align:right; min-width:220px;"><div id="currentUserLabel" style="font-weight:700; font-size:0.95rem;"></div><div id="currentUserRole" style="opacity:.85; font-size:0.85rem; margin-top:0.25rem;"></div><button class="btn btn-secondary" style="margin-top:0.6rem;" onclick="auth.logout()">Sair</button></div></header><nav id="desktopNav"><!-- Seção RT e Controle de Materiais --><div class="nav-section"><div class="nav-section-title">📋 RT & Materiais</div><button data-section="materiais-obra" onclick="app.showSection('materiais-obra', this)">Controle de Materiais</button><button data-section="entregas-materiais" onclick="app.showSection('entregas-materiais', this)">Controle de Entregas</button><button data-section="saldo-nf" onclick="app.showSection('saldo-nf', this)">Saldo por NF</button></div><!-- Seção Controle de Romaneios --><div class="nav-section"><div class="nav-section-title">📦 Controle de Romaneios</div><button data-section="visao-geral" onclick="app.showSection('visao-geral', this)">Visão Geral</button><button data-section="por-empresa" onclick="app.showSection('por-empresa', this)">Por Empresa</button><button data-section="por-material" onclick="app.showSection('por-material', this)">Por Material</button><button data-section="registros" onclick="app.showSection('registros', this)">Gerenciar Registros</button><button data-section="relatorio" onclick="app.showSection('relatorio', this)">Relatório Visual</button></div><!-- Rastreabilidade e Relatórios --><div class="nav-section"><div class="nav-section-title">📊 Rastreabilidade & Relatórios</div><button data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this)">Rastreabilidade</button><button data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this)">Relatório do Dia</button></div></nav><button id="mobileHomeBtn" class="mobile-home-btn" onclick="voltarParaInicio()">← Voltar ao início</button><main><!-- Alert ── --><div id="alert" class="alert"></div><!-- KPIs sempre visíveis --><div id="globalKpiGrid" class="kpi-grid"><div class="kpi"><div class="icon">📦</div><div class="value" id="kpiTotal">0</div><div class="label">Total de Itens</div></div><div class="kpi"><div class="icon">🏢</div><div class="value" id="kpiEmpresas">0</div><div class="label">Empresas</div></div><div class="kpi"><div class="icon">🔨</div><div class="value" id="kpiMateriais">0</div><div class="label">Tipos de Material</div></div><div class="kpi"><div class="icon">✅</div><div class="value" id="kpiConcluidos">0</div><div class="label">Concluídos</div></div></div><!-- ── VISÃO GERAL ── --><section id="visao-geral" class="active"><div class="card"><h2>📊 Resumo Geral</h2><div class="chart-grid"><div class="chart-wrap"><canvas id="chartData"></canvas></div><div class="chart-wrap"><canvas id="chartStatus"></canvas></div></div></div></section><!-- ── POR EMPRESA ── --><section id="por-empresa"><div class="card"><h2>🏢 Participação por Empresa</h2><div class="progress-list" id="progressEmpresas"></div></div><div class="card"><h2>📈 Comparativo de Empresas</h2><div class="chart-wrap" style="height:320px"><canvas id="chartEmpresaBar"></canvas></div></div></section><!-- ── POR MATERIAL ── --><section id="por-material"><div class="card"><h2>🔨 Participação por Material</h2><div class="progress-list" id="progressMateriais"></div></div><div class="card"><h2>📈 Comparativo de Materiais</h2><div class="chart-wrap" style="height:300px"><canvas id="chartMaterialBar"></canvas></div></div></section><!-- ── REGISTROS ── --><section id="registros"><div class="card"><h2>📝 Gerenciar Registros</h2><div class="btn-group"><button class="btn btn-primary" onclick="app.abrirModalNovo()">
 ➕ Novo Registro
 </button><button class="btn btn-success" onclick="app.exportarCSV()">
 💾 Exportar CSV
@@ -1111,11 +1139,38 @@
 📊 Relatório Completo
 </button><button class="btn btn-secondary" onclick="appMateriais.buscarMateriais()">
 🔄 Atualizar
-</button><button type="button" class="btn btn-secondary" id="btnGerenciarGruposMateriais" onclick="appMateriais.abrirModalGrupos()">🗂️ Grupos de Materiais</button></div><div class="filter-bar"><input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" /><select id="filterGrupoMateriais" onchange="appMateriais.filtrarMateriais()" style="min-width:180px;flex:1;padding:.7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;"><option value="">Todos os grupos</option><option value="__sem_grupo__">Sem grupo</option></select><input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" /></div><div id="materiaisContainer" class="materiais-grid"></div></div></section><!-- ── CONTROLE DE SALDO POR NF ── --><section id="saldo-nf"><div class="card"><h2>💰 Controle de Saldo por NF</h2><p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p><div class="btn-group"><button class="btn btn-primary" onclick="appSaldoNF.abrirModalMaterial()">➕ Cadastrar Material/Contrato</button><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">🧾 Lançar NF</button><button class="btn btn-warning" onclick="appSaldoNF.exportarCSV()">💾 Exportar CSV</button><button class="btn btn-secondary" onclick="appSaldoNF.renderizar()">🔄 Atualizar</button></div><div class="filter-bar"><input type="text" id="saldoBusca" placeholder="🔍 Buscar material, NF ou fornecedor..." oninput="appSaldoNF.renderizar()" /><select id="saldoStatusFiltro" onchange="appSaldoNF.renderizar()"><option value="">Todos os status</option><option value="ok">Saldo tranquilo</option><option value="atencao">Atenção</option><option value="critico">Pedir RT/RS</option><option value="zerado">Saldo zerado</option></select></div><div id="saldoResumo" class="saldo-grid"></div><div id="saldoAlertas"></div></div><div class="card"><h2>📦 Saldos por Material</h2><div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div></div><div class="card"><h2>🧾 Histórico de NFs lançadas</h2><div class="table-wrap"><table><thead><tr><th>Data</th><th>NF</th><th>Fornecedor</th><th>Material</th><th>Qtd.</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody id="saldoTabelaNFs"></tbody></table></div></div></section><!-- ── RELATÓRIO DO DIA ── --><section id="relatorio-dia"><div class="card"><h2>📋 Relatório do Dia</h2><div class="btn-group"><button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Abrir Relatório para Impressão</button><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Abrir Relatório Completo</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRelatorioDia()">🔄 Atualizar Painel</button></div><div id="painelRelatorioDia"></div></div></section><!-- ── RASTREABILIDADE COMPLETA ── --><section id="rastreabilidade"><div class="card"><h2>🧾 Lançamento de Rastreabilidade</h2><form id="formRastreabilidade" onsubmit="appMateriais.salvarRastreabilidadeManual(event)"><div class="form-row"><div class="form-group"><label for="rastMaterialNome">Material *</label><input type="text" id="rastMaterialNome" list="rastMateriaisList" placeholder="Ex: Cimento CP II" required /><datalist id="rastMateriaisList"></datalist></div><div class="form-group"><label for="rastQuantidade">Quantidade *</label><input type="number" id="rastQuantidade" min="1" step="1" placeholder="Ex: 10" required /></div></div><div class="form-row"><div class="form-group"><label for="rastResponsavel">Quem retirou *</label><input type="text" id="rastResponsavel" placeholder="Nome de quem retirou" required /></div><div class="form-group"><label for="rastDataHora">Data e hora *</label><input type="datetime-local" id="rastDataHora" required /></div></div><div class="form-row"><div class="form-group"><label for="rastFuncao">Função</label><input type="text" id="rastFuncao" placeholder="Ex: Pedreiro" /></div><div class="form-group"><label for="rastSetor">Setor</label><input type="text" id="rastSetor" placeholder="Ex: Estrutura" /></div></div><div class="form-group"><label for="rastMotivo">Motivo *</label><input type="text" id="rastMotivo" placeholder="Ex: Concretagem da laje" required /></div><div class="form-group"><label for="rastObservacoes">Observações</label><textarea id="rastObservacoes" rows="3" placeholder="Informações adicionais"></textarea></div><div class="btn-group"><button class="btn btn-success" type="submit">➕ Salvar Rastreabilidade</button><button class="btn btn-secondary" type="button" onclick="appMateriais.preencherDataRastreabilidade()">🕒 Usar data/hora atual</button></div></form></div><div class="card"><h2>📋 Rastreabilidade Completa</h2><div class="btn-group"><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRastreabilidadeCompleta()">🔄 Atualizar</button></div><div class="filter-bar"><input type="date" id="rastFiltroData" onchange="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroMaterial" placeholder="🔍 Buscar material..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroPessoa" placeholder="👤 Buscar quem retirou..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroSetor" placeholder="🏗️ Buscar setor/função..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /></div><div id="rastreabilidadeCompletaContainer"></div></div></section><!-- ── RELATÓRIO VISUAL ── --><section id="relatorio"><div class="card"><h2>📊 Relatório Visual para Apresentação</h2><div class="btn-group"><button class="btn btn-success" onclick="app.exportarPDF()">
+</button><button type="button" class="btn btn-secondary" id="btnGerenciarGruposMateriais" onclick="appMateriais.abrirModalGrupos()">🗂️ Grupos de Materiais</button></div><div class="filter-bar"><input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" /><select id="filterGrupoMateriais" onchange="appMateriais.filtrarMateriais()" style="min-width:180px;flex:1;padding:.7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;"><option value="">Todos os grupos</option><option value="__sem_grupo__">Sem grupo</option></select><input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" /></div><div id="materiaisContainer" class="materiais-grid"></div></div></section><section id="entregas-materiais">
+<div class="card">
+  <div class="delivery-heading"><div><h2>📝 Controle de Entrega de Materiais</h2><p style="color:#6b7a99;margin:.35rem 0 0">Registre quem recebeu os materiais, a empresa, a data, os itens alocados e a assinatura.</p></div>
+    <div class="btn-group"><button id="btnNovaEntregaMaterial" type="button" class="btn btn-primary" onclick="appEntregasMateriais.abrirFormulario()">➕ Nova entrega</button><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.atualizar()">🔄 Atualizar</button></div>
+  </div>
+  <p id="entregaPermissaoInfo" style="display:none;color:#6b7a99;margin:.8rem 0 0">Acesso somente para consulta. Apenas Admin e Almoxarife podem criar, editar ou excluir entregas.</p>
+</div>
+<div id="entregaFormCard" class="card" style="display:none">
+  <h3 id="entregaFormTitulo">Nova entrega</h3>
+  <form id="formEntregaMaterial" onsubmit="appEntregasMateriais.salvar(event)">
+    <div class="delivery-form-grid">
+      <div class="form-group"><label for="entregaNome">Nome</label><input id="entregaNome" type="text" maxlength="120" required placeholder="Nome de quem recebeu" /></div>
+      <div class="form-group"><label for="entregaEmpresa">Empresa</label><input id="entregaEmpresa" type="text" maxlength="120" required placeholder="Empresa" /></div>
+      <div class="form-group"><label for="entregaData">Data</label><input id="entregaData" type="date" required /></div>
+    </div>
+    <div class="delivery-item-head"><h3>Materiais alocados</h3><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.adicionarItem()">＋ Adicionar material</button></div>
+    <div id="entregaItensForm"></div>
+    <datalist id="entregaMateriaisSugestoes"></datalist>
+    <div class="form-group"><label for="entregaAssinaturaCanvas">Assinatura</label>
+      <div class="delivery-signature-actions"><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.limparAssinatura()">Limpar assinatura</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('entregaAssinaturaUpload').click()">🖼️ Enviar imagem da assinatura</button><input id="entregaAssinaturaUpload" type="file" accept="image/*" style="display:none" /></div>
+      <div class="delivery-signature-wrap"><canvas id="entregaAssinaturaCanvas" width="960" height="260" aria-label="Campo para desenhar a assinatura"></canvas></div>
+      <small id="entregaAssinaturaAjuda" style="display:block;color:#6b7a99;margin-top:.4rem">Desenhe com o dedo ou mouse, ou envie uma imagem da assinatura.</small>
+    </div>
+    <div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.fecharFormulario()">Cancelar</button><button id="btnSalvarEntregaMaterial" type="submit" class="btn btn-success">Salvar entrega</button></div>
+  </form>
+</div>
+<div class="card"><div class="delivery-heading"><div><h3>Entregas registradas</h3><p style="color:#6b7a99;margin:.25rem 0 0">As imagens dos materiais e assinaturas são sincronizadas entre o site e o aplicativo.</p></div><input id="buscarEntregaMaterial" type="search" placeholder="Buscar por nome, empresa ou material" oninput="appEntregasMateriais.renderizar()" style="max-width:360px" /></div><div id="entregasMateriaisLista" style="margin-top:1rem"></div></div>
+</section><!-- ── CONTROLE DE SALDO POR NF ── --><section id="saldo-nf"><div class="card"><h2>💰 Controle de Saldo por NF</h2><p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p><div class="btn-group"><button class="btn btn-primary" onclick="appSaldoNF.abrirModalMaterial()">➕ Cadastrar Material/Contrato</button><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">🧾 Lançar NF</button><button class="btn btn-warning" onclick="appSaldoNF.exportarCSV()">💾 Exportar CSV</button><button class="btn btn-secondary" onclick="appSaldoNF.renderizar()">🔄 Atualizar</button></div><div class="filter-bar"><input type="text" id="saldoBusca" placeholder="🔍 Buscar material, NF ou fornecedor..." oninput="appSaldoNF.renderizar()" /><select id="saldoStatusFiltro" onchange="appSaldoNF.renderizar()"><option value="">Todos os status</option><option value="ok">Saldo tranquilo</option><option value="atencao">Atenção</option><option value="critico">Pedir RT/RS</option><option value="zerado">Saldo zerado</option></select></div><div id="saldoResumo" class="saldo-grid"></div><div id="saldoAlertas"></div></div><div class="card"><h2>📦 Saldos por Material</h2><div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div></div><div class="card"><h2>🧾 Histórico de NFs lançadas</h2><div class="table-wrap"><table><thead><tr><th>Data</th><th>NF</th><th>Fornecedor</th><th>Material</th><th>Qtd.</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody id="saldoTabelaNFs"></tbody></table></div></div></section><!-- ── RELATÓRIO DO DIA ── --><section id="relatorio-dia"><div class="card"><h2>📋 Relatório do Dia</h2><div class="btn-group"><button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Abrir Relatório para Impressão</button><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Abrir Relatório Completo</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRelatorioDia()">🔄 Atualizar Painel</button></div><div id="painelRelatorioDia"></div></div></section><!-- ── RASTREABILIDADE COMPLETA ── --><section id="rastreabilidade"><div class="card"><h2>🧾 Lançamento de Rastreabilidade</h2><form id="formRastreabilidade" onsubmit="appMateriais.salvarRastreabilidadeManual(event)"><div class="form-row"><div class="form-group"><label for="rastMaterialNome">Material *</label><input type="text" id="rastMaterialNome" list="rastMateriaisList" placeholder="Ex: Cimento CP II" required /><datalist id="rastMateriaisList"></datalist></div><div class="form-group"><label for="rastQuantidade">Quantidade *</label><input type="number" id="rastQuantidade" min="1" step="1" placeholder="Ex: 10" required /></div></div><div class="form-row"><div class="form-group"><label for="rastResponsavel">Quem retirou *</label><input type="text" id="rastResponsavel" placeholder="Nome de quem retirou" required /></div><div class="form-group"><label for="rastDataHora">Data e hora *</label><input type="datetime-local" id="rastDataHora" required /></div></div><div class="form-row"><div class="form-group"><label for="rastFuncao">Função</label><input type="text" id="rastFuncao" placeholder="Ex: Pedreiro" /></div><div class="form-group"><label for="rastSetor">Setor</label><input type="text" id="rastSetor" placeholder="Ex: Estrutura" /></div></div><div class="form-group"><label for="rastMotivo">Motivo *</label><input type="text" id="rastMotivo" placeholder="Ex: Concretagem da laje" required /></div><div class="form-group"><label for="rastObservacoes">Observações</label><textarea id="rastObservacoes" rows="3" placeholder="Informações adicionais"></textarea></div><div class="btn-group"><button class="btn btn-success" type="submit">➕ Salvar Rastreabilidade</button><button class="btn btn-secondary" type="button" onclick="appMateriais.preencherDataRastreabilidade()">🕒 Usar data/hora atual</button></div></form></div><div class="card"><h2>📋 Rastreabilidade Completa</h2><div class="btn-group"><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRastreabilidadeCompleta()">🔄 Atualizar</button></div><div class="filter-bar"><input type="date" id="rastFiltroData" onchange="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroMaterial" placeholder="🔍 Buscar material..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroPessoa" placeholder="👤 Buscar quem retirou..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroSetor" placeholder="🏗️ Buscar setor/função..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /></div><div id="rastreabilidadeCompletaContainer"></div></div></section><!-- ── RELATÓRIO VISUAL ── --><section id="relatorio"><div class="card"><h2>📊 Relatório Visual para Apresentação</h2><div class="btn-group"><button class="btn btn-success" onclick="app.exportarPDF()">
 📥 Baixar Relatório PDF
 </button><button class="btn btn-secondary" onclick="window.print()">
 🖨️ Imprimir
-</button></div><div id="pdf-container" class="pdf-report"><!-- Relatório será gerado aqui --></div></div></section></main><!-- ── MODAIS CONTROLE DE SALDO POR NF ── --><div id="modalSaldoMaterial" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Saldo por NF</span></div><h3 id="saldoMaterialTitle">Cadastrar Material / Contrato</h3><form id="formSaldoMaterial" onsubmit="appSaldoNF.salvarMaterial(event)"><div class="form-group"><label for="saldoMaterialNome">Material *</label><input type="text" id="saldoMaterialNome" required placeholder="Ex: Concreto FCK 30, Areia média, Brita 1..." /></div><div class="form-group"><label for="saldoMaterialUnidade">Unidade *</label><input type="text" id="saldoMaterialUnidade" required placeholder="Ex: m³, un, kg, ton, mês" /></div><div class="form-group"><label for="saldoMaterialContrato">Saldo contratado *</label><input type="number" step="0.001" min="0" id="saldoMaterialContrato" required placeholder="Ex: 500" /></div><div class="form-group"><label for="saldoMaterialMargem">Margem de segurança (%) *</label><input type="number" step="0.01" min="0" max="100" id="saldoMaterialMargem" required value="20" /></div><div class="form-group"><label for="saldoMaterialObs">Observação</label><textarea id="saldoMaterialObs" rows="3" placeholder="Ex: Alinhar nova RT quando chegar em 20% de saldo."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><div id="modalSaldoNF" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Lançamento de NF</span></div><h3 id="saldoNFTitle">Lançar NF</h3><form id="formSaldoNF" onsubmit="appSaldoNF.salvarNF(event)"><div class="form-group"><label for="saldoNFData">Data *</label><input type="date" id="saldoNFData" required /></div><div class="form-group"><label for="saldoNFNumero">Número da NF *</label><input type="text" id="saldoNFNumero" required placeholder="Ex: 109765" /></div><div class="form-group"><label for="saldoNFFornecedor">Fornecedor</label><input type="text" id="saldoNFFornecedor" placeholder="Ex: Concremix, Pedreira, Blocos..." /></div><div class="form-group"><label for="saldoNFMaterial">Material *</label><select id="saldoNFMaterial" required></select></div><div class="form-group"><label for="saldoNFValor">Valor da NF</label><input type="number" step="0.01" min="0" id="saldoNFValor" placeholder="Ex: 12500,00" /></div><div class="form-group"><label for="saldoNFObs">Observação</label><textarea id="saldoNFObs" rows="3" placeholder="Ex: referente ao pedido/contrato..."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">Cancelar</button><button type="submit" class="btn btn-success">Salvar NF</button></div></form></div></div><!-- ── MODAL EMPRÉSTIMOS ── --><div id="modal" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Empréstimos</span></div><h3 id="modalTitle">Novo Registro</h3><form id="formRegistro" onsubmit="app.salvarRegistro(event)"><div class="form-group"><label for="empresa">Empresa *</label><input type="text" id="empresa" required placeholder="Ex: Felipe Agosti" /></div><div class="form-group"><label for="material">Material *</label><input type="text" id="material" required placeholder="Ex: Pontalete" /></div><div class="form-group"><label for="data">Data do Empréstimo *</label><input type="date" id="data" required /></div><div class="form-group"><label for="quantidade">Quantidade *</label><input type="number" id="quantidade" required min="1" placeholder="Ex: 20" /></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><!-- ── MODAL MATERIAIS DA OBRA ── --><div id="modalMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3 id="modalMateriaisTitle">Novo Material</h3><form id="formMateriais" onsubmit="appMateriais.salvarMaterial(event)"><div class="form-group"><label for="nomeMaterial">Nome do Material *</label><input type="text" id="nomeMaterial" required placeholder="Ex: Cimento, Areia, Tijolos..." /></div><div class="form-group"><label for="quantidadeMaterial">Quantidade *</label><input type="number" id="quantidadeMaterial" required min="1" placeholder="Ex: 50" /></div><div class="form-group"><label for="especificacoes">Especificações / Descrição</label><textarea id="especificacoes" placeholder="Ex: Cimento Portland 50kg, Areia média, etc..." rows="3"></textarea></div><div class="form-group"><label>Grupos do material</label><small style="display:block;color:#6b7a99;margin:.25rem 0 .5rem;">Selecione um ou mais grupos para filtrar este material depois.</small><div id="materialGruposChecklist" style="display:flex;flex-direction:column;gap:.25rem;max-height:160px;overflow:auto;"></div></div><div class="form-group"><label for="fotoMaterial">Foto do Material</label><small class="camera-helper">A imagem será comprimida automaticamente. No celular, use <strong>Galeria</strong> para escolher uma imagem salva ou <strong>Câmera</strong> para tirar a foto na hora.</small><input type="file" id="fotoMaterial" accept="image/*" style="display:none;" /><input type="file" id="fotoMaterialCamera" accept="image/*" capture="environment" style="display:none;" /><div class="camera-actions"><button type="button" class="btn gallery-btn" onclick="document.getElementById('fotoMaterial').click()"><span class="camera-btn-icon">🖼️</span><span>Escolher da Galeria</span></button><button type="button" class="btn capture-btn" onclick="document.getElementById('fotoMaterialCamera').click()"><span class="camera-btn-icon">📷</span><span>Tirar Foto</span></button></div><div id="imagemPreview" class="image-preview image-preview-app" style="display: none;"><img id="imagemPreviewImg" src="" alt="Preview" /></div></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Material</button></div></form></div></div><!-- ── MODAL GRUPOS DE MATERIAIS ── --><div id="modalGruposMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalGrupos()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3>Grupos de Materiais</h3><p style="color:#6b7a99;">Crie grupos para organizar os materiais. Excluir um grupo remove apenas a classificação, não os materiais.</p><form id="formNovoGrupoMaterial" onsubmit="appMateriais.criarGrupoMaterial(event)"><div class="form-group"><label for="novoGrupoMaterial">Nome do grupo</label><input type="text" id="novoGrupoMaterial" maxlength="40" required placeholder="Ex.: Limpeza, Finalização, Segurança" /></div><div class="modal-buttons"><button type="submit" class="btn btn-success">Criar grupo</button></div></form><div id="listaGruposMateriais"></div></div></div><!-- ── MODAL RETIRADA DE MATERIAL ── --><div id="modalRetirada" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Rastreabilidade</span></div><h3>Registrar Retirada</h3><form id="formRetirada" onsubmit="appMateriais.salvarRetirada(event)"><input type="hidden" id="retiradaMaterialId" /><div class="form-group"><label for="retiradaMaterialNome">Material</label><input type="text" id="retiradaMaterialNome" readonly /></div><div class="form-group"><label for="retiradaQuantidade">Quantidade retirada *</label><input type="number" id="retiradaQuantidade" min="1" required /></div><div class="form-group"><label for="retiradaResponsavel">Quem retirou *</label><input type="text" id="retiradaResponsavel" required placeholder="Nome de quem retirou" /></div><div class="form-group"><label for="retiradaFuncao">Função</label><input type="text" id="retiradaFuncao" placeholder="Ex: Pedreiro, Encarregado" /></div><div class="form-group"><label for="retiradaSetor">Setor</label><input type="text" id="retiradaSetor" placeholder="Ex: Engenharia, Produção" /></div><div class="form-group"><label for="retiradaMotivo">Motivo da retirada *</label><textarea id="retiradaMotivo" rows="3" required placeholder="Descreva o motivo da retirada"></textarea></div><div class="form-group"><label for="retiradaObservacoes">Observações</label><textarea id="retiradaObservacoes" rows="2" placeholder="Opcional"></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Retirada</button></div></form></div></div><div id="room3dModal" class="room3d-modal"><div class="room3d-shell"><div class="room3d-topbar"><div><h3 id="room3dTitle">Apartamento virtual do pavimento</h3><p id="room3dSubtitle">Clique nas superfícies do ambiente para abrir o serviço correto.</p></div><button type="button" class="btn btn-secondary" onclick="floorRooms.close()">✕ Fechar</button></div><div class="room3d-content"><div class="room3d-stage"><div class="room3d-legend-bar"><span class="room3d-legend-pill">🏠 Apartamento visual</span><span class="room3d-legend-pill">🖱️ Parede, teto, chão e porta clicáveis</span></div><div class="room3d-scene"><div class="room3d-apartment"><div class="room3d-floor-base"></div><div class="room3d-floor-finish"></div><div class="room3d-floor-lines"></div><div class="room3d-wall-back"></div><div class="room3d-wall-left"></div><div class="room3d-wall-right"></div><div class="room3d-ceiling-panel"></div><div class="room3d-ceiling-detail"></div><div class="room3d-window w1"></div><div class="room3d-window w2"></div><div class="room3d-door-frame"><div class="room3d-door-leaf"></div></div><div class="room3d-rug"></div><div class="room3d-sofa"></div><div class="room3d-table"></div><div class="room3d-tv"></div><div class="room3d-plant"></div><div class="room3d-hotspots" id="room3dHotspots"></div></div></div></div><div class="room3d-side"><div class="room3d-summary"><div style="display:flex;justify-content:space-between;gap:.8rem;align-items:flex-start;"><div><strong style="display:block;color:var(--blue-dark);font-size:1rem;">Controle interno do apartamento</strong><div class="room3d-pav-note">Parede esquerda = gesso liso, parede direita = pintura, teto = forro, chão = contra piso e porta = instalação de porta.</div></div><span class="predio3d-badge" id="room3dOverallStatus">Sem dados</span></div><div class="room3d-summary-grid"><div class="room3d-summary-card"><div class="num" id="room3dSummaryDone">0</div><div>Concluídos</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryProgress">0</div><div>Em andamento</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryPhotos">0</div><div>Fotos</div></div></div></div><div id="room3dServices" class="room3d-services"></div></div></div></div></div><footer><div class="footer-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><em>Gestão com propósito e excelência</em></div></footer><!-- Firebase bridge -->
+</button></div><div id="pdf-container" class="pdf-report"><!-- Relatório será gerado aqui --></div></div></section></main><!-- ── MODAIS CONTROLE DE SALDO POR NF ── --><div id="modalSaldoMaterial" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Saldo por NF</span></div><h3 id="saldoMaterialTitle">Cadastrar Material / Contrato</h3><form id="formSaldoMaterial" onsubmit="appSaldoNF.salvarMaterial(event)"><div class="form-group"><label for="saldoMaterialNome">Material *</label><input type="text" id="saldoMaterialNome" required placeholder="Ex: Concreto FCK 30, Areia média, Brita 1..." /></div><div class="form-group"><label for="saldoMaterialUnidade">Unidade *</label><input type="text" id="saldoMaterialUnidade" required placeholder="Ex: m³, un, kg, ton, mês" /></div><div class="form-group"><label for="saldoMaterialContrato">Saldo contratado *</label><input type="number" step="0.001" min="0" id="saldoMaterialContrato" required placeholder="Ex: 500" /></div><div class="form-group"><label for="saldoMaterialMargem">Margem de segurança (%) *</label><input type="number" step="0.01" min="0" max="100" id="saldoMaterialMargem" required value="20" /></div><div class="form-group"><label for="saldoMaterialObs">Observação</label><textarea id="saldoMaterialObs" rows="3" placeholder="Ex: Alinhar nova RT quando chegar em 20% de saldo."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><div id="modalSaldoNF" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Lançamento de NF</span></div><h3 id="saldoNFTitle">Lançar NF</h3><form id="formSaldoNF" onsubmit="appSaldoNF.salvarNF(event)"><div class="form-group"><label for="saldoNFData">Data *</label><input type="date" id="saldoNFData" required /></div><div class="form-group"><label for="saldoNFNumero">Número da NF *</label><input type="text" id="saldoNFNumero" required placeholder="Ex: 109765" /></div><div class="form-group"><label for="saldoNFFornecedor">Fornecedor</label><input type="text" id="saldoNFFornecedor" placeholder="Ex: Concremix, Pedreira, Blocos..." /></div><div class="form-group"><label for="saldoNFMaterial">Material *</label><select id="saldoNFMaterial" required></select></div><div class="form-group"><label for="saldoNFValor">Valor da NF</label><input type="number" step="0.01" min="0" id="saldoNFValor" placeholder="Ex: 12500,00" /></div><div class="form-group"><label for="saldoNFObs">Observação</label><textarea id="saldoNFObs" rows="3" placeholder="Ex: referente ao pedido/contrato..."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">Cancelar</button><button type="submit" class="btn btn-success">Salvar NF</button></div></form></div></div><!-- ── MODAL EMPRÉSTIMOS ── --><div id="modal" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Empréstimos</span></div><h3 id="modalTitle">Novo Registro</h3><form id="formRegistro" onsubmit="app.salvarRegistro(event)"><div class="form-group"><label for="empresa">Empresa *</label><input type="text" id="empresa" required placeholder="Ex: Felipe Agosti" /></div><div class="form-group"><label for="material">Material *</label><input type="text" id="material" required placeholder="Ex: Pontalete" /></div><div class="form-group"><label for="data">Data do Empréstimo *</label><input type="date" id="data" required /></div><div class="form-group"><label for="quantidade">Quantidade *</label><input type="number" id="quantidade" required min="1" placeholder="Ex: 20" /></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><!-- ── MODAL MATERIAIS DA OBRA ── --><div id="modalMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3 id="modalMateriaisTitle">Novo Material</h3><form id="formMateriais" onsubmit="appMateriais.salvarMaterial(event)"><div class="form-group"><label for="nomeMaterial">Nome do Material *</label><input type="text" id="nomeMaterial" required placeholder="Ex: Cimento, Areia, Tijolos..." /></div><div class="form-group"><label for="quantidadeMaterial">Quantidade *</label><input type="number" id="quantidadeMaterial" required min="1" placeholder="Ex: 50" /></div><div class="form-group"><label for="especificacoes">Especificações / Descrição</label><textarea id="especificacoes" placeholder="Ex: Cimento Portland 50kg, Areia média, etc..." rows="3"></textarea></div><div class="form-group"><label>Grupos do material</label><small style="display:block;color:#6b7a99;margin:.25rem 0 .5rem;">Selecione um ou mais grupos para filtrar este material depois.</small><div id="materialGruposChecklist" class="material-group-checklist"></div></div><div class="form-group"><label for="fotoMaterial">Foto do Material</label><small class="camera-helper">A imagem será comprimida automaticamente. No celular, use <strong>Galeria</strong> para escolher uma imagem salva ou <strong>Câmera</strong> para tirar a foto na hora.</small><input type="file" id="fotoMaterial" accept="image/*" style="display:none;" /><input type="file" id="fotoMaterialCamera" accept="image/*" capture="environment" style="display:none;" /><div class="camera-actions"><button type="button" class="btn gallery-btn" onclick="document.getElementById('fotoMaterial').click()"><span class="camera-btn-icon">🖼️</span><span>Escolher da Galeria</span></button><button type="button" class="btn capture-btn" onclick="document.getElementById('fotoMaterialCamera').click()"><span class="camera-btn-icon">📷</span><span>Tirar Foto</span></button></div><div id="imagemPreview" class="image-preview image-preview-app" style="display: none;"><img id="imagemPreviewImg" src="" alt="Preview" /></div></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Material</button></div></form></div></div><!-- ── MODAL GRUPOS DE MATERIAIS ── --><div id="modalGruposMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalGrupos()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3>Grupos de Materiais</h3><p style="color:#6b7a99;">Crie grupos para organizar os materiais. Excluir um grupo remove apenas a classificação, não os materiais.</p><form id="formNovoGrupoMaterial" onsubmit="appMateriais.criarGrupoMaterial(event)"><div class="form-group"><label for="novoGrupoMaterial">Nome do grupo</label><input type="text" id="novoGrupoMaterial" maxlength="40" required placeholder="Ex.: Limpeza, Finalização, Segurança" /></div><div class="modal-buttons"><button type="submit" class="btn btn-success">Criar grupo</button></div></form><div id="listaGruposMateriais"></div></div></div><!-- ── MODAL RETIRADA DE MATERIAL ── --><div id="modalRetirada" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Rastreabilidade</span></div><h3>Registrar Retirada</h3><form id="formRetirada" onsubmit="appMateriais.salvarRetirada(event)"><input type="hidden" id="retiradaMaterialId" /><div class="form-group"><label for="retiradaMaterialNome">Material</label><input type="text" id="retiradaMaterialNome" readonly /></div><div class="form-group"><label for="retiradaQuantidade">Quantidade retirada *</label><input type="number" id="retiradaQuantidade" min="1" required /></div><div class="form-group"><label for="retiradaResponsavel">Quem retirou *</label><input type="text" id="retiradaResponsavel" required placeholder="Nome de quem retirou" /></div><div class="form-group"><label for="retiradaFuncao">Função</label><input type="text" id="retiradaFuncao" placeholder="Ex: Pedreiro, Encarregado" /></div><div class="form-group"><label for="retiradaSetor">Setor</label><input type="text" id="retiradaSetor" placeholder="Ex: Engenharia, Produção" /></div><div class="form-group"><label for="retiradaMotivo">Motivo da retirada *</label><textarea id="retiradaMotivo" rows="3" required placeholder="Descreva o motivo da retirada"></textarea></div><div class="form-group"><label for="retiradaObservacoes">Observações</label><textarea id="retiradaObservacoes" rows="2" placeholder="Opcional"></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Retirada</button></div></form></div></div><div id="room3dModal" class="room3d-modal"><div class="room3d-shell"><div class="room3d-topbar"><div><h3 id="room3dTitle">Apartamento virtual do pavimento</h3><p id="room3dSubtitle">Clique nas superfícies do ambiente para abrir o serviço correto.</p></div><button type="button" class="btn btn-secondary" onclick="floorRooms.close()">✕ Fechar</button></div><div class="room3d-content"><div class="room3d-stage"><div class="room3d-legend-bar"><span class="room3d-legend-pill">🏠 Apartamento visual</span><span class="room3d-legend-pill">🖱️ Parede, teto, chão e porta clicáveis</span></div><div class="room3d-scene"><div class="room3d-apartment"><div class="room3d-floor-base"></div><div class="room3d-floor-finish"></div><div class="room3d-floor-lines"></div><div class="room3d-wall-back"></div><div class="room3d-wall-left"></div><div class="room3d-wall-right"></div><div class="room3d-ceiling-panel"></div><div class="room3d-ceiling-detail"></div><div class="room3d-window w1"></div><div class="room3d-window w2"></div><div class="room3d-door-frame"><div class="room3d-door-leaf"></div></div><div class="room3d-rug"></div><div class="room3d-sofa"></div><div class="room3d-table"></div><div class="room3d-tv"></div><div class="room3d-plant"></div><div class="room3d-hotspots" id="room3dHotspots"></div></div></div></div><div class="room3d-side"><div class="room3d-summary"><div style="display:flex;justify-content:space-between;gap:.8rem;align-items:flex-start;"><div><strong style="display:block;color:var(--blue-dark);font-size:1rem;">Controle interno do apartamento</strong><div class="room3d-pav-note">Parede esquerda = gesso liso, parede direita = pintura, teto = forro, chão = contra piso e porta = instalação de porta.</div></div><span class="predio3d-badge" id="room3dOverallStatus">Sem dados</span></div><div class="room3d-summary-grid"><div class="room3d-summary-card"><div class="num" id="room3dSummaryDone">0</div><div>Concluídos</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryProgress">0</div><div>Em andamento</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryPhotos">0</div><div>Fotos</div></div></div></div><div id="room3dServices" class="room3d-services"></div></div></div></div></div><footer><div class="footer-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><em>Gestão com propósito e excelência</em></div></footer><!-- Firebase bridge -->
 <script type="module">
   import {
     salvarNaNuvem,
@@ -1138,8 +1193,13 @@
     escutarMudancasRTDiaDia,
     salvarSaldoNFNaNuvem,
     carregarSaldoNFDaNuvem,
-    escutarMudancasSaldoNF
-  } from "./firebase-controle-usuarios.js?v=1.0.16";
+    escutarMudancasSaldoNF,
+    salvarEntregasMateriaisNaNuvem,
+    carregarEntregasMateriaisDaNuvem,
+    escutarMudancasEntregasMateriais,
+    resolverImagemAnexoDaNuvem,
+    excluirImagemAnexoDaNuvem
+  } from "./firebase-controle-usuarios.js?v=1.0.17";
 
   window.__fb = {
     salvarNaNuvem,
@@ -1162,7 +1222,12 @@
     escutarMudancasRTDiaDia,
     salvarSaldoNFNaNuvem,
     carregarSaldoNFDaNuvem,
-    escutarMudancasSaldoNF
+    escutarMudancasSaldoNF,
+    salvarEntregasMateriaisNaNuvem,
+    carregarEntregasMateriaisDaNuvem,
+    escutarMudancasEntregasMateriais,
+    resolverImagemAnexoDaNuvem,
+    excluirImagemAnexoDaNuvem
   };
   window.dispatchEvent(new Event('firebase-ready'));
 </script>
@@ -1271,10 +1336,10 @@ const auth = {
     document.getElementById('currentUserRole').textContent = `Perfil: ${this.roleLabel(role)}`;
 
     const permitidas = {
-      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia'],
-      almoxarife: ['materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia'],
-      go: ['materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia'],
-      engenharia: ['materiais-obra','saldo-nf','relatorio','relatorio-dia']
+      admin: ['visao-geral','por-empresa','por-material','registros','materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia','entregas-materiais'],
+      almoxarife: ['materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia','entregas-materiais'],
+      go: ['materiais-obra','saldo-nf','rastreabilidade','relatorio','relatorio-dia','entregas-materiais'],
+      engenharia: ['materiais-obra','saldo-nf','relatorio','relatorio-dia','entregas-materiais']
     }[role] || ['relatorio-dia'];
 
     document.querySelectorAll('nav button').forEach((btn) => {
@@ -1311,6 +1376,7 @@ const auth = {
     this.aplicarPermissoes(window.currentUser);
     app.init();
     appMateriais.init();
+    appEntregasMateriais.init();
     appSaldoNF.init();
     appRT.init();
     appRT.carregarMateriais();
@@ -1320,8 +1386,8 @@ const auth = {
   pode(acao) {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
-      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia','gerenciar_grupos_materiais'],
-      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia'],
+      admin: ['editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
+      almoxarife: ['editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_predio_3d']
     };
@@ -2547,13 +2613,13 @@ const appMateriais = {
     if (!container) return;
     const chavesSelecionadas = new Set(this.normalizarGruposMateriais(selecionados).map(grupo => this.normalizarChaveGrupo(grupo)));
     if (!this.gruposMateriais.length) {
-      container.innerHTML = '<span style="color:#6b7a99;">Nenhum grupo cadastrado. O administrador pode criá-los na tela de materiais.</span>';
+      container.innerHTML = '<span style="color:#6b7a99;">Nenhum grupo cadastrado. Admin ou Almoxarife pode criá-los na tela de materiais.</span>';
       return;
     }
     container.innerHTML = this.gruposMateriais.map(grupo => {
       const marcado = chavesSelecionadas.has(this.normalizarChaveGrupo(grupo)) ? 'checked' : '';
       const seguro = this.escaparHTML(grupo);
-      return `<label style="display:flex;align-items:center;gap:.5rem;padding:.3rem 0;"><input type="checkbox" name="gruposMaterial" value="${seguro}" ${marcado} /><span>${seguro}</span></label>`;
+      return `<label class="material-group-option"><input class="material-group-checkbox" type="checkbox" name="gruposMaterial" value="${seguro}" ${marcado} /><span>${seguro}</span></label>`;
     }).join('');
   },
 
@@ -2575,7 +2641,7 @@ const appMateriais = {
 
   abrirModalGrupos() {
     if (!auth.pode('gerenciar_grupos_materiais')) {
-      app.mostrarAlerta('Somente o perfil admin pode criar ou excluir grupos.', 'error');
+      app.mostrarAlerta('Somente Admin e Almoxarife podem criar ou excluir grupos.', 'error');
       return;
     }
     this.renderizarListaGruposMateriais();
@@ -2592,7 +2658,7 @@ const appMateriais = {
   async criarGrupoMaterial(event) {
     event.preventDefault();
     if (!auth.pode('gerenciar_grupos_materiais')) {
-      app.mostrarAlerta('Somente o perfil admin pode criar grupos.', 'error');
+      app.mostrarAlerta('Somente Admin e Almoxarife podem criar grupos.', 'error');
       return;
     }
     const input = document.getElementById('novoGrupoMaterial');
@@ -2617,7 +2683,7 @@ const appMateriais = {
 
   async excluirGrupoMaterial(indice) {
     if (!auth.pode('gerenciar_grupos_materiais')) {
-      app.mostrarAlerta('Somente o perfil admin pode excluir grupos.', 'error');
+      app.mostrarAlerta('Somente Admin e Almoxarife podem excluir grupos.', 'error');
       return;
     }
     const grupo = this.gruposMateriais[indice];
@@ -3158,7 +3224,8 @@ const appMateriais = {
     const podeEditar = auth.pode('editar_materiais');
     const podeRetirar = auth.pode('registrar_retirada');
 
-    container.innerHTML = materiais.map(m => {
+    const materiaisOrdenados = [...materiais].sort((a,b) => String(a?.nome || '').localeCompare(String(b?.nome || ''), 'pt-BR', { sensitivity: 'base', numeric: true }));
+    container.innerHTML = materiaisOrdenados.map(m => {
       const dataFormatada = new Date(m.dataAtualizacao).toLocaleDateString('pt-BR');
       const horaFormatada = new Date(m.dataAtualizacao).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
       const ultimaMov = this.movimentacoes.filter(x => x.materialId === m.id).sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora))[0];
@@ -3555,6 +3622,324 @@ movimentacoes: movimentacoesOrdenadas
 
 
 
+// ── CONTROLE DE ENTREGAS / EMPRÉSTIMOS DE MATERIAIS ──
+const appEntregasMateriais = {
+  STORAGE_KEY: 'controle_entregas_materiais_v1',
+  PENDING_KEY: 'controle_entregas_materiais_pendente_v1',
+  registros: [],
+  itensFormulario: [],
+  editandoId: null,
+  assinaturaReferencia: null,
+  assinaturaDataUrl: null,
+  temAssinatura: false,
+  _unsub: null,
+  _isSaving: false,
+  _pendente: false,
+  _initialized: false,
+  _imageCache: new Map(),
+  podeModificar() { return auth.pode('gerenciar_entregas_materiais'); },
+  gerarId(prefixo='registro') {
+    const aleatorio = window.crypto?.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).slice(2, 11);
+    return `${prefixo}_${Date.now()}_${aleatorio}`;
+  },
+  dataHoje() {
+    const d = new Date();
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  },
+  formatarData(valor) {
+    const s = String(valor || '').split('T')[0];
+    const partes = s.split('-');
+    return partes.length === 3 ? `${partes[2]}/${partes[1]}/${partes[0]}` : s;
+  },
+  escaparHTML(valor) {
+    return String(valor ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  },
+  novoItem() { return { id: this.gerarId('item'), nome: '', especificacoes: '', dataAlocacao: this.dataHoje(), imagem: null }; },
+  init() {
+    if (this._initialized) return;
+    this._initialized = true;
+    this.configurarAssinatura();
+    const upload = document.getElementById('entregaAssinaturaUpload');
+    if (upload) upload.addEventListener('change', e => this.processarAssinatura(e));
+    this.carregar().then(() => {
+      this.atualizarSugestoesMateriais();
+      this.renderizar();
+      this.iniciarSyncAoVivo();
+      if (this._pendente) this.sincronizarPendente();
+    });
+    if (!this._onlineHandler) {
+      this._onlineHandler = () => this.sincronizarPendente();
+      window.addEventListener('online', this._onlineHandler);
+    }
+  },
+  carregarLocal() {
+    try {
+      const raw = localStorage.getItem(this.STORAGE_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) { console.warn('Não foi possível ler entregas locais:', e); return []; }
+  },
+  salvarLocal() {
+    try {
+      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.registros));
+      localStorage.setItem(this.PENDING_KEY, this._pendente ? '1' : '0');
+      return true;
+    } catch (e) {
+      console.error('Não foi possível salvar entregas neste aparelho:', e);
+      return false;
+    }
+  },
+  async carregar() {
+    const locais = this.carregarLocal();
+    this._pendente = localStorage.getItem(this.PENDING_KEY) === '1';
+    try {
+      const cloud = await window.__fb?.carregarEntregasMateriaisDaNuvem?.();
+      if (Array.isArray(cloud) && !this._pendente) {
+        this.registros = cloud;
+        this.salvarLocal();
+        return;
+      }
+      if (Array.isArray(locais)) this.registros = locais;
+      if (this.registros.length && (this._pendente || !Array.isArray(cloud))) this._pendente = true;
+      this.salvarLocal();
+    } catch (e) {
+      this.registros = Array.isArray(locais) ? locais : [];
+      if (this.registros.length) this._pendente = true;
+      this.salvarLocal();
+      console.warn('Entregas mantidas no aparelho; não foi possível carregar a nuvem:', e);
+    }
+  },
+  iniciarSyncAoVivo() {
+    if (!window.__fb?.escutarMudancasEntregasMateriais) return;
+    try {
+      if (this._unsub) this._unsub();
+      this._unsub = window.__fb.escutarMudancasEntregasMateriais(registros => {
+        if (this._isSaving || this._pendente || !Array.isArray(registros)) return;
+        this.registros = registros;
+        this.salvarLocal();
+        this.renderizar();
+      });
+    } catch (e) { console.warn('Sincronização ao vivo das entregas indisponível:', e); }
+  },
+  async sincronizarPendente() {
+    if (!this._pendente || this._isSaving || !navigator.onLine || !window.__fb?.salvarEntregasMateriaisNaNuvem) return;
+    this._isSaving = true;
+    try {
+      const salvos = await window.__fb.salvarEntregasMateriaisNaNuvem(this.registros);
+      this.registros = Array.isArray(salvos) ? salvos : this.registros;
+      this._pendente = false;
+      this.salvarLocal();
+      this.renderizar();
+    } catch (e) { console.warn('Não foi possível sincronizar entregas pendentes:', e); }
+    finally { this._isSaving = false; }
+  },
+  atualizarSugestoesMateriais() {
+    const lista = document.getElementById('entregaMateriaisSugestoes');
+    if (!lista) return;
+    const nomes = (window.appMateriais?.materiais || []).map(m => String(m?.nome || '').trim()).filter(Boolean);
+    lista.innerHTML = [...new Set(nomes)].sort((a,b) => a.localeCompare(b,'pt-BR',{sensitivity:'base'})).map(n => `<option value="${this.escaparHTML(n)}"></option>`).join('');
+  },
+  async resolverImagem(ref) {
+    if (!ref || typeof ref !== 'string') return null;
+    if (ref.startsWith('data:image/')) return ref;
+    if (this._imageCache.has(ref)) return this._imageCache.get(ref);
+    try {
+      const data = await window.__fb?.resolverImagemAnexoDaNuvem?.(ref);
+      if (data) this._imageCache.set(ref, data);
+      return data || null;
+    } catch (e) { console.warn('Imagem de entrega não carregou:', e); return null; }
+  },
+  configurarAssinatura() {
+    const canvas = document.getElementById('entregaAssinaturaCanvas');
+    if (!canvas || canvas.dataset.bound) return;
+    canvas.dataset.bound = '1';
+    const ctx = canvas.getContext('2d');
+    const limparCanvas = () => { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height); };
+    limparCanvas();
+    ctx.strokeStyle = '#153b67'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    const ponto = e => { const r = canvas.getBoundingClientRect(); return { x:(e.clientX-r.left)*canvas.width/r.width, y:(e.clientY-r.top)*canvas.height/r.height }; };
+    canvas.addEventListener('pointerdown', e => {
+      if (!this.podeModificar()) return;
+      e.preventDefault(); this.drawing = true; this.assinaturaReferencia = null; this.assinaturaDataUrl = null; this.temAssinatura = true;
+      canvas.setPointerCapture?.(e.pointerId); const p = ponto(e); ctx.beginPath(); ctx.arc(p.x,p.y,1.7,0,Math.PI*2); ctx.fillStyle='#153b67'; ctx.fill(); ctx.beginPath(); ctx.moveTo(p.x,p.y);
+      const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent='Assinatura desenhada. Você pode limpar e refazer se precisar.';
+    });
+    canvas.addEventListener('pointermove', e => { if (!this.drawing) return; e.preventDefault(); const p=ponto(e); ctx.lineTo(p.x,p.y); ctx.stroke(); });
+    const parar = () => { this.drawing = false; };
+    canvas.addEventListener('pointerup', parar); canvas.addEventListener('pointercancel', parar); canvas.addEventListener('lostpointercapture', parar);
+  },
+  desenharImagemAssinatura(src) {
+    const canvas=document.getElementById('entregaAssinaturaCanvas'); if(!canvas || !src) return;
+    const img=new Image(); img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);const scale=Math.min((canvas.width-24)/img.width,(canvas.height-24)/img.height);const w=img.width*scale,h=img.height*scale;ctx.drawImage(img,(canvas.width-w)/2,(canvas.height-h)/2,w,h);}; img.src=src;
+  },
+  async processarAssinatura(event) {
+    const input=event.target, file=input.files?.[0]; if(!file) return;
+    if(!this.podeModificar()){input.value='';return;}
+    try {
+      const data=await appMateriais.comprimirImagem(file);
+      this.assinaturaReferencia=null; this.assinaturaDataUrl=data; this.temAssinatura=true;
+      this.desenharImagemAssinatura(data);
+      const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent='Imagem da assinatura carregada.';
+    } catch(e) { console.error(e); app.mostrarAlerta('Não foi possível carregar a imagem da assinatura.','error'); }
+    input.value='';
+  },
+  limparAssinatura(silencioso=false) {
+    if(!silencioso && !this.podeModificar()) return;
+    const canvas=document.getElementById('entregaAssinaturaCanvas');
+    if(canvas){const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}
+    this.assinaturaReferencia=null; this.assinaturaDataUrl=null; this.temAssinatura=false;
+    const upload=document.getElementById('entregaAssinaturaUpload'); if(upload) upload.value='';
+    const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent='Desenhe com o dedo ou mouse, ou envie uma imagem da assinatura.';
+  },
+  async carregarAssinaturaExistente(ref) {
+    if(!ref) return;
+    const src=await this.resolverImagem(ref);
+    if(src) this.desenharImagemAssinatura(src);
+  },
+  abrirFormulario() {
+    if(!this.podeModificar()) return app.mostrarAlerta('Somente Admin e Almoxarife podem criar entregas.','error');
+    this.editandoId=null; this.itensFormulario=[this.novoItem()]; this.limparAssinatura(true);
+    document.getElementById('formEntregaMaterial')?.reset();
+    document.getElementById('entregaData').value=this.dataHoje();
+    document.getElementById('entregaFormTitulo').textContent='Nova entrega';
+    document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar entrega';
+    document.getElementById('entregaFormCard').style.display='block';
+    this.renderizarItensFormulario(); this.atualizarSugestoesMateriais();
+    document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+  },
+  fecharFormulario() {
+    const card=document.getElementById('entregaFormCard'); if(card) card.style.display='none';
+    this.editandoId=null;
+  },
+  adicionarItem() { if(!this.podeModificar()) return; this.itensFormulario.push(this.novoItem()); this.renderizarItensFormulario(); },
+  removerItem(indice) {
+    if(!this.podeModificar()) return;
+    if(this.itensFormulario.length<=1) return app.mostrarAlerta('A entrega precisa ter pelo menos um material.','warning');
+    this.itensFormulario.splice(indice,1); this.renderizarItensFormulario();
+  },
+  atualizarItem(indice,campo,valor) { if(!this.podeModificar()) return; if(this.itensFormulario[indice]) this.itensFormulario[indice][campo]=valor; },
+  renderizarItensFormulario() {
+    const cont=document.getElementById('entregaItensForm'); if(!cont) return;
+    cont.innerHTML=this.itensFormulario.map((item,i)=>{
+      const foto=String(item.imagem||''); const direto=foto.startsWith('data:image/');
+      return `<div class="delivery-item-card"><div class="delivery-item-head"><strong>Material ${i+1}</strong><button type="button" class="delete-btn" onclick="appEntregasMateriais.removerItem(${i})">Remover</button></div>
+      <div class="delivery-form-grid"><div class="form-group"><label>Nome do material</label><input type="text" list="entregaMateriaisSugestoes" maxlength="160" required value="${this.escaparHTML(item.nome)}" oninput="appEntregasMateriais.atualizarItem(${i},'nome',this.value)" /></div>
+      <div class="form-group"><label>Data de alocação</label><input type="date" required value="${this.escaparHTML(item.dataAlocacao||this.dataHoje())}" oninput="appEntregasMateriais.atualizarItem(${i},'dataAlocacao',this.value)" /></div>
+      <div class="form-group" style="grid-column:1/-1"><label>Especificações</label><textarea rows="2" maxlength="500" placeholder="Especificações do material" oninput="appEntregasMateriais.atualizarItem(${i},'especificacoes',this.value)">${this.escaparHTML(item.especificacoes)}</textarea></div></div>
+      <div class="form-group"><label>Imagem do material (opcional)</label><div class="delivery-photo-actions"><input id="entregaFotoGaleria_${i}" type="file" accept="image/*" style="display:none" onchange="appEntregasMateriais.processarImagemMaterial(event,${i})" /><input id="entregaFotoCamera_${i}" type="file" accept="image/*" capture="environment" style="display:none" onchange="appEntregasMateriais.processarImagemMaterial(event,${i})" /><button type="button" class="btn btn-secondary" onclick="document.getElementById('entregaFotoGaleria_${i}').click()">🖼️ Escolher imagem</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('entregaFotoCamera_${i}').click()">📷 Tirar foto</button>${item.imagem?`<button type="button" class="btn btn-warning" onclick="appEntregasMateriais.removerImagemMaterial(${i})">Remover imagem</button>`:''}</div>
+      <img class="delivery-photo-preview" data-entrega-editor-img="${i}" alt="Prévia do material ${i+1}" src="${direto?foto:''}" style="${item.imagem?'':'display:none'}" /></div></div>`;
+    }).join('');
+    this.carregarImagensEditor();
+  },
+  async carregarImagensEditor() {
+    const cont=document.getElementById('entregaItensForm'); if(!cont) return;
+    for(const img of cont.querySelectorAll('[data-entrega-editor-img]')){
+      const i=Number(img.dataset.entregaEditorImg); const ref=this.itensFormulario[i]?.imagem; if(!ref) continue;
+      const src=await this.resolverImagem(ref); if(src){img.src=src;img.style.display='block';}
+    }
+  },
+  async processarImagemMaterial(event,indice) {
+    const input=event.target,file=input.files?.[0]; if(!file) return; if(!this.podeModificar()){input.value='';return;}
+    try { const data=await appMateriais.comprimirImagem(file); if(this.itensFormulario[indice]) this.itensFormulario[indice].imagem=data; input.value=''; this.renderizarItensFormulario(); }
+    catch(e){console.error(e);app.mostrarAlerta('Não foi possível carregar a imagem do material.','error');input.value='';}
+  },
+  removerImagemMaterial(indice) { if(this.itensFormulario[indice]){this.itensFormulario[indice].imagem=null;this.renderizarItensFormulario();} },
+  async editar(id) {
+    if(!this.podeModificar()) return app.mostrarAlerta('Apenas Admin e Almoxarife podem editar entregas.','error');
+    const r=this.registros.find(x=>String(x.id)===String(id)); if(!r) return;
+    this.editandoId=r.id; this.itensFormulario=(Array.isArray(r.itens)?r.itens:[]).map(x=>({...x})); if(!this.itensFormulario.length) this.itensFormulario=[this.novoItem()];
+    this.assinaturaReferencia=r.assinatura||null; this.assinaturaDataUrl=null; this.temAssinatura=Boolean(r.assinatura); this.limparCanvasSemEstado();
+    document.getElementById('formEntregaMaterial').reset();
+    document.getElementById('entregaNome').value=r.nome||''; document.getElementById('entregaEmpresa').value=r.empresa||''; document.getElementById('entregaData').value=r.data||this.dataHoje();
+    document.getElementById('entregaFormTitulo').textContent='Editar entrega'; document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar alterações';
+    document.getElementById('entregaFormCard').style.display='block'; this.renderizarItensFormulario();
+    const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent=r.assinatura?'Assinatura atual carregada; desenhe sobre ela, envie outra ou limpe para substituir.':'Desenhe ou envie a assinatura.';
+    await this.carregarAssinaturaExistente(r.assinatura);
+    document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+  },
+  limparCanvasSemEstado() {
+    const c=document.getElementById('entregaAssinaturaCanvas'); if(c){const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);}
+  },
+  assinaturaAtual() {
+    if(this.assinaturaDataUrl) return this.assinaturaDataUrl;
+    if(this.assinaturaReferencia) return this.assinaturaReferencia;
+    if(!this.temAssinatura) return null;
+    const c=document.getElementById('entregaAssinaturaCanvas'); return c ? c.toDataURL('image/jpeg',0.86) : null;
+  },
+  async salvar(event) {
+    event.preventDefault();
+    if(!this.podeModificar()) return app.mostrarAlerta('Somente Admin e Almoxarife podem alterar entregas.','error');
+    const nome=document.getElementById('entregaNome').value.trim();
+    const empresa=document.getElementById('entregaEmpresa').value.trim();
+    const data=document.getElementById('entregaData').value;
+    const itens=this.itensFormulario.map(item=>({...item,nome:String(item.nome||'').trim(),especificacoes:String(item.especificacoes||'').trim(),dataAlocacao:String(item.dataAlocacao||'')}));
+    if(!nome||!empresa||!data) return app.mostrarAlerta('Preencha Nome, Empresa e Data.','warning');
+    if(!itens.length||itens.some(item=>!item.nome||!item.dataAlocacao)) return app.mostrarAlerta('Informe o nome e a data de alocação de cada material.','warning');
+    const assinatura=this.assinaturaAtual();
+    if(!assinatura) return app.mostrarAlerta('Desenhe ou envie a assinatura antes de salvar.','warning');
+    const id=this.editandoId||this.gerarId('entrega');
+    const anterior=this.registros.find(x=>String(x.id)===String(id));
+    const registro={id,nome,empresa,data,assinatura,itens,criadoPor:anterior?.criadoPor||window.currentUser?.username||'',criadoEm:anterior?.criadoEm||new Date().toISOString(),atualizadoEm:new Date().toISOString()};
+    const proxima=[registro,...this.registros.filter(x=>String(x.id)!==String(id))];
+    this.registros=proxima; this._pendente=true; const localOk=this.salvarLocal();
+    this._isSaving=true;
+    let sincronizado=false;
+    try {
+      if(!window.__fb?.salvarEntregasMateriaisNaNuvem) throw new Error('Firebase indisponível');
+      const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(proxima);
+      this.registros=Array.isArray(salvos)?salvos:proxima; this._pendente=false; this.salvarLocal(); sincronizado=true;
+    } catch(e) { console.error('Entrega salva localmente, mas não sincronizou:',e); this._pendente=true; this.salvarLocal(); }
+    finally { this._isSaving=false; }
+    this.fecharFormulario(); this.renderizar();
+    if(sincronizado) app.mostrarAlerta('Entrega salva e sincronizada com site e aplicativo.','success');
+    else app.mostrarAlerta(localOk?'Entrega salva neste aparelho; a nuvem não confirmou. Verifique a conexão e tente atualizar.':'A entrega ficou aberta nesta sessão, mas o armazenamento local não confirmou.','warning');
+  },
+  async excluir(id) {
+    if(!this.podeModificar()) return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir entregas.','error');
+    const r=this.registros.find(x=>String(x.id)===String(id)); if(!r) return;
+    if(!window.confirm(`Excluir a entrega de ${r.nome||'este registro'}?`)) return;
+    const proxima=this.registros.filter(x=>String(x.id)!==String(id)); this.registros=proxima; this._pendente=true; this.salvarLocal(); this._isSaving=true;
+    let sincronizado=false;
+    try {
+      const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(proxima); this.registros=Array.isArray(salvos)?salvos:proxima; this._pendente=false; this.salvarLocal(); sincronizado=true;
+    } catch(e) { console.error('Não foi possível sincronizar a exclusão:',e); this._pendente=true; this.salvarLocal(); }
+    finally { this._isSaving=false; }
+    if(sincronizado){
+      const refs=[r.assinatura,...(r.itens||[]).map(i=>i.imagem)].filter(Boolean);
+      for(const ref of refs){try{await window.__fb?.excluirImagemAnexoDaNuvem?.(ref);}catch(e){console.warn('A imagem removida ficou órfã no Firestore:',e);}}
+    }
+    this.renderizar(); app.mostrarAlerta(sincronizado?'Entrega excluída.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
+  },
+  renderizar() {
+    const lista=document.getElementById('entregasMateriaisLista'); if(!lista) return;
+    const pode=this.podeModificar();
+    const botao=document.getElementById('btnNovaEntregaMaterial'); if(botao) botao.style.display=pode?'inline-flex':'none';
+    const info=document.getElementById('entregaPermissaoInfo'); if(info) info.style.display=pode?'none':'block';
+    this.atualizarSugestoesMateriais();
+    const q=String(document.getElementById('buscarEntregaMaterial')?.value||'').trim().toLocaleLowerCase('pt-BR');
+    const registros=[...this.registros].filter(r=>!q||[r.nome,r.empresa,...(Array.isArray(r.itens)?r.itens:[]).flatMap(i=>[i.nome,i.especificacoes])].join(' ').toLocaleLowerCase('pt-BR').includes(q));
+    registros.sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))||String(b.criadoEm||'').localeCompare(String(a.criadoEm||'')));
+    if(!registros.length){lista.innerHTML=`<p style="color:#64748b;text-align:center;padding:1.5rem">${this.registros.length?'Nenhuma entrega corresponde à busca.':'Nenhuma entrega cadastrada ainda.'}</p>`;return;}
+    lista.innerHTML=registros.map(r=>{
+      const id=this.escaparHTML(r.id); const itens=Array.isArray(r.itens)?r.itens:[];
+      const itensHTML=itens.map((item,i)=>`<div class="delivery-item-row"><div><strong>${this.escaparHTML(item.nome)}</strong>${item.especificacoes?`<small>Especificações: ${this.escaparHTML(item.especificacoes)}</small>`:''}<small>Alocado em: ${this.formatarData(item.dataAlocacao)}</small></div>${item.imagem?`<img class="delivery-record-photo" data-entrega-record="${id}" data-entrega-item="${this.escaparHTML(item.id)}" alt="Foto de ${this.escaparHTML(item.nome)}" />`:''}</div>`).join('');
+      const assinatura=r.assinatura?`<div class="delivery-record-signature"><span>Assinatura:</span><img data-entrega-signature="${id}" alt="Assinatura de ${this.escaparHTML(r.nome)}" /></div>`:'';
+      const acoes=pode?`<div class="delivery-record-actions"><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.editar('${id}')">✏️ Editar</button><button type="button" class="delete-btn" onclick="appEntregasMateriais.excluir('${id}')">Excluir</button></div>`:'';
+      return `<article class="delivery-record"><div class="delivery-record-head"><div><h3>${this.escaparHTML(r.nome)}</h3><p>${this.escaparHTML(r.empresa)}</p></div><strong>Data: ${this.formatarData(r.data)}</strong></div><div>${itensHTML||'<small>Sem itens cadastrados.</small>'}</div>${assinatura}${acoes}</article>`;
+    }).join('');
+    this.carregarImagensLista();
+  },
+  async carregarImagensLista() {
+    const lista=document.getElementById('entregasMateriaisLista'); if(!lista) return;
+    for(const img of lista.querySelectorAll('[data-entrega-record]')){
+      const r=this.registros.find(x=>String(x.id)===img.dataset.entregaRecord); const item=r?.itens?.find(x=>String(x.id)===img.dataset.entregaItem); const src=await this.resolverImagem(item?.imagem); if(src) img.src=src; else img.style.display='none';
+    }
+    for(const img of lista.querySelectorAll('[data-entrega-signature]')){
+      const r=this.registros.find(x=>String(x.id)===img.dataset.entregaSignature); const src=await this.resolverImagem(r?.assinatura); if(src) img.src=src; else img.style.display='none';
+    }
+  },
+  atualizar() { this.renderizar(); if(this._pendente) this.sincronizarPendente(); }
+};
+
 const appSaldoNF = {
 STORAGE_KEY: 'controle_saldo_nf_v1',
 dados: { materiais: [], nfs: [] },
@@ -3761,6 +4146,9 @@ if(tbody) tbody.innerHTML=lista.length?lista.map(m=>{ const usado=this.percentua
 const nfs=[...this.dados.nfs].sort((a,b)=>(b.data||'').localeCompare(a.data||''));
 const tbodyN=document.getElementById('saldoTabelaNFs');
 if(tbodyN) tbodyN.innerHTML=nfs.length?nfs.map(n=>{ const m=this.dados.materiais.find(x=>String(x.id)===String(n.materialId)); return `<tr><td data-label="Data">${n.data?new Date(n.data+'T12:00:00').toLocaleDateString('pt-BR'):'-'}</td><td data-label="NF"><strong>${this.esc(n.numero)}</strong></td><td data-label="Fornecedor">${this.esc(n.fornecedor||'-')}</td><td data-label="Material">${this.esc(m?.nome||'Material excluído')}</td><td data-label="Qtd.">${this.num(n.quantidade)} ${this.esc(m?.unidade||'')}</td><td data-label="Valor">${n.valor?this.moeda(n.valor):'-'}</td><td data-label="Obs.">${this.esc(n.obs||'-')}</td><td data-label="Ações"><div class="saldo-actions"><button class="btn btn-secondary" onclick="appSaldoNF.abrirModalNF(${n.id})">Editar</button><button class="btn btn-danger" onclick="appSaldoNF.excluirNF(${n.id})">Excluir</button></div></td></tr>`}).join(''):'<tr><td colspan="8">Nenhuma NF lançada.</td></tr>';
+const somenteConsulta = this.somenteLeitura();
+document.querySelectorAll('#saldo-nf .saldo-actions button').forEach(button => { button.hidden = somenteConsulta; });
+document.querySelectorAll('#saldo-nf .btn-group > button[onclick^="appSaldoNF.abrirModalMaterial"], #saldo-nf .btn-group > button[onclick^="appSaldoNF.abrirModalNF"]').forEach(button => { button.hidden = somenteConsulta; });
 },
 
 exportarCSV(){
@@ -4666,6 +5054,7 @@ window.__appInicializada = true;
 window.auth = auth;
 window.app = app;
 window.appMateriais = appMateriais;
+window.appEntregasMateriais = appEntregasMateriais;
 window.appSaldoNF = appSaldoNF;
 window.appRT = appRT;
 window.floorRooms = floorRooms;
@@ -4731,7 +5120,7 @@ desktopNav.style.display = 'none';
 atualizarBotaoMobile();
 }
 window.addEventListener('resize', handleMediaChange);
-</script><!-- ── MENU HAMBÚRGUER (Mobile) ── --><button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button><!-- ── MOBILE MENU ── --><nav class="mobile-menu" id="mobileMenu"><div class="mobile-menu-brand"><div class="mobile-menu-brand-mark">📦</div><div><strong>Controle de Materiais</strong><small>Plano & Plano</small></div><button class="mobile-menu-close" type="button" onclick="closeMobileMenu()" aria-label="Fechar menu">×</button></div><div class="mobile-menu-primary"><button class="mobile-nav-button mobile-nav-home" data-section="visao-geral" onclick="app.showSection('visao-geral', this); closeMobileMenu()"><span>⌂</span> Início</button><button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()"><span>🏗️</span> Controle de Materiais</button><button class="mobile-nav-button" data-section="saldo-nf" onclick="app.showSection('saldo-nf', this); closeMobileMenu()"><span>🧾</span> Saldo por NF</button></div><details class="mobile-menu-group"><summary><span>📦</span> Romaneios <b>＋</b></summary><div class="mobile-menu-group-items"><button class="mobile-nav-button" data-section="por-empresa" onclick="app.showSection('por-empresa', this); closeMobileMenu()">Por Empresa</button><button class="mobile-nav-button" data-section="por-material" onclick="app.showSection('por-material', this); closeMobileMenu()">Por Material</button><button class="mobile-nav-button" data-section="registros" onclick="app.showSection('registros', this); closeMobileMenu()">Gerenciar Registros</button><button class="mobile-nav-button" data-section="relatorio" onclick="app.showSection('relatorio', this); closeMobileMenu()">Relatório Visual</button></div></details><details class="mobile-menu-group"><summary><span>📊</span> Rastreabilidade e relatórios <b>＋</b></summary><div class="mobile-menu-group-items"><button class="mobile-nav-button" data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this); closeMobileMenu()">Rastreabilidade</button><button class="mobile-nav-button" data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this); closeMobileMenu()">Relatório do Dia</button></div></details><div class="mobile-menu-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><em>Gestão com propósito e excelência</em></div></nav><div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
+</script><!-- ── MENU HAMBÚRGUER (Mobile) ── --><button class="menu-toggle" id="menuToggle" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button><!-- ── MOBILE MENU ── --><nav class="mobile-menu" id="mobileMenu"><div class="mobile-menu-brand"><div class="mobile-menu-brand-mark">📦</div><div><strong>Controle de Materiais</strong><small>Plano & Plano</small></div><button class="mobile-menu-close" type="button" onclick="closeMobileMenu()" aria-label="Fechar menu">×</button></div><div class="mobile-menu-primary"><button class="mobile-nav-button mobile-nav-home" data-section="visao-geral" onclick="app.showSection('visao-geral', this); closeMobileMenu()"><span>⌂</span> Início</button><button class="mobile-nav-button" data-section="materiais-obra" onclick="app.showSection('materiais-obra', this); closeMobileMenu()"><span>🏗️</span> Controle de Materiais</button><button class="mobile-nav-button" data-section="entregas-materiais" onclick="app.showSection('entregas-materiais', this); closeMobileMenu()"><span>📝</span> Controle de Entregas</button><button class="mobile-nav-button" data-section="saldo-nf" onclick="app.showSection('saldo-nf', this); closeMobileMenu()"><span>🧾</span> Saldo por NF</button></div><details class="mobile-menu-group"><summary><span>📦</span> Romaneios <b>＋</b></summary><div class="mobile-menu-group-items"><button class="mobile-nav-button" data-section="por-empresa" onclick="app.showSection('por-empresa', this); closeMobileMenu()">Por Empresa</button><button class="mobile-nav-button" data-section="por-material" onclick="app.showSection('por-material', this); closeMobileMenu()">Por Material</button><button class="mobile-nav-button" data-section="registros" onclick="app.showSection('registros', this); closeMobileMenu()">Gerenciar Registros</button><button class="mobile-nav-button" data-section="relatorio" onclick="app.showSection('relatorio', this); closeMobileMenu()">Relatório Visual</button></div></details><details class="mobile-menu-group"><summary><span>📊</span> Rastreabilidade e relatórios <b>＋</b></summary><div class="mobile-menu-group-items"><button class="mobile-nav-button" data-section="rastreabilidade" onclick="app.showSection('rastreabilidade', this); closeMobileMenu()">Rastreabilidade</button><button class="mobile-nav-button" data-section="relatorio-dia" onclick="app.showSection('relatorio-dia', this); closeMobileMenu()">Relatório do Dia</button></div></details><div class="mobile-menu-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><em>Gestão com propósito e excelência</em></div></nav><div class="mobile-menu-overlay" onclick="closeMobileMenu()"></div>
 <script>handleMediaChange();</script>
 
 </body></html>
