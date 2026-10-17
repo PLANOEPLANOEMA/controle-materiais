@@ -1227,7 +1227,7 @@
     escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
-  } from "./firebase-controle-usuarios.js?v=1.0.21";
+  } from "./firebase-controle-usuarios.js?v=1.0.22";
 
   window.__fb = {
     salvarNaNuvem,
@@ -3678,6 +3678,26 @@ const appEntregasMateriais = {
   _initialized: false,
   _imageCache: new Map(),
   podeModificar() { return auth.pode('gerenciar_entregas_materiais'); },
+  equipamentoEmUsoPorOutroRegistro(equipamentoId,nomeEquipamento='',registroIdExcluir=null) {
+    const id=String(equipamentoId||'');
+    const nome=String(nomeEquipamento||'').trim().toLocaleLowerCase('pt-BR');
+    return this.registros.some(registro=>{
+      if(registroIdExcluir!==null&&registroIdExcluir!==undefined&&String(registro.id)===String(registroIdExcluir))return false;
+      return (Array.isArray(registro.itens)?registro.itens:[]).some(item=>{
+        if(item.status==='Concluído')return false;
+        const mesmoId=Boolean(id&&item.equipamentoId&&String(item.equipamentoId)===id);
+        const legadoSemId=!item.equipamentoId&&nome&&String(item.nome||'').trim().toLocaleLowerCase('pt-BR')===nome;
+        return mesmoId||legadoSemId;
+      });
+    });
+  },
+  solicitarSenhaAdmin(acao) {
+    const senha=window.prompt(`Digite a senha de Administrador para ${acao}:`);
+    if(senha===null)return false;
+    const senhaAdmin=auth.USUARIOS?.admin?.senha;
+    if(!senhaAdmin||String(senha).trim()!==senhaAdmin){app.mostrarAlerta('Senha incorreta. Ação cancelada.','error');return false;}
+    return true;
+  },
   gerarId(prefixo='registro') {
     const aleatorio = window.crypto?.randomUUID ? window.crypto.randomUUID() : Math.random().toString(36).slice(2, 11);
     return `${prefixo}_${Date.now()}_${aleatorio}`;
@@ -3748,13 +3768,25 @@ const appEntregasMateriais = {
   removerItem(indice) { if(!this.podeModificar())return;if(this.itensFormulario.length<=1)return app.mostrarAlerta('A entrega precisa ter pelo menos um equipamento.','warning');this.itensFormulario.splice(indice,1);this.renderizarItensFormulario(); },
   atualizarItem(indice,campo,valor) { if(!this.podeModificar())return;if(this.itensFormulario[indice])this.itensFormulario[indice][campo]=valor; },
   selecionarEquipamento(indice,id) {
-    if(!this.podeModificar())return;const eq=(window.appEquipamentosLocacao?.equipamentos||[]).find(x=>String(x.id)===String(id));if(!eq)return;const item=this.itensFormulario[indice];if(!item)return;
+    if(!this.podeModificar())return;
+    const eq=(window.appEquipamentosLocacao?.equipamentos||[]).find(x=>String(x.id)===String(id));if(!eq)return;
+    const item=this.itensFormulario[indice];if(!item)return;
+    const emUso=item.status!=='Concluído'&&this.equipamentoEmUsoPorOutroRegistro(eq.id,eq.nome,this.editandoId);
+    const repetido=this.itensFormulario.some((outro,j)=>j!==indice&&String(outro.equipamentoId)===String(eq.id));
+    if(emUso||repetido){app.mostrarAlerta(emUso?'Este equipamento já está Em uso. Registre a baixa/devolução antes de fazer outra entrega.':'Este equipamento já foi incluído nesta entrega.','warning');this.renderizarItensFormulario();return;}
     Object.assign(item,{equipamentoId:eq.id,nome:eq.nome,empresaLocacao:eq.empresaLocacao||'',dataLocacao:eq.dataLocacao||'',especificacoes:eq.especificacoes||'',imagem:eq.imagem||null});this.renderizarItensFormulario();
   },
   renderizarItensFormulario() {
     const cont=document.getElementById('entregaItensForm');if(!cont)return;const equipamentos=[...(window.appEquipamentosLocacao?.equipamentos||[])].sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base'}));
     cont.innerHTML=this.itensFormulario.map((item,i)=>{
-      const atual=equipamentos.find(eq=>String(eq.id)===String(item.equipamentoId));let options='<option value="">Selecione um equipamento cadastrado</option>'+equipamentos.map(eq=>`<option value="${this.escaparHTML(eq.id)}" ${String(eq.id)===String(item.equipamentoId)?'selected':''}>${this.escaparHTML(eq.nome)} — ${this.escaparHTML(eq.empresaLocacao||'')}</option>`).join('');
+      const atual=equipamentos.find(eq=>String(eq.id)===String(item.equipamentoId));let options='<option value="">Selecione um equipamento cadastrado</option>'+equipamentos.map(eq=>{
+        const selecionado=String(eq.id)===String(item.equipamentoId);
+        const emUso=item.status!=='Concluído'&&this.equipamentoEmUsoPorOutroRegistro(eq.id,eq.nome,this.editandoId);
+        const repetido=this.itensFormulario.some((outro,j)=>j!==i&&String(outro.equipamentoId)===String(eq.id));
+        const bloqueado=emUso||repetido;
+        const aviso=emUso?' · EM USO — baixa obrigatória':repetido?' · já incluído nesta entrega':'';
+        return `<option value="${this.escaparHTML(eq.id)}" ${selecionado?'selected':''} ${bloqueado?'disabled':''}>${this.escaparHTML(eq.nome)} — ${this.escaparHTML(eq.empresaLocacao||'')}${aviso}</option>`;
+      }).join('');
       if(item.equipamentoId&&!atual)options+=`<option value="${this.escaparHTML(item.equipamentoId)}" selected>${this.escaparHTML(item.nome||'Equipamento')} (não consta mais no cadastro)</option>`;
       const nome=atual?.nome||item.nome;const empresaLocacao=atual?.empresaLocacao||item.empresaLocacao;const dataLocacao=atual?.dataLocacao||item.dataLocacao;const especificacoes=atual?.especificacoes||item.especificacoes;const imagem=atual?.imagem||item.imagem;const direto=String(imagem||'').startsWith('data:image/');
       const detalhes=nome?`<div class="equipment-selection-details"><strong>${this.escaparHTML(nome)}</strong><span>Empresa de locação: ${this.escaparHTML(empresaLocacao||'-')}</span><span>Data de locação: ${this.formatarData(dataLocacao)||'-'}</span>${especificacoes?`<span>Especificações: ${this.escaparHTML(especificacoes)}</span>`:''}</div>`:'<small style="color:#64748b">Selecione um equipamento cadastrado. A foto e as especificações virão do cadastro.</small>';
@@ -3778,6 +3810,13 @@ const appEntregasMateriais = {
     const itens=this.itensFormulario.map(item=>({...item,nome:String(item.nome||'').trim(),especificacoes:String(item.especificacoes||'').trim(),empresaLocacao:String(item.empresaLocacao||'').trim()}));
     if(!nome||!empresa||!data)return app.mostrarAlerta('Preencha Nome, Empresa e Data do empréstimo.','warning');
     if(!itens.length||itens.some(item=>!item.equipamentoId||!item.nome))return app.mostrarAlerta('Selecione um equipamento cadastrado para cada item da entrega.','warning');
+    const equipamentosNaEntrega=new Set();
+    for(const item of itens){
+      const equipamentoId=String(item.equipamentoId);
+      if(equipamentosNaEntrega.has(equipamentoId))return app.mostrarAlerta('O mesmo equipamento não pode ser incluído duas vezes na mesma entrega.','warning');
+      equipamentosNaEntrega.add(equipamentoId);
+      if(item.status!=='Concluído'&&this.equipamentoEmUsoPorOutroRegistro(item.equipamentoId,item.nome,this.editandoId))return app.mostrarAlerta(`O equipamento “${item.nome}” já está Em uso. Registre a baixa/devolução antes de fazer outra entrega.`,'warning');
+    }
     const assinatura=this.assinaturaAtual();if(!assinatura)return app.mostrarAlerta('Desenhe ou envie a assinatura antes de salvar.','warning');
     const id=this.editandoId||this.gerarId('entrega'),registro={id,nome,empresa,data,horario,assinatura,itens,criadoPor:anterior?.criadoPor||window.currentUser?.username||'',criadoEm:anterior?.criadoEm||new Date().toISOString(),atualizadoEm:new Date().toISOString()};
     const proxima=[registro,...this.registros.filter(x=>String(x.id)!==String(id))];this.registros=proxima;this._pendente=true;const localOk=this.salvarLocal();this._isSaving=true;let sincronizado=false;
@@ -3791,14 +3830,21 @@ const appEntregasMateriais = {
     if(this._isSaving)return app.mostrarAlerta('Aguarde a sincronização da alteração anterior.','warning');
     const reg=this.registros.find(x=>String(x.id)===String(registroId)),itens=Array.isArray(reg?.itens)?reg.itens:[],item=itens.find(x=>String(x.id)===String(itemId))||itens[Number(itemIndex)];
     if(!reg||!item)return;if(!item.id)item.id=this.gerarId('item');
-    const proximo=item.status==='Em uso'?'Concluído':'Em uso',instante=new Date().toISOString();item.status=proximo;item.statusAtualizadoEm=instante;item.devolvidoEm=proximo==='Concluído'?instante:null;reg.atualizadoEm=instante;
+    const proximo=item.status==='Em uso'?'Concluído':'Em uso';
+    if(proximo==='Em uso'){
+      if(item.status==='Concluído'&&!this.solicitarSenhaAdmin('retornar o equipamento para Em uso'))return;
+      const nome=String(item.nome||'').trim().toLocaleLowerCase('pt-BR');
+      const conflitoNoMesmoRegistro=itens.some(outro=>outro!==item&&outro.status!=='Concluído'&&((item.equipamentoId&&String(outro.equipamentoId)===String(item.equipamentoId))||(!outro.equipamentoId&&nome&&String(outro.nome||'').trim().toLocaleLowerCase('pt-BR')===nome)));
+      if(conflitoNoMesmoRegistro||this.equipamentoEmUsoPorOutroRegistro(item.equipamentoId,item.nome,reg.id))return app.mostrarAlerta('Este equipamento já está Em uso em outra entrega. Registre a baixa/devolução antes de reabrir ou entregar novamente.','warning');
+    }
+    const instante=new Date().toISOString();item.status=proximo;item.statusAtualizadoEm=instante;item.devolvidoEm=proximo==='Concluído'?instante:null;reg.atualizadoEm=instante;
     this._pendente=true;const localOk=this.salvarLocal();this._isSaving=true;let sincronizado=false;
     try{if(!window.__fb?.salvarEntregasMateriaisNaNuvem)throw new Error('Firebase indisponível');const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(this.registros);this.registros=Array.isArray(salvos)?salvos:this.registros;this._pendente=false;this.salvarLocal();sincronizado=true;}
     catch(e){console.error('Status local; sincronização falhou:',e);this._pendente=true;this.salvarLocal();}finally{this._isSaving=false;}
     this.renderizar();app.mostrarAlerta(sincronizado?`Status atualizado: ${proximo}.`:localOk?'Status salvo neste aparelho; a nuvem ainda não confirmou.':'O status não foi confirmado.',sincronizado?'success':'warning');
   },
   async excluir(id) {
-    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir entregas.','error');const r=this.registros.find(x=>String(x.id)===String(id));if(!r)return;if(!window.confirm(`Excluir a entrega de ${r.nome||'este registro'}?`))return;const proxima=this.registros.filter(x=>String(x.id)!==String(id));this.registros=proxima;this._pendente=true;this.salvarLocal();this._isSaving=true;let sincronizado=false;
+    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir entregas.','error');const r=this.registros.find(x=>String(x.id)===String(id));if(!r)return;if(!window.confirm(`Excluir a entrega de ${r.nome||'este registro'}?`))return;if(!this.solicitarSenhaAdmin('excluir esta entrega'))return;const proxima=this.registros.filter(x=>String(x.id)!==String(id));this.registros=proxima;this._pendente=true;this.salvarLocal();this._isSaving=true;let sincronizado=false;
     try{const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(proxima);this.registros=Array.isArray(salvos)?salvos:proxima;this._pendente=false;this.salvarLocal();sincronizado=true;}catch(e){console.error('Não foi possível sincronizar a exclusão:',e);this._pendente=true;this.salvarLocal();}finally{this._isSaving=false;}
     if(sincronizado){const refs=[r.assinatura,...(r.itens||[]).filter(i=>!i.equipamentoId).map(i=>i.imagem)].filter(Boolean);for(const ref of refs){try{await window.__fb?.excluirImagemAnexoDaNuvem?.(ref);}catch(e){console.warn('A imagem removida ficou órfã no Firestore:',e);}}}
     this.renderizar();app.mostrarAlerta(sincronizado?'Entrega excluída.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
@@ -3933,7 +3979,7 @@ const appEquipamentosLocacao = {
   },
   editar(id) { if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem editar equipamentos.','error');this.abrirFormulario(id); },
   async excluir(id) {
-    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir equipamentos.','error');const eq=this.equipamentos.find(x=>String(x.id)===String(id));if(!eq)return;if(!window.confirm(`Excluir o equipamento "${eq.nome}" do cadastro? Os registros de entrega já feitos serão preservados.`))return;const proxima=this.equipamentos.filter(x=>String(x.id)!==String(id));this.equipamentos=proxima;this._pendente=true;this.salvarLocal();this._isSaving=true;let sincronizado=false;
+    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir equipamentos.','error');const eq=this.equipamentos.find(x=>String(x.id)===String(id));if(!eq)return;if(!window.confirm(`Excluir o equipamento "${eq.nome}" do cadastro? Os registros de entrega já feitos serão preservados.`))return;if(!appEntregasMateriais.solicitarSenhaAdmin('excluir este equipamento do cadastro'))return;const proxima=this.equipamentos.filter(x=>String(x.id)!==String(id));this.equipamentos=proxima;this._pendente=true;this.salvarLocal();this._isSaving=true;let sincronizado=false;
     try{const salvos=await window.__fb.salvarEquipamentosLocacaoNaNuvem(proxima);this.equipamentos=Array.isArray(salvos)?salvos:proxima;this._pendente=false;this.salvarLocal();sincronizado=true;}catch(e){console.error('Não foi possível sincronizar a exclusão do equipamento:',e);this._pendente=true;this.salvarLocal();}finally{this._isSaving=false;}
     this.renderizar();app.mostrarAlerta(sincronizado?'Equipamento removido do cadastro; as entregas anteriores foram mantidas.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
   },
