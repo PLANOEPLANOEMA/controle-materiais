@@ -1191,7 +1191,7 @@
   </form>
 </div>
 <div class="card"><div class="delivery-heading"><div><h3>Entregas de equipamentos registradas</h3><p style="color:#6b7a99;margin:.25rem 0 0">As fotos dos equipamentos e assinaturas são sincronizadas entre o site e o aplicativo.</p></div><input id="buscarEntregaMaterial" type="search" placeholder="Buscar por recebedor, empresa ou equipamento" oninput="appEntregasMateriais.renderizar()" style="max-width:360px" /></div><div id="entregasMateriaisLista" style="margin-top:1rem"></div></div>
-</section><!-- ── CONTROLE DE SALDO POR NF ── --><section id="saldo-nf"><div class="card"><h2>💰 Controle de Saldo por NF</h2><p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p><div class="btn-group"><button class="btn btn-primary" onclick="appSaldoNF.abrirModalMaterial()">➕ Cadastrar Material/Contrato</button><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">🧾 Lançar NF</button><button class="btn btn-warning" onclick="appSaldoNF.exportarCSV()">💾 Exportar CSV</button><button class="btn btn-secondary" onclick="appSaldoNF.renderizar()">🔄 Atualizar</button></div><div class="filter-bar"><input type="text" id="saldoBusca" placeholder="🔍 Buscar material, NF ou fornecedor..." oninput="appSaldoNF.renderizar()" /><select id="saldoStatusFiltro" onchange="appSaldoNF.renderizar()"><option value="">Todos os status</option><option value="ok">Saldo tranquilo</option><option value="atencao">Atenção</option><option value="critico">Pedir RT/RS</option><option value="zerado">Saldo zerado</option></select></div><div id="saldoResumo" class="saldo-grid"></div><div id="saldoAlertas"></div></div><div class="card"><h2>📦 Saldos por Material</h2><div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div></div><div class="card"><h2>🧾 Histórico de NFs lançadas</h2><div class="table-wrap"><table><thead><tr><th>Data</th><th>NF</th><th>Fornecedor</th><th>Material</th><th>Qtd.</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody id="saldoTabelaNFs"></tbody></table></div></div></section><!-- ── RELATÓRIO DO DIA ── --><section id="relatorio-dia"><div class="card"><h2>📋 Relatório do Dia</h2><div class="btn-group"><button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Abrir Relatório para Impressão</button><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Abrir Relatório Completo</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRelatorioDia()">🔄 Atualizar Painel</button></div><div id="painelRelatorioDia"></div></div></section><!-- ── RASTREABILIDADE COMPLETA ── --><section id="rastreabilidade"><div class="card"><h2>🧾 Lançamento de Rastreabilidade</h2><form id="formRastreabilidade" onsubmit="appMateriais.salvarRastreabilidadeManual(event)"><div class="form-row"><div class="form-group"><label for="rastMaterialNome">Material *</label><input type="text" id="rastMaterialNome" list="rastMateriaisList" placeholder="Ex: Cimento CP II" required /><datalist id="rastMateriaisList"></datalist></div><div class="form-group"><label for="rastQuantidade">Quantidade *</label><input type="number" id="rastQuantidade" min="1" step="1" placeholder="Ex: 10" required /></div></div><div class="form-row"><div class="form-group"><label for="rastResponsavel">Quem retirou *</label><input type="text" id="rastResponsavel" placeholder="Nome de quem retirou" required /></div><div class="form-group"><label for="rastDataHora">Data e hora *</label><input type="datetime-local" id="rastDataHora" required /></div></div><div class="form-row"><div class="form-group"><label for="rastFuncao">Função</label><input type="text" id="rastFuncao" placeholder="Ex: Pedreiro" /></div><div class="form-group"><label for="rastSetor">Setor</label><input type="text" id="rastSetor" placeholder="Ex: Estrutura" /></div></div><div class="form-group"><label for="rastMotivo">Motivo *</label><input type="text" id="rastMotivo" placeholder="Ex: Concretagem da laje" required /></div><div class="form-group"><label for="rastObservacoes">Observações</label><textarea id="rastObservacoes" rows="3" placeholder="Informações adicionais"></textarea></div><div class="btn-group"><button class="btn btn-success" type="submit">➕ Salvar Rastreabilidade</button><button class="btn btn-secondary" type="button" onclick="appMateriais.preencherDataRastreabilidade()">🕒 Usar data/hora atual</button></div></form></div><div class="card"><h2>📋 Rastreabilidade Completa</h2><div class="btn-group"><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRastreabilidadeCompleta()">🔄 Atualizar</button></div><div class="filter-bar"><input type="date" id="rastFiltroData" onchange="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroMaterial" placeholder="🔍 Buscar material..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroPessoa" placeholder="👤 Buscar quem retirou..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroSetor" placeholder="🏗️ Buscar setor/função..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /></div><div id="rastreabilidadeCompletaContainer"></div></div></section><!-- ── RELATÓRIO VISUAL ── --><section id="relatorio"><div class="card"><h2>📊 Relatório Visual para Apresentação</h2><div class="btn-group"><button class="btn btn-success" onclick="app.exportarPDF()">
+</section><!-- ── CONTROLE DE SALDO POR NF ── --><section id="saldo-nf"><div class="card"><h2>💰 Controle de Saldo por NF</h2><p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p><div class="btn-group"><button class="btn btn-primary" onclick="appSaldoNF.abrirModalMaterial()">➕ Cadastrar Material/Contrato</button><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">🧾 Lançar NF</button><button class="btn btn-warning" onclick="appSaldoNF.exportarCSV()">💾 Exportar CSV</button><button class="btn btn-secondary" onclick="appSaldoNF.renderizar()">🔄 Atualizar</button></div><div class="filter-bar"><input type="text" id="saldoBusca" placeholder="🔍 Buscar material, NF ou fornecedor..." oninput="appSaldoNF.renderizar()" /><select id="saldoStatusFiltro" onchange="appSaldoNF.renderizar()"><option value="">Todos os status</option><option value="ok">Saldo tranquilo</option><option value="atencao">Atenção</option><option value="critico">Pedir RT/RS</option><option value="zerado">Saldo zerado</option></select></div><div id="saldoResumo" class="saldo-grid"></div><div id="saldoAlertas"></div></div><div class="card"><h2>📦 Saldos por Material</h2><div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div></div><div class="card"><h2>🧾 Histórico de NFs lançadas</h2><div class="table-wrap"><table><thead><tr><th>Data</th><th>NF</th><th>Fornecedor</th><th>Material</th><th>Qtd.</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody id="saldoTabelaNFs"></tbody></table></div></div></section><!-- ── RELATÓRIO DO DIA ── --><section id="relatorio-dia"><div class="card"><h2>📋 Relatório do Dia</h2><div class="btn-group"><button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Abrir Relatório para Impressão</button><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Abrir Relatório Completo</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRelatorioDia()">🔄 Atualizar Painel</button></div><div id="painelRelatorioDia"></div></div></section><!-- ── RASTREABILIDADE COMPLETA ── --><section id="rastreabilidade"><div class="card"><h2>🧾 Lançamento de Rastreabilidade</h2><form id="formRastreabilidade" onsubmit="appMateriais.salvarRastreabilidadeManual(event)"><div class="form-row"><div class="form-group"><label for="rastMaterialNome">Material *</label><input type="text" id="rastMaterialNome" list="rastMateriaisList" placeholder="Ex: Cimento CP II" required /><datalist id="rastMateriaisList"></datalist></div><div class="form-group"><label for="rastQuantidade">Quantidade *</label><input type="number" id="rastQuantidade" min="1" step="1" placeholder="Ex: 10" required /></div></div><div class="form-row"><div class="form-group"><label for="rastResponsavel">Quem retirou *</label><input type="text" id="rastResponsavel" placeholder="Nome de quem retirou" required /></div><div class="form-group"><label for="rastDataHora">Data e hora *</label><input type="datetime-local" id="rastDataHora" required /></div></div><div class="form-row"><div class="form-group"><label for="rastFuncao">Função</label><input type="text" id="rastFuncao" placeholder="Ex: Pedreiro" /></div><div class="form-group"><label for="rastSetor">Setor</label><input type="text" id="rastSetor" placeholder="Ex: Estrutura" /></div></div><div class="form-group"><label for="rastMotivo">Motivo *</label><input type="text" id="rastMotivo" placeholder="Ex: Concretagem da laje" required /></div><div class="form-group"><label for="rastObservacoes">Observações</label><textarea id="rastObservacoes" rows="3" placeholder="Informações adicionais"></textarea></div><div class="btn-group"><button class="btn btn-success" type="submit">➕ Salvar Rastreabilidade</button><button class="btn btn-secondary" type="button" onclick="appMateriais.preencherDataRastreabilidade()">🕒 Usar data/hora atual</button></div></form></div><div class="card"><h2>📋 Rastreabilidade Completa</h2><div class="btn-group"><label for="rastRelatorioMaterial" style="display:flex;align-items:center;gap:.45rem;font-weight:700;color:var(--blue-dark)">Material do relatório<select id="rastRelatorioMaterial" style="min-width:220px;max-width:100%"><option value="">Todos os materiais</option></select></label><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Gerar relatório</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRastreabilidadeCompleta()">🔄 Atualizar</button></div><div class="filter-bar"><input type="date" id="rastFiltroData" onchange="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroMaterial" placeholder="🔍 Buscar material..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroPessoa" placeholder="👤 Buscar quem retirou..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroSetor" placeholder="🏗️ Buscar setor/função..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /></div><div id="rastreabilidadeCompletaContainer"></div></div></section><!-- ── RELATÓRIO VISUAL ── --><section id="relatorio"><div class="card"><h2>📊 Relatório Visual para Apresentação</h2><div class="btn-group"><button class="btn btn-success" onclick="app.exportarPDF()">
 📥 Baixar Relatório PDF
 </button><button class="btn btn-secondary" onclick="window.print()">
 🖨️ Imprimir
@@ -1227,7 +1227,7 @@
     escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
-  } from "./firebase-controle-usuarios.js?v=1.0.19";
+  } from "./firebase-controle-usuarios.js?v=1.0.20";
 
   window.__fb = {
     salvarNaNuvem,
@@ -3359,7 +3359,7 @@ const appMateriais = {
     const itens = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora)).slice(0, 20);
     box.innerHTML = `<h2>🧾 Últimas Retiradas</h2>
       <div class="btn-group" style="margin-bottom:1rem;">
-        ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
+        ${auth.pode('ver_rastreabilidade') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button>` : ''}
         <button class="btn btn-secondary" onclick="app.showSection('rastreabilidade', document.querySelector('nav button[data-section=&quot;rastreabilidade&quot;]'))">📋 Ver Rastreabilidade Completa</button>
       </div>
       ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
@@ -3451,6 +3451,7 @@ const appMateriais = {
   renderizarRastreabilidadeCompleta() {
     const container = document.getElementById('rastreabilidadeCompletaContainer');
     if (!container) return;
+    this.atualizarOpcoesRelatorioRastreabilidade();
     const formRast = document.getElementById('formRastreabilidade');
     if (formRast) formRast.closest('.card').style.display = auth.pode('registrar_retirada') ? '' : 'none';
     if (!auth.pode('ver_rastreabilidade')) {
@@ -3461,7 +3462,7 @@ const appMateriais = {
     container.innerHTML = `
       <div class="btn-group" style="margin-bottom:1rem;">
         <span class="btn btn-primary" style="cursor:default;">🧾 ${itens.length} registros</span>
-        ${auth.pode('ver_relatorio_completo') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Relatório Completo</button>` : ''}
+        ${auth.pode('ver_rastreabilidade') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button>` : ''}
       </div>
       ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
   },
@@ -3603,22 +3604,61 @@ movimentacoes: []
 });
 },
 
+atualizarOpcoesRelatorioRastreabilidade() {
+const select = document.getElementById('rastRelatorioMaterial');
+if (!select) return;
+const anterior = select.value || '';
+const nomesPorChave = new Map();
+this.movimentacoes.forEach(m => {
+const nome = String(m.materialNome || '').trim();
+if (nome) nomesPorChave.set(nome.toLocaleLowerCase('pt-BR'), nome);
+});
+const nomes = [...nomesPorChave.values()].sort((a,b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }));
+select.innerHTML = '<option value="">Todos os materiais</option>';
+nomes.forEach(nome => {
+const option = document.createElement('option');
+option.value = nome;
+option.textContent = nome;
+select.appendChild(option);
+});
+select.value = nomes.some(nome => nome.localeCompare(anterior, 'pt-BR', { sensitivity: 'base' }) === 0) ? anterior : '';
+},
+
+abrirJanelaRelatorioRastreabilidade({ titulo, subtitulo, movimentacoes }) {
+const escapar = valor => String(valor ?? '-').replace(/[&<>"']/g, caractere => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[caractere]));
+const dataFormatada = valor => { const data = new Date(valor); return Number.isNaN(data.getTime()) ? '-' : data.toLocaleString('pt-BR'); };
+const agora = new Date();
+const dataHoraGeracao = `${agora.toLocaleDateString('pt-BR')} às ${agora.toLocaleTimeString('pt-BR')}`;
+const totalQuantidade = movimentacoes.reduce((total, m) => total + (Number.isFinite(Number(m.quantidade)) ? Number(m.quantidade) : 0), 0);
+const materiais = [...new Set(movimentacoes.map(m => String(m.materialNome || '').trim()).filter(Boolean))];
+const linhas = movimentacoes.map(m => `<tr><td>${escapar(dataFormatada(m.dataHora))}</td><td>${escapar(m.materialNome)}</td><td class="center">${escapar(m.quantidade)}</td><td>${escapar(m.responsavel)}</td><td>${escapar(m.funcao || '-')}</td><td>${escapar(m.setor || '-')}</td><td>${escapar(m.motivo || '-')}</td><td>${escapar(m.observacoes || '-')}</td><td>${escapar(m.lancadoPor || '-')}</td></tr>`).join('');
+const html = `<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${escapar(titulo)}</title><style>*{box-sizing:border-box}body{font-family:Arial,sans-serif;margin:0;color:#1a2340;background:#fff}.page{max-width:1400px;margin:0 auto;padding:24px}.actions{margin:0 0 18px}.btn{background:#1F3864;color:#fff;border:0;border-radius:8px;padding:10px 16px;cursor:pointer;font-weight:700}.header{display:flex;align-items:center;gap:16px;border-bottom:3px solid #1F3864;padding-bottom:16px;margin-bottom:20px}.header img{height:54px;width:auto}.header h1{margin:0;color:#1F3864;font-size:25px}.muted{color:#64748b;margin-top:6px}.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:18px 0 24px}.stat{background:#DDEEFF;border-left:4px solid #2E75B6;border-radius:10px;padding:14px}.value{font-size:25px;font-weight:700;color:#1F3864}.stat div:last-child{margin-top:4px}table{width:100%;border-collapse:collapse;font-size:12px}thead tr{background:#1F3864;color:#fff}th,td{border:1px solid #d9e3f0;padding:8px;text-align:left;vertical-align:top}.center{text-align:center}.footer{text-align:center;color:#64748b;border-top:1px solid #d9e3f0;padding-top:12px;margin-top:24px;font-size:12px}@page{size:A4 landscape;margin:10mm}@media print{.actions{display:none}.page{max-width:none;padding:0}}@media(max-width:800px){.page{padding:12px;overflow-x:auto}.header{align-items:flex-start}.stats{grid-template-columns:1fr}}</style></head><body><main class="page"><div class="actions"><button class="btn" onclick="window.print()">🖨️ Imprimir relatório</button></div><header class="header"><img src="./logo.png" alt="Plano & Plano" onerror="this.style.display='none'"><div><h1>${escapar(titulo)}</h1><div class="muted">${escapar(subtitulo)}</div><div class="muted">Gerado em ${escapar(dataHoraGeracao)}</div></div></header><div class="stats"><div class="stat"><div class="value">${movimentacoes.length}</div><div>Registros de rastreabilidade</div></div><div class="stat"><div class="value">${totalQuantidade}</div><div>Quantidade total registrada</div></div><div class="stat"><div class="value">${materiais.length}</div><div>Materiais no relatório</div></div></div><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th></tr></thead><tbody>${linhas}</tbody></table><div class="footer">Relatório de rastreabilidade gerado pelo sistema de Controle de Materiais - Plano &amp; Plano</div></main></body></html>`;
+const win = window.open('', '_blank');
+if (!win) { app.mostrarAlerta('O navegador bloqueou a abertura do relatório. Libere pop-ups e tente novamente.', 'error'); return; }
+win.document.open(); win.document.write(html); win.document.close();
+},
+
 gerarRelatorioRastreabilidadeCompleta() {
 if (!auth.pode('ver_rastreabilidade')) {
 app.mostrarAlerta('Seu perfil não pode abrir o relatório de rastreabilidade.', 'error');
 return;
 }
-const movimentacoesOrdenadas = this.movimentacoes.slice().sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora));
+this.atualizarOpcoesRelatorioRastreabilidade();
+const selecionado = document.getElementById('rastRelatorioMaterial')?.value || '';
+const chaveSelecionada = String(selecionado).trim().toLocaleLowerCase('pt-BR');
+const movimentacoesOrdenadas = this.movimentacoes
+.filter(m => !chaveSelecionada || String(m.materialNome || '').trim().toLocaleLowerCase('pt-BR') === chaveSelecionada)
+.slice()
+.sort((a,b) => new Date(b.dataHora) - new Date(a.dataHora));
 if (!movimentacoesOrdenadas.length) {
-app.mostrarAlerta('Ainda não há registros de rastreabilidade para gerar o relatório.', 'error');
+app.mostrarAlerta(selecionado ? `Não há registros de rastreabilidade para ${selecionado}.` : 'Ainda não há registros de rastreabilidade para gerar o relatório.', 'error');
 return;
 }
-this.abrirJanelaRelatorioRastreabilidade({
-titulo: 'Relatório Completo de Rastreabilidade',
-subtitulo: 'Relatório exclusivo com todas as retiradas registradas no sistema.',
-movimentacoes: movimentacoesOrdenadas
-});
-}};
+const titulo = selecionado ? `Rastreabilidade - ${selecionado}` : 'Relatório de Rastreabilidade';
+const subtitulo = selecionado ? `Movimentações do material: ${selecionado}.` : 'Movimentações registradas de todos os materiais.';
+this.abrirJanelaRelatorioRastreabilidade({ titulo, subtitulo, movimentacoes: movimentacoesOrdenadas });
+}
+};
 
 
 
