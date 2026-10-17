@@ -35,7 +35,16 @@ const REF_EQUIPAMENTOS_LOCACAO = doc(db, "controle", "equipamentos_locacao");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
-  await setDoc(REF_EMPRESTIMOS, { registros, updatedAt: Date.now() }, { merge: true });
+  const lista = Array.isArray(registros) ? registros : [];
+  const prontas = await Promise.all(lista.map(async (registro) => {
+    const foto = registro?.fotoRomaneio;
+    const referencia = typeof foto === 'string' && foto.startsWith('data:image/')
+      ? await prepararFotoSemBloquear(foto, `romaneio_${registro.id}_foto`)
+      : foto || null;
+    return { ...registro, fotoRomaneio: referencia };
+  }));
+  await setDoc(REF_EMPRESTIMOS, { registros: prontas, updatedAt: Date.now() }, { merge: true });
+  return prontas;
 }
 
 export async function carregarDaNuvem() {
