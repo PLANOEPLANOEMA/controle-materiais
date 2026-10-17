@@ -31,6 +31,7 @@ const REF_RT_DIA_DIA = doc(db, "controle", "rt_dia_dia");
 const REF_SALDO_NF = doc(db, "controle", "saldo_nf");
 const REF_GRUPOS_MATERIAIS = doc(db, "controle", "grupos_materiais");
 const REF_ENTREGAS_MATERIAIS = doc(db, "controle", "entregas_materiais");
+const REF_EQUIPAMENTOS_LOCACAO = doc(db, "controle", "equipamentos_locacao");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
@@ -257,6 +258,33 @@ export async function excluirImagemAnexoDaNuvem(imagem) {
   const id = imagem.slice('controle-photo:'.length);
   if (!id) return;
   await deleteDoc(doc(db, "controle", id));
+}
+
+
+// ── EQUIPAMENTOS DE LOCAÇÃO ──
+export async function salvarEquipamentosLocacaoNaNuvem(equipamentos) {
+  const lista = Array.isArray(equipamentos) ? equipamentos : [];
+  const prontas = await Promise.all(lista.map(async (equipamento) => {
+    const id = String(equipamento?.id || 'sem-id');
+    const fotoId = String(equipamento?.fotoId || `equipamento_${id}_foto`);
+    const imagemOriginal = equipamento?.imagem || null;
+    const imagem = await prepararFotoSemBloquear(imagemOriginal, fotoId);
+    return { ...equipamento, fotoId, imagem: imagem || (imagemOriginal?.startsWith('data:image/') ? null : imagemOriginal) };
+  }));
+  await setDoc(REF_EQUIPAMENTOS_LOCACAO, { equipamentos: prontas, updatedAt: Date.now() }, { merge: true });
+  return prontas;
+}
+
+export async function carregarEquipamentosLocacaoDaNuvem() {
+  const snap = await getDoc(REF_EQUIPAMENTOS_LOCACAO);
+  return snap.exists() ? (snap.data().equipamentos ?? null) : null;
+}
+
+export function escutarMudancasEquipamentosLocacao(callback) {
+  return onSnapshot(REF_EQUIPAMENTOS_LOCACAO, (snap) => {
+    const equipamentos = snap.exists() ? snap.data().equipamentos : [];
+    callback(Array.isArray(equipamentos) ? equipamentos : []);
+  }, (error) => console.warn('Sincronização de equipamentos indisponível:', error));
 }
 
 // ── PLANEJAMENTO RT ──

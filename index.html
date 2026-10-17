@@ -1120,6 +1120,17 @@
 .delivery-record-signature{display:flex;align-items:center;gap:.7rem;margin-top:.8rem;color:#64748b;font-size:.85rem}
 .delivery-record-signature img{width:180px;height:66px;object-fit:contain;border:1px solid var(--line);border-radius:9px;background:#fff}
 .delivery-record-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.85rem}
+.equipment-list{display:grid;gap:.75rem}
+.equipment-record{display:grid;grid-template-columns:110px minmax(0,1fr);gap:1rem;align-items:start;border:1px solid var(--line);border-radius:14px;background:#fff;padding:.85rem}
+.equipment-record-photo,.equipment-photo-placeholder{width:110px;height:96px;object-fit:contain;border:1px solid var(--line);border-radius:10px;background:#f8fbff}
+.equipment-photo-placeholder{display:grid;place-items:center;color:#64748b;font-size:.8rem}
+.equipment-record-body h4{margin:0 0 .45rem;color:var(--blue-dark)}
+.equipment-record-body p{margin:.22rem 0;color:#52627a}
+.equipment-record-actions{display:flex;gap:.5rem;flex-wrap:wrap;margin-top:.65rem}
+.equipment-photo-preview{display:block;max-width:220px;max-height:170px;object-fit:contain;border:1px solid var(--line);border-radius:10px;background:#fff;margin:.55rem 0}
+.equipment-selection-details{display:grid;gap:.2rem;margin:.6rem 0;padding:.7rem;border:1px solid #dbe7f4;border-radius:10px;background:#fff;color:#52627a}
+.equipment-selection-details strong{color:var(--blue-dark)}
+@media(max-width:680px){.equipment-record{grid-template-columns:80px minmax(0,1fr);gap:.7rem;padding:.7rem}.equipment-record-photo,.equipment-photo-placeholder{width:80px;height:80px}}
 @media(max-width:680px){.delivery-form-grid{grid-template-columns:1fr}.delivery-item-row{align-items:flex-start}.delivery-record-signature{align-items:flex-start;flex-direction:column}.delivery-record-signature img{max-width:100%}}
 
 </style>
@@ -1141,23 +1152,36 @@
 🔄 Atualizar
 </button><button type="button" class="btn btn-secondary" id="btnGerenciarGruposMateriais" onclick="appMateriais.abrirModalGrupos()">🗂️ Grupos de Materiais</button></div><div class="filter-bar"><input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" /><select id="filterGrupoMateriais" onchange="appMateriais.filtrarMateriais()" style="min-width:180px;flex:1;padding:.7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;"><option value="">Todos os grupos</option><option value="__sem_grupo__">Sem grupo</option></select><input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" /></div><div id="materiaisContainer" class="materiais-grid"></div></div></section><section id="entregas-materiais">
 <div class="card">
-  <div class="delivery-heading"><div><h2>📝 Controle de Entrega de Materiais</h2><p style="color:#6b7a99;margin:.35rem 0 0">Registre quem recebeu os materiais, a empresa, a data, os itens alocados e a assinatura.</p></div>
-    <div class="btn-group"><button id="btnNovaEntregaMaterial" type="button" class="btn btn-primary" onclick="appEntregasMateriais.abrirFormulario()">➕ Nova entrega</button><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.atualizar()">🔄 Atualizar</button></div>
+  <div class="delivery-heading"><div><h2>📝 Controle de Entrega de Equipamentos</h2><p style="color:#6b7a99;margin:.35rem 0 0">Cadastre equipamentos locados e selecione-os ao registrar uma entrega. Os dados sincronizam entre o site e o aplicativo.</p></div>
+    <div class="btn-group"><button id="btnNovoEquipamento" type="button" class="btn btn-primary" onclick="appEquipamentosLocacao.abrirFormulario()">➕ Cadastrar equipamento</button><button id="btnNovaEntregaMaterial" type="button" class="btn btn-success" onclick="appEntregasMateriais.abrirFormulario()">➕ Nova entrega</button><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.atualizar()">🔄 Atualizar</button></div>
   </div>
-  <p id="entregaPermissaoInfo" style="display:none;color:#6b7a99;margin:.8rem 0 0">Acesso somente para consulta. Apenas Admin e Almoxarife podem criar, editar ou excluir entregas.</p>
+  <p id="entregaPermissaoInfo" style="display:none;color:#6b7a99;margin:.8rem 0 0">Acesso somente para consulta. Apenas Admin e Almoxarife podem cadastrar equipamentos e alterar entregas.</p>
 </div>
+<div id="equipamentoFormCard" class="card" style="display:none">
+  <h3 id="equipamentoFormTitulo">Cadastrar equipamento</h3>
+  <form id="formEquipamentoLocacao" onsubmit="appEquipamentosLocacao.salvar(event)">
+    <div class="delivery-form-grid">
+      <div class="form-group"><label for="equipamentoNome">Nome do equipamento</label><input id="equipamentoNome" type="text" maxlength="160" required placeholder="Ex.: Martelete rompedor" /></div>
+      <div class="form-group"><label for="equipamentoEmpresaLocacao">Empresa de locação</label><input id="equipamentoEmpresaLocacao" type="text" maxlength="160" required placeholder="Nome da locadora" /></div>
+      <div class="form-group"><label for="equipamentoDataLocacao">Data de locação</label><input id="equipamentoDataLocacao" type="date" required /></div>
+      <div class="form-group" style="grid-column:1/-1"><label for="equipamentoEspecificacoes">Especificações</label><textarea id="equipamentoEspecificacoes" rows="3" maxlength="800" placeholder="Marca, modelo, capacidade ou outras especificações"></textarea></div>
+    </div>
+    <div class="form-group"><label>Imagem do equipamento (opcional)</label><div class="delivery-photo-actions"><input id="equipamentoFotoGaleria" type="file" accept="image/*" style="display:none" onchange="appEquipamentosLocacao.processarFoto(event)" /><input id="equipamentoFotoCamera" type="file" accept="image/*" capture="environment" style="display:none" onchange="appEquipamentosLocacao.processarFoto(event)" /><button type="button" class="btn btn-secondary" onclick="document.getElementById('equipamentoFotoGaleria').click()">🖼️ Escolher imagem</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('equipamentoFotoCamera').click()">📷 Tirar foto</button><button id="btnRemoverFotoEquipamento" type="button" class="btn btn-warning" style="display:none" onclick="appEquipamentosLocacao.removerFoto()">Remover imagem</button></div><img id="equipamentoFotoPreview" class="equipment-photo-preview" alt="Prévia do equipamento" style="display:none" /></div>
+    <div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appEquipamentosLocacao.fecharFormulario()">Cancelar</button><button id="btnSalvarEquipamento" type="submit" class="btn btn-success">Salvar equipamento</button></div>
+  </form>
+</div>
+<div class="card" id="equipamentoListaCard"><div class="delivery-heading"><div><h3>Equipamentos cadastrados</h3><p style="color:#6b7a99;margin:.25rem 0 0">A foto e as informações cadastradas serão usadas nas entregas.</p></div><input id="buscarEquipamentosLocacao" type="search" placeholder="Buscar equipamento ou locadora" oninput="appEquipamentosLocacao.renderizar()" style="max-width:360px" /></div><div id="equipamentosLocacaoLista" class="equipment-list" style="margin-top:1rem"></div></div>
 <div id="entregaFormCard" class="card" style="display:none">
-  <h3 id="entregaFormTitulo">Nova entrega</h3>
+  <h3 id="entregaFormTitulo">Nova entrega de equipamento</h3>
   <form id="formEntregaMaterial" onsubmit="appEntregasMateriais.salvar(event)">
     <div class="delivery-form-grid">
-      <div class="form-group"><label for="entregaNome">Nome</label><input id="entregaNome" type="text" maxlength="120" required placeholder="Nome de quem recebeu" /></div>
-      <div class="form-group"><label for="entregaEmpresa">Empresa</label><input id="entregaEmpresa" type="text" maxlength="120" required placeholder="Empresa" /></div>
-      <div class="form-group"><label for="entregaData">Data</label><input id="entregaData" type="date" required /></div>
+      <div class="form-group"><label for="entregaNome">Nome de quem recebeu</label><input id="entregaNome" type="text" maxlength="120" required placeholder="Nome do recebedor" /></div>
+      <div class="form-group"><label for="entregaEmpresa">Empresa de quem recebeu</label><input id="entregaEmpresa" type="text" maxlength="120" required placeholder="Empresa do recebedor" /></div>
+      <div class="form-group"><label for="entregaData">Data do empréstimo</label><input id="entregaData" type="date" required /></div>
     </div>
-    <div class="delivery-item-head"><h3>Materiais alocados</h3><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.adicionarItem()">＋ Adicionar material</button></div>
+    <div class="delivery-item-head"><h3>Equipamentos entregues</h3><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.adicionarItem()">＋ Adicionar equipamento</button></div>
     <div id="entregaItensForm"></div>
-    <datalist id="entregaMateriaisSugestoes"></datalist>
-    <div class="form-group"><label for="entregaAssinaturaCanvas">Assinatura</label>
+    <div class="form-group"><label for="entregaAssinaturaCanvas">Assinatura de quem recebeu</label>
       <div class="delivery-signature-actions"><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.limparAssinatura()">Limpar assinatura</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('entregaAssinaturaUpload').click()">🖼️ Enviar imagem da assinatura</button><input id="entregaAssinaturaUpload" type="file" accept="image/*" style="display:none" /></div>
       <div class="delivery-signature-wrap"><canvas id="entregaAssinaturaCanvas" width="960" height="260" aria-label="Campo para desenhar a assinatura"></canvas></div>
       <small id="entregaAssinaturaAjuda" style="display:block;color:#6b7a99;margin-top:.4rem">Desenhe com o dedo ou mouse, ou envie uma imagem da assinatura.</small>
@@ -1165,7 +1189,7 @@
     <div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.fecharFormulario()">Cancelar</button><button id="btnSalvarEntregaMaterial" type="submit" class="btn btn-success">Salvar entrega</button></div>
   </form>
 </div>
-<div class="card"><div class="delivery-heading"><div><h3>Entregas registradas</h3><p style="color:#6b7a99;margin:.25rem 0 0">As imagens dos materiais e assinaturas são sincronizadas entre o site e o aplicativo.</p></div><input id="buscarEntregaMaterial" type="search" placeholder="Buscar por nome, empresa ou material" oninput="appEntregasMateriais.renderizar()" style="max-width:360px" /></div><div id="entregasMateriaisLista" style="margin-top:1rem"></div></div>
+<div class="card"><div class="delivery-heading"><div><h3>Entregas de equipamentos registradas</h3><p style="color:#6b7a99;margin:.25rem 0 0">As fotos dos equipamentos e assinaturas são sincronizadas entre o site e o aplicativo.</p></div><input id="buscarEntregaMaterial" type="search" placeholder="Buscar por recebedor, empresa ou equipamento" oninput="appEntregasMateriais.renderizar()" style="max-width:360px" /></div><div id="entregasMateriaisLista" style="margin-top:1rem"></div></div>
 </section><!-- ── CONTROLE DE SALDO POR NF ── --><section id="saldo-nf"><div class="card"><h2>💰 Controle de Saldo por NF</h2><p style="color:#6b7a99;margin:.35rem 0 1rem 0;">Cadastre o saldo contratado de cada material e lance NF por NF. O sistema avisa quando atingir a margem de segurança para alinhar RT/RS com a engenharia.</p><div class="btn-group"><button class="btn btn-primary" onclick="appSaldoNF.abrirModalMaterial()">➕ Cadastrar Material/Contrato</button><button class="btn btn-success" onclick="appSaldoNF.abrirModalNF()">🧾 Lançar NF</button><button class="btn btn-warning" onclick="appSaldoNF.exportarCSV()">💾 Exportar CSV</button><button class="btn btn-secondary" onclick="appSaldoNF.renderizar()">🔄 Atualizar</button></div><div class="filter-bar"><input type="text" id="saldoBusca" placeholder="🔍 Buscar material, NF ou fornecedor..." oninput="appSaldoNF.renderizar()" /><select id="saldoStatusFiltro" onchange="appSaldoNF.renderizar()"><option value="">Todos os status</option><option value="ok">Saldo tranquilo</option><option value="atencao">Atenção</option><option value="critico">Pedir RT/RS</option><option value="zerado">Saldo zerado</option></select></div><div id="saldoResumo" class="saldo-grid"></div><div id="saldoAlertas"></div></div><div class="card"><h2>📦 Saldos por Material</h2><div class="table-wrap"><table><thead><tr><th>Material</th><th>Unid.</th><th>Saldo contratado</th><th>Total lançado</th><th>Saldo atual</th><th>Margem</th><th>Status</th><th>Ações</th></tr></thead><tbody id="saldoTabelaMateriais"></tbody></table></div></div><div class="card"><h2>🧾 Histórico de NFs lançadas</h2><div class="table-wrap"><table><thead><tr><th>Data</th><th>NF</th><th>Fornecedor</th><th>Material</th><th>Qtd.</th><th>Valor</th><th>Obs.</th><th>Ações</th></tr></thead><tbody id="saldoTabelaNFs"></tbody></table></div></div></section><!-- ── RELATÓRIO DO DIA ── --><section id="relatorio-dia"><div class="card"><h2>📋 Relatório do Dia</h2><div class="btn-group"><button class="btn btn-success" onclick="appMateriais.gerarRelatorioDia()">📋 Abrir Relatório para Impressão</button><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioCompleto()">📊 Abrir Relatório Completo</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRelatorioDia()">🔄 Atualizar Painel</button></div><div id="painelRelatorioDia"></div></div></section><!-- ── RASTREABILIDADE COMPLETA ── --><section id="rastreabilidade"><div class="card"><h2>🧾 Lançamento de Rastreabilidade</h2><form id="formRastreabilidade" onsubmit="appMateriais.salvarRastreabilidadeManual(event)"><div class="form-row"><div class="form-group"><label for="rastMaterialNome">Material *</label><input type="text" id="rastMaterialNome" list="rastMateriaisList" placeholder="Ex: Cimento CP II" required /><datalist id="rastMateriaisList"></datalist></div><div class="form-group"><label for="rastQuantidade">Quantidade *</label><input type="number" id="rastQuantidade" min="1" step="1" placeholder="Ex: 10" required /></div></div><div class="form-row"><div class="form-group"><label for="rastResponsavel">Quem retirou *</label><input type="text" id="rastResponsavel" placeholder="Nome de quem retirou" required /></div><div class="form-group"><label for="rastDataHora">Data e hora *</label><input type="datetime-local" id="rastDataHora" required /></div></div><div class="form-row"><div class="form-group"><label for="rastFuncao">Função</label><input type="text" id="rastFuncao" placeholder="Ex: Pedreiro" /></div><div class="form-group"><label for="rastSetor">Setor</label><input type="text" id="rastSetor" placeholder="Ex: Estrutura" /></div></div><div class="form-group"><label for="rastMotivo">Motivo *</label><input type="text" id="rastMotivo" placeholder="Ex: Concretagem da laje" required /></div><div class="form-group"><label for="rastObservacoes">Observações</label><textarea id="rastObservacoes" rows="3" placeholder="Informações adicionais"></textarea></div><div class="btn-group"><button class="btn btn-success" type="submit">➕ Salvar Rastreabilidade</button><button class="btn btn-secondary" type="button" onclick="appMateriais.preencherDataRastreabilidade()">🕒 Usar data/hora atual</button></div></form></div><div class="card"><h2>📋 Rastreabilidade Completa</h2><div class="btn-group"><button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button><button class="btn btn-secondary" onclick="appMateriais.renderizarRastreabilidadeCompleta()">🔄 Atualizar</button></div><div class="filter-bar"><input type="date" id="rastFiltroData" onchange="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroMaterial" placeholder="🔍 Buscar material..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroPessoa" placeholder="👤 Buscar quem retirou..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /><input type="text" id="rastFiltroSetor" placeholder="🏗️ Buscar setor/função..." oninput="appMateriais.renderizarRastreabilidadeCompleta()" /></div><div id="rastreabilidadeCompletaContainer"></div></div></section><!-- ── RELATÓRIO VISUAL ── --><section id="relatorio"><div class="card"><h2>📊 Relatório Visual para Apresentação</h2><div class="btn-group"><button class="btn btn-success" onclick="app.exportarPDF()">
 📥 Baixar Relatório PDF
 </button><button class="btn btn-secondary" onclick="window.print()">
@@ -1197,9 +1221,12 @@
     salvarEntregasMateriaisNaNuvem,
     carregarEntregasMateriaisDaNuvem,
     escutarMudancasEntregasMateriais,
+    salvarEquipamentosLocacaoNaNuvem,
+    carregarEquipamentosLocacaoDaNuvem,
+    escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
-  } from "./firebase-controle-usuarios.js?v=1.0.17";
+  } from "./firebase-controle-usuarios.js?v=1.0.18";
 
   window.__fb = {
     salvarNaNuvem,
@@ -1226,6 +1253,9 @@
     salvarEntregasMateriaisNaNuvem,
     carregarEntregasMateriaisDaNuvem,
     escutarMudancasEntregasMateriais,
+    salvarEquipamentosLocacaoNaNuvem,
+    carregarEquipamentosLocacaoDaNuvem,
+    escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
   };
@@ -3622,7 +3652,7 @@ movimentacoes: movimentacoesOrdenadas
 
 
 
-// ── CONTROLE DE ENTREGAS / EMPRÉSTIMOS DE MATERIAIS ──
+// ── CONTROLE DE ENTREGAS / EMPRÉSTIMOS DE EQUIPAMENTOS ──
 const appEntregasMateriais = {
   STORAGE_KEY: 'controle_entregas_materiais_v1',
   PENDING_KEY: 'controle_entregas_materiais_pendente_v1',
@@ -3654,290 +3684,176 @@ const appEntregasMateriais = {
   escaparHTML(valor) {
     return String(valor ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   },
-  novoItem() { return { id: this.gerarId('item'), nome: '', especificacoes: '', dataAlocacao: this.dataHoje(), imagem: null }; },
+  novoItem() { return { id: this.gerarId('item'), equipamentoId: '', nome: '', empresaLocacao: '', dataLocacao: '', especificacoes: '', imagem: null }; },
   init() {
     if (this._initialized) return;
     this._initialized = true;
+    window.appEquipamentosLocacao?.init();
     this.configurarAssinatura();
     const upload = document.getElementById('entregaAssinaturaUpload');
     if (upload) upload.addEventListener('change', e => this.processarAssinatura(e));
-    this.carregar().then(() => {
-      this.atualizarSugestoesMateriais();
-      this.renderizar();
-      this.iniciarSyncAoVivo();
-      if (this._pendente) this.sincronizarPendente();
-    });
-    if (!this._onlineHandler) {
-      this._onlineHandler = () => this.sincronizarPendente();
-      window.addEventListener('online', this._onlineHandler);
-    }
+    this.carregar().then(() => { this.renderizar(); this.iniciarSyncAoVivo(); if (this._pendente) this.sincronizarPendente(); });
+    if (!this._onlineHandler) { this._onlineHandler = () => this.sincronizarPendente(); window.addEventListener('online', this._onlineHandler); }
   },
-  carregarLocal() {
-    try {
-      const raw = localStorage.getItem(this.STORAGE_KEY);
-      return raw ? JSON.parse(raw) : [];
-    } catch (e) { console.warn('Não foi possível ler entregas locais:', e); return []; }
-  },
-  salvarLocal() {
-    try {
-      localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.registros));
-      localStorage.setItem(this.PENDING_KEY, this._pendente ? '1' : '0');
-      return true;
-    } catch (e) {
-      console.error('Não foi possível salvar entregas neste aparelho:', e);
-      return false;
-    }
-  },
+  carregarLocal() { try { const raw=localStorage.getItem(this.STORAGE_KEY); return raw?JSON.parse(raw):[]; } catch(e){console.warn('Não foi possível ler entregas locais:',e);return [];} },
+  salvarLocal() { try { localStorage.setItem(this.STORAGE_KEY,JSON.stringify(this.registros));localStorage.setItem(this.PENDING_KEY,this._pendente?'1':'0');return true;}catch(e){console.error('Não foi possível salvar entregas neste aparelho:',e);return false;} },
   async carregar() {
-    const locais = this.carregarLocal();
-    this._pendente = localStorage.getItem(this.PENDING_KEY) === '1';
-    try {
-      const cloud = await window.__fb?.carregarEntregasMateriaisDaNuvem?.();
-      if (Array.isArray(cloud) && !this._pendente) {
-        this.registros = cloud;
-        this.salvarLocal();
-        return;
-      }
-      if (Array.isArray(locais)) this.registros = locais;
-      if (this.registros.length && (this._pendente || !Array.isArray(cloud))) this._pendente = true;
-      this.salvarLocal();
-    } catch (e) {
-      this.registros = Array.isArray(locais) ? locais : [];
-      if (this.registros.length) this._pendente = true;
-      this.salvarLocal();
-      console.warn('Entregas mantidas no aparelho; não foi possível carregar a nuvem:', e);
-    }
+    const locais=this.carregarLocal();this._pendente=localStorage.getItem(this.PENDING_KEY)==='1';
+    try { const cloud=await window.__fb?.carregarEntregasMateriaisDaNuvem?.();if(Array.isArray(cloud)&&!this._pendente){this.registros=cloud;this.salvarLocal();return;}this.registros=Array.isArray(locais)?locais:[];if(this.registros.length&&(this._pendente||!Array.isArray(cloud)))this._pendente=true;this.salvarLocal(); }
+    catch(e){this.registros=Array.isArray(locais)?locais:[];if(this.registros.length)this._pendente=true;this.salvarLocal();console.warn('Entregas mantidas no aparelho; não foi possível carregar a nuvem:',e);}
   },
   iniciarSyncAoVivo() {
-    if (!window.__fb?.escutarMudancasEntregasMateriais) return;
-    try {
-      if (this._unsub) this._unsub();
-      this._unsub = window.__fb.escutarMudancasEntregasMateriais(registros => {
-        if (this._isSaving || this._pendente || !Array.isArray(registros)) return;
-        this.registros = registros;
-        this.salvarLocal();
-        this.renderizar();
-      });
-    } catch (e) { console.warn('Sincronização ao vivo das entregas indisponível:', e); }
+    if(!window.__fb?.escutarMudancasEntregasMateriais)return;
+    try { if(this._unsub)this._unsub();this._unsub=window.__fb.escutarMudancasEntregasMateriais(registros=>{if(this._isSaving||this._pendente||!Array.isArray(registros))return;this.registros=registros;this.salvarLocal();this.renderizar();}); }
+    catch(e){console.warn('Sincronização ao vivo das entregas indisponível:',e);}
   },
   async sincronizarPendente() {
-    if (!this._pendente || this._isSaving || !navigator.onLine || !window.__fb?.salvarEntregasMateriaisNaNuvem) return;
-    this._isSaving = true;
-    try {
-      const salvos = await window.__fb.salvarEntregasMateriaisNaNuvem(this.registros);
-      this.registros = Array.isArray(salvos) ? salvos : this.registros;
-      this._pendente = false;
-      this.salvarLocal();
-      this.renderizar();
-    } catch (e) { console.warn('Não foi possível sincronizar entregas pendentes:', e); }
-    finally { this._isSaving = false; }
-  },
-  atualizarSugestoesMateriais() {
-    const lista = document.getElementById('entregaMateriaisSugestoes');
-    if (!lista) return;
-    const nomes = (window.appMateriais?.materiais || []).map(m => String(m?.nome || '').trim()).filter(Boolean);
-    lista.innerHTML = [...new Set(nomes)].sort((a,b) => a.localeCompare(b,'pt-BR',{sensitivity:'base'})).map(n => `<option value="${this.escaparHTML(n)}"></option>`).join('');
+    if(!this._pendente||this._isSaving||!navigator.onLine||!window.__fb?.salvarEntregasMateriaisNaNuvem)return;
+    this._isSaving=true;try{const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(this.registros);this.registros=Array.isArray(salvos)?salvos:this.registros;this._pendente=false;this.salvarLocal();this.renderizar();}catch(e){console.warn('Não foi possível sincronizar entregas pendentes:',e);}finally{this._isSaving=false;}
   },
   async resolverImagem(ref) {
-    if (!ref || typeof ref !== 'string') return null;
-    if (ref.startsWith('data:image/')) return ref;
-    if (this._imageCache.has(ref)) return this._imageCache.get(ref);
-    try {
-      const data = await window.__fb?.resolverImagemAnexoDaNuvem?.(ref);
-      if (data) this._imageCache.set(ref, data);
-      return data || null;
-    } catch (e) { console.warn('Imagem de entrega não carregou:', e); return null; }
+    if(!ref||typeof ref!=='string')return null;if(ref.startsWith('data:image/'))return ref;if(this._imageCache.has(ref))return this._imageCache.get(ref);
+    try{const data=await window.__fb?.resolverImagemAnexoDaNuvem?.(ref);if(data)this._imageCache.set(ref,data);return data||null;}catch(e){console.warn('Imagem de entrega não carregou:',e);return null;}
   },
   configurarAssinatura() {
-    const canvas = document.getElementById('entregaAssinaturaCanvas');
-    if (!canvas || canvas.dataset.bound) return;
-    canvas.dataset.bound = '1';
-    const ctx = canvas.getContext('2d');
-    const limparCanvas = () => { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,canvas.width,canvas.height); };
-    limparCanvas();
-    ctx.strokeStyle = '#153b67'; ctx.lineWidth = 4; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
-    const ponto = e => { const r = canvas.getBoundingClientRect(); return { x:(e.clientX-r.left)*canvas.width/r.width, y:(e.clientY-r.top)*canvas.height/r.height }; };
-    canvas.addEventListener('pointerdown', e => {
-      if (!this.podeModificar()) return;
-      e.preventDefault(); this.drawing = true; this.assinaturaReferencia = null; this.assinaturaDataUrl = null; this.temAssinatura = true;
-      canvas.setPointerCapture?.(e.pointerId); const p = ponto(e); ctx.beginPath(); ctx.arc(p.x,p.y,1.7,0,Math.PI*2); ctx.fillStyle='#153b67'; ctx.fill(); ctx.beginPath(); ctx.moveTo(p.x,p.y);
-      const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent='Assinatura desenhada. Você pode limpar e refazer se precisar.';
-    });
-    canvas.addEventListener('pointermove', e => { if (!this.drawing) return; e.preventDefault(); const p=ponto(e); ctx.lineTo(p.x,p.y); ctx.stroke(); });
-    const parar = () => { this.drawing = false; };
-    canvas.addEventListener('pointerup', parar); canvas.addEventListener('pointercancel', parar); canvas.addEventListener('lostpointercapture', parar);
+    const canvas=document.getElementById('entregaAssinaturaCanvas');if(!canvas||canvas.dataset.bound)return;canvas.dataset.bound='1';const ctx=canvas.getContext('2d');const limparCanvas=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);};limparCanvas();ctx.strokeStyle='#153b67';ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';
+    const ponto=e=>{const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};};
+    canvas.addEventListener('pointerdown',e=>{if(!this.podeModificar())return;e.preventDefault();this.drawing=true;this.assinaturaReferencia=null;this.assinaturaDataUrl=null;this.temAssinatura=true;canvas.setPointerCapture?.(e.pointerId);const p=ponto(e);ctx.beginPath();ctx.arc(p.x,p.y,1.7,0,Math.PI*2);ctx.fillStyle='#153b67';ctx.fill();ctx.beginPath();ctx.moveTo(p.x,p.y);const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Assinatura desenhada. Você pode limpar e refazer se precisar.';});
+    canvas.addEventListener('pointermove',e=>{if(!this.drawing)return;e.preventDefault();const p=ponto(e);ctx.lineTo(p.x,p.y);ctx.stroke();});const parar=()=>{this.drawing=false;};canvas.addEventListener('pointerup',parar);canvas.addEventListener('pointercancel',parar);canvas.addEventListener('lostpointercapture',parar);
   },
-  desenharImagemAssinatura(src) {
-    const canvas=document.getElementById('entregaAssinaturaCanvas'); if(!canvas || !src) return;
-    const img=new Image(); img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);const scale=Math.min((canvas.width-24)/img.width,(canvas.height-24)/img.height);const w=img.width*scale,h=img.height*scale;ctx.drawImage(img,(canvas.width-w)/2,(canvas.height-h)/2,w,h);}; img.src=src;
+  desenharImagemAssinatura(src) { const canvas=document.getElementById('entregaAssinaturaCanvas');if(!canvas||!src)return;const img=new Image();img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);const scale=Math.min((canvas.width-24)/img.width,(canvas.height-24)/img.height);const w=img.width*scale,h=img.height*scale;ctx.drawImage(img,(canvas.width-w)/2,(canvas.height-h)/2,w,h);};img.src=src; },
+  async processarAssinatura(event) { const input=event.target,file=input.files?.[0];if(!file)return;if(!this.podeModificar()){input.value='';return;}try{const data=await appMateriais.comprimirImagem(file);this.assinaturaReferencia=null;this.assinaturaDataUrl=data;this.temAssinatura=true;this.desenharImagemAssinatura(data);const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Imagem da assinatura carregada.';}catch(e){console.error(e);app.mostrarAlerta('Não foi possível carregar a imagem da assinatura.','error');}input.value=''; },
+  limparAssinatura(silencioso=false) { if(!silencioso&&!this.podeModificar())return;const canvas=document.getElementById('entregaAssinaturaCanvas');if(canvas){const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}this.assinaturaReferencia=null;this.assinaturaDataUrl=null;this.temAssinatura=false;const upload=document.getElementById('entregaAssinaturaUpload');if(upload)upload.value='';const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Desenhe com o dedo ou mouse, ou envie uma imagem da assinatura.'; },
+  async carregarAssinaturaExistente(ref) { if(!ref)return;const src=await this.resolverImagem(ref);if(src)this.desenharImagemAssinatura(src); },
+  async abrirFormulario() {
+    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem criar entregas.','error');
+    await window.appEquipamentosLocacao?.init();
+    if(!(window.appEquipamentosLocacao?.equipamentos||[]).length){app.mostrarAlerta('Cadastre primeiro um equipamento para poder registrar a entrega.','warning');window.appEquipamentosLocacao?.abrirFormulario();return;}
+    this.editandoId=null;this.itensFormulario=[this.novoItem()];this.limparAssinatura(true);document.getElementById('formEntregaMaterial')?.reset();document.getElementById('entregaData').value=this.dataHoje();document.getElementById('entregaFormTitulo').textContent='Nova entrega de equipamento';document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar entrega';document.getElementById('entregaFormCard').style.display='block';this.renderizarItensFormulario();document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
   },
-  async processarAssinatura(event) {
-    const input=event.target, file=input.files?.[0]; if(!file) return;
-    if(!this.podeModificar()){input.value='';return;}
-    try {
-      const data=await appMateriais.comprimirImagem(file);
-      this.assinaturaReferencia=null; this.assinaturaDataUrl=data; this.temAssinatura=true;
-      this.desenharImagemAssinatura(data);
-      const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent='Imagem da assinatura carregada.';
-    } catch(e) { console.error(e); app.mostrarAlerta('Não foi possível carregar a imagem da assinatura.','error'); }
-    input.value='';
+  fecharFormulario() { const card=document.getElementById('entregaFormCard');if(card)card.style.display='none';this.editandoId=null; },
+  async adicionarItem() { if(!this.podeModificar())return;await window.appEquipamentosLocacao?.init();if(!(window.appEquipamentosLocacao?.equipamentos||[]).length){app.mostrarAlerta('Cadastre primeiro um equipamento para poder registrar a entrega.','warning');window.appEquipamentosLocacao?.abrirFormulario();return;}this.itensFormulario.push(this.novoItem());this.renderizarItensFormulario(); },
+  removerItem(indice) { if(!this.podeModificar())return;if(this.itensFormulario.length<=1)return app.mostrarAlerta('A entrega precisa ter pelo menos um equipamento.','warning');this.itensFormulario.splice(indice,1);this.renderizarItensFormulario(); },
+  atualizarItem(indice,campo,valor) { if(!this.podeModificar())return;if(this.itensFormulario[indice])this.itensFormulario[indice][campo]=valor; },
+  selecionarEquipamento(indice,id) {
+    if(!this.podeModificar())return;const eq=(window.appEquipamentosLocacao?.equipamentos||[]).find(x=>String(x.id)===String(id));if(!eq)return;const item=this.itensFormulario[indice];if(!item)return;
+    Object.assign(item,{equipamentoId:eq.id,nome:eq.nome,empresaLocacao:eq.empresaLocacao||'',dataLocacao:eq.dataLocacao||'',especificacoes:eq.especificacoes||'',imagem:eq.imagem||null});this.renderizarItensFormulario();
   },
-  limparAssinatura(silencioso=false) {
-    if(!silencioso && !this.podeModificar()) return;
-    const canvas=document.getElementById('entregaAssinaturaCanvas');
-    if(canvas){const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}
-    this.assinaturaReferencia=null; this.assinaturaDataUrl=null; this.temAssinatura=false;
-    const upload=document.getElementById('entregaAssinaturaUpload'); if(upload) upload.value='';
-    const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent='Desenhe com o dedo ou mouse, ou envie uma imagem da assinatura.';
-  },
-  async carregarAssinaturaExistente(ref) {
-    if(!ref) return;
-    const src=await this.resolverImagem(ref);
-    if(src) this.desenharImagemAssinatura(src);
-  },
-  abrirFormulario() {
-    if(!this.podeModificar()) return app.mostrarAlerta('Somente Admin e Almoxarife podem criar entregas.','error');
-    this.editandoId=null; this.itensFormulario=[this.novoItem()]; this.limparAssinatura(true);
-    document.getElementById('formEntregaMaterial')?.reset();
-    document.getElementById('entregaData').value=this.dataHoje();
-    document.getElementById('entregaFormTitulo').textContent='Nova entrega';
-    document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar entrega';
-    document.getElementById('entregaFormCard').style.display='block';
-    this.renderizarItensFormulario(); this.atualizarSugestoesMateriais();
-    document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
-  },
-  fecharFormulario() {
-    const card=document.getElementById('entregaFormCard'); if(card) card.style.display='none';
-    this.editandoId=null;
-  },
-  adicionarItem() { if(!this.podeModificar()) return; this.itensFormulario.push(this.novoItem()); this.renderizarItensFormulario(); },
-  removerItem(indice) {
-    if(!this.podeModificar()) return;
-    if(this.itensFormulario.length<=1) return app.mostrarAlerta('A entrega precisa ter pelo menos um material.','warning');
-    this.itensFormulario.splice(indice,1); this.renderizarItensFormulario();
-  },
-  atualizarItem(indice,campo,valor) { if(!this.podeModificar()) return; if(this.itensFormulario[indice]) this.itensFormulario[indice][campo]=valor; },
   renderizarItensFormulario() {
-    const cont=document.getElementById('entregaItensForm'); if(!cont) return;
+    const cont=document.getElementById('entregaItensForm');if(!cont)return;const equipamentos=[...(window.appEquipamentosLocacao?.equipamentos||[])].sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base'}));
     cont.innerHTML=this.itensFormulario.map((item,i)=>{
-      const foto=String(item.imagem||''); const direto=foto.startsWith('data:image/');
-      return `<div class="delivery-item-card"><div class="delivery-item-head"><strong>Material ${i+1}</strong><button type="button" class="delete-btn" onclick="appEntregasMateriais.removerItem(${i})">Remover</button></div>
-      <div class="delivery-form-grid"><div class="form-group"><label>Nome do material</label><input type="text" list="entregaMateriaisSugestoes" maxlength="160" required value="${this.escaparHTML(item.nome)}" oninput="appEntregasMateriais.atualizarItem(${i},'nome',this.value)" /></div>
-      <div class="form-group"><label>Data de alocação</label><input type="date" required value="${this.escaparHTML(item.dataAlocacao||this.dataHoje())}" oninput="appEntregasMateriais.atualizarItem(${i},'dataAlocacao',this.value)" /></div>
-      <div class="form-group" style="grid-column:1/-1"><label>Especificações</label><textarea rows="2" maxlength="500" placeholder="Especificações do material" oninput="appEntregasMateriais.atualizarItem(${i},'especificacoes',this.value)">${this.escaparHTML(item.especificacoes)}</textarea></div></div>
-      <div class="form-group"><label>Imagem do material (opcional)</label><div class="delivery-photo-actions"><input id="entregaFotoGaleria_${i}" type="file" accept="image/*" style="display:none" onchange="appEntregasMateriais.processarImagemMaterial(event,${i})" /><input id="entregaFotoCamera_${i}" type="file" accept="image/*" capture="environment" style="display:none" onchange="appEntregasMateriais.processarImagemMaterial(event,${i})" /><button type="button" class="btn btn-secondary" onclick="document.getElementById('entregaFotoGaleria_${i}').click()">🖼️ Escolher imagem</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('entregaFotoCamera_${i}').click()">📷 Tirar foto</button>${item.imagem?`<button type="button" class="btn btn-warning" onclick="appEntregasMateriais.removerImagemMaterial(${i})">Remover imagem</button>`:''}</div>
-      <img class="delivery-photo-preview" data-entrega-editor-img="${i}" alt="Prévia do material ${i+1}" src="${direto?foto:''}" style="${item.imagem?'':'display:none'}" /></div></div>`;
-    }).join('');
-    this.carregarImagensEditor();
+      const atual=equipamentos.find(eq=>String(eq.id)===String(item.equipamentoId));let options='<option value="">Selecione um equipamento cadastrado</option>'+equipamentos.map(eq=>`<option value="${this.escaparHTML(eq.id)}" ${String(eq.id)===String(item.equipamentoId)?'selected':''}>${this.escaparHTML(eq.nome)} — ${this.escaparHTML(eq.empresaLocacao||'')}</option>`).join('');
+      if(item.equipamentoId&&!atual)options+=`<option value="${this.escaparHTML(item.equipamentoId)}" selected>${this.escaparHTML(item.nome||'Equipamento')} (não consta mais no cadastro)</option>`;
+      const nome=atual?.nome||item.nome;const empresaLocacao=atual?.empresaLocacao||item.empresaLocacao;const dataLocacao=atual?.dataLocacao||item.dataLocacao;const especificacoes=atual?.especificacoes||item.especificacoes;const imagem=atual?.imagem||item.imagem;const direto=String(imagem||'').startsWith('data:image/');
+      const detalhes=nome?`<div class="equipment-selection-details"><strong>${this.escaparHTML(nome)}</strong><span>Empresa de locação: ${this.escaparHTML(empresaLocacao||'-')}</span><span>Data de locação: ${this.formatarData(dataLocacao)||'-'}</span>${especificacoes?`<span>Especificações: ${this.escaparHTML(especificacoes)}</span>`:''}</div>`:'<small style="color:#64748b">Selecione um equipamento cadastrado. A foto e as especificações virão do cadastro.</small>';
+      return `<div class="delivery-item-card"><div class="delivery-item-head"><strong>Equipamento ${i+1}</strong><button type="button" class="delete-btn" onclick="appEntregasMateriais.removerItem(${i})">Remover</button></div><div class="form-group"><label for="entregaEquipamento_${i}">Equipamento</label><select id="entregaEquipamento_${i}" required onchange="appEntregasMateriais.selecionarEquipamento(${i},this.value)">${options}</select></div>${detalhes}${imagem?`<img class="delivery-photo-preview" data-entrega-editor-img="${i}" alt="Foto de ${this.escaparHTML(nome||'equipamento')}" src="${direto?imagem:''}" />`:''}</div>`;
+    }).join('');this.carregarImagensEditor();
   },
-  async carregarImagensEditor() {
-    const cont=document.getElementById('entregaItensForm'); if(!cont) return;
-    for(const img of cont.querySelectorAll('[data-entrega-editor-img]')){
-      const i=Number(img.dataset.entregaEditorImg); const ref=this.itensFormulario[i]?.imagem; if(!ref) continue;
-      const src=await this.resolverImagem(ref); if(src){img.src=src;img.style.display='block';}
-    }
-  },
-  async processarImagemMaterial(event,indice) {
-    const input=event.target,file=input.files?.[0]; if(!file) return; if(!this.podeModificar()){input.value='';return;}
-    try { const data=await appMateriais.comprimirImagem(file); if(this.itensFormulario[indice]) this.itensFormulario[indice].imagem=data; input.value=''; this.renderizarItensFormulario(); }
-    catch(e){console.error(e);app.mostrarAlerta('Não foi possível carregar a imagem do material.','error');input.value='';}
-  },
-  removerImagemMaterial(indice) { if(this.itensFormulario[indice]){this.itensFormulario[indice].imagem=null;this.renderizarItensFormulario();} },
+  async carregarImagensEditor() { const cont=document.getElementById('entregaItensForm');if(!cont)return;for(const img of cont.querySelectorAll('[data-entrega-editor-img]')){const i=Number(img.dataset.entregaEditorImg);const eq=(window.appEquipamentosLocacao?.equipamentos||[]).find(x=>String(x.id)===String(this.itensFormulario[i]?.equipamentoId));const ref=eq?.imagem||this.itensFormulario[i]?.imagem;if(!ref)continue;const src=await this.resolverImagem(ref);if(src){img.src=src;img.style.display='block';}} },
   async editar(id) {
-    if(!this.podeModificar()) return app.mostrarAlerta('Apenas Admin e Almoxarife podem editar entregas.','error');
-    const r=this.registros.find(x=>String(x.id)===String(id)); if(!r) return;
-    this.editandoId=r.id; this.itensFormulario=(Array.isArray(r.itens)?r.itens:[]).map(x=>({...x})); if(!this.itensFormulario.length) this.itensFormulario=[this.novoItem()];
-    this.assinaturaReferencia=r.assinatura||null; this.assinaturaDataUrl=null; this.temAssinatura=Boolean(r.assinatura); this.limparCanvasSemEstado();
-    document.getElementById('formEntregaMaterial').reset();
-    document.getElementById('entregaNome').value=r.nome||''; document.getElementById('entregaEmpresa').value=r.empresa||''; document.getElementById('entregaData').value=r.data||this.dataHoje();
-    document.getElementById('entregaFormTitulo').textContent='Editar entrega'; document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar alterações';
-    document.getElementById('entregaFormCard').style.display='block'; this.renderizarItensFormulario();
-    const ajuda=document.getElementById('entregaAssinaturaAjuda'); if(ajuda) ajuda.textContent=r.assinatura?'Assinatura atual carregada; desenhe sobre ela, envie outra ou limpe para substituir.':'Desenhe ou envie a assinatura.';
-    await this.carregarAssinaturaExistente(r.assinatura);
-    document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+    if(!this.podeModificar())return app.mostrarAlerta('Apenas Admin e Almoxarife podem editar entregas.','error');const r=this.registros.find(x=>String(x.id)===String(id));if(!r)return;
+    const cadastrados=window.appEquipamentosLocacao?.equipamentos||[];const itens=(Array.isArray(r.itens)?r.itens:[]).map(x=>{const match=cadastrados.find(eq=>String(eq.id)===String(x.equipamentoId))||cadastrados.find(eq=>String(eq.nome||'').trim().toLocaleLowerCase('pt-BR')===String(x.nome||'').trim().toLocaleLowerCase('pt-BR'));return {...x,equipamentoId:x.equipamentoId||match?.id||''};});
+    if(itens.some(x=>!x.equipamentoId)){app.mostrarAlerta('Este registro antigo não está vinculado a um equipamento cadastrado. Ele foi preservado para consulta; cadastre equipamentos para as próximas entregas.','warning');return;}
+    this.editandoId=r.id;this.itensFormulario=itens.length?itens.map(x=>({...x})): [this.novoItem()];this.assinaturaReferencia=r.assinatura||null;this.assinaturaDataUrl=null;this.temAssinatura=Boolean(r.assinatura);this.limparCanvasSemEstado();document.getElementById('formEntregaMaterial').reset();document.getElementById('entregaNome').value=r.nome||'';document.getElementById('entregaEmpresa').value=r.empresa||'';document.getElementById('entregaData').value=r.data||this.dataHoje();document.getElementById('entregaFormTitulo').textContent='Editar entrega de equipamento';document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar alterações';document.getElementById('entregaFormCard').style.display='block';this.renderizarItensFormulario();const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent=r.assinatura?'Assinatura atual carregada; desenhe sobre ela, envie outra ou limpe para substituir.':'Desenhe ou envie a assinatura.';await this.carregarAssinaturaExistente(r.assinatura);document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
   },
-  limparCanvasSemEstado() {
-    const c=document.getElementById('entregaAssinaturaCanvas'); if(c){const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);}
-  },
-  assinaturaAtual() {
-    if(this.assinaturaDataUrl) return this.assinaturaDataUrl;
-    if(this.assinaturaReferencia) return this.assinaturaReferencia;
-    if(!this.temAssinatura) return null;
-    const c=document.getElementById('entregaAssinaturaCanvas'); return c ? c.toDataURL('image/jpeg',0.86) : null;
-  },
+  limparCanvasSemEstado() { const c=document.getElementById('entregaAssinaturaCanvas');if(c){const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);} },
+  assinaturaAtual() { if(this.assinaturaDataUrl)return this.assinaturaDataUrl;if(this.assinaturaReferencia)return this.assinaturaReferencia;if(!this.temAssinatura)return null;const c=document.getElementById('entregaAssinaturaCanvas');return c?c.toDataURL('image/jpeg',0.86):null; },
   async salvar(event) {
-    event.preventDefault();
-    if(!this.podeModificar()) return app.mostrarAlerta('Somente Admin e Almoxarife podem alterar entregas.','error');
-    const nome=document.getElementById('entregaNome').value.trim();
-    const empresa=document.getElementById('entregaEmpresa').value.trim();
-    const data=document.getElementById('entregaData').value;
-    const itens=this.itensFormulario.map(item=>({...item,nome:String(item.nome||'').trim(),especificacoes:String(item.especificacoes||'').trim(),dataAlocacao:String(item.dataAlocacao||'')}));
-    if(!nome||!empresa||!data) return app.mostrarAlerta('Preencha Nome, Empresa e Data.','warning');
-    if(!itens.length||itens.some(item=>!item.nome||!item.dataAlocacao)) return app.mostrarAlerta('Informe o nome e a data de alocação de cada material.','warning');
-    const assinatura=this.assinaturaAtual();
-    if(!assinatura) return app.mostrarAlerta('Desenhe ou envie a assinatura antes de salvar.','warning');
-    const id=this.editandoId||this.gerarId('entrega');
-    const anterior=this.registros.find(x=>String(x.id)===String(id));
-    const registro={id,nome,empresa,data,assinatura,itens,criadoPor:anterior?.criadoPor||window.currentUser?.username||'',criadoEm:anterior?.criadoEm||new Date().toISOString(),atualizadoEm:new Date().toISOString()};
-    const proxima=[registro,...this.registros.filter(x=>String(x.id)!==String(id))];
-    this.registros=proxima; this._pendente=true; const localOk=this.salvarLocal();
-    this._isSaving=true;
-    let sincronizado=false;
-    try {
-      if(!window.__fb?.salvarEntregasMateriaisNaNuvem) throw new Error('Firebase indisponível');
-      const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(proxima);
-      this.registros=Array.isArray(salvos)?salvos:proxima; this._pendente=false; this.salvarLocal(); sincronizado=true;
-    } catch(e) { console.error('Entrega salva localmente, mas não sincronizou:',e); this._pendente=true; this.salvarLocal(); }
-    finally { this._isSaving=false; }
-    this.fecharFormulario(); this.renderizar();
-    if(sincronizado) app.mostrarAlerta('Entrega salva e sincronizada com site e aplicativo.','success');
-    else app.mostrarAlerta(localOk?'Entrega salva neste aparelho; a nuvem não confirmou. Verifique a conexão e tente atualizar.':'A entrega ficou aberta nesta sessão, mas o armazenamento local não confirmou.','warning');
+    event.preventDefault();if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem alterar entregas.','error');const nome=document.getElementById('entregaNome').value.trim();const empresa=document.getElementById('entregaEmpresa').value.trim();const data=document.getElementById('entregaData').value;const itens=this.itensFormulario.map(item=>({...item,nome:String(item.nome||'').trim(),especificacoes:String(item.especificacoes||'').trim(),empresaLocacao:String(item.empresaLocacao||'').trim()}));
+    if(!nome||!empresa||!data)return app.mostrarAlerta('Preencha Nome, Empresa e Data do empréstimo.','warning');if(!itens.length||itens.some(item=>!item.equipamentoId||!item.nome))return app.mostrarAlerta('Selecione um equipamento cadastrado para cada item da entrega.','warning');const assinatura=this.assinaturaAtual();if(!assinatura)return app.mostrarAlerta('Desenhe ou envie a assinatura antes de salvar.','warning');
+    const id=this.editandoId||this.gerarId('entrega');const anterior=this.registros.find(x=>String(x.id)===String(id));const registro={id,nome,empresa,data,assinatura,itens,criadoPor:anterior?.criadoPor||window.currentUser?.username||'',criadoEm:anterior?.criadoEm||new Date().toISOString(),atualizadoEm:new Date().toISOString()};const proxima=[registro,...this.registros.filter(x=>String(x.id)!==String(id))];this.registros=proxima;this._pendente=true;const localOk=this.salvarLocal();this._isSaving=true;let sincronizado=false;
+    try{if(!window.__fb?.salvarEntregasMateriaisNaNuvem)throw new Error('Firebase indisponível');const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(proxima);this.registros=Array.isArray(salvos)?salvos:proxima;this._pendente=false;this.salvarLocal();sincronizado=true;}catch(e){console.error('Entrega salva localmente, mas não sincronizou:',e);this._pendente=true;this.salvarLocal();}finally{this._isSaving=false;}
+    this.fecharFormulario();this.renderizar();if(sincronizado)app.mostrarAlerta('Entrega salva e sincronizada com site e aplicativo.','success');else app.mostrarAlerta(localOk?'Entrega salva neste aparelho; a nuvem não confirmou. Verifique a conexão e tente atualizar.':'A entrega ficou aberta nesta sessão, mas o armazenamento local não confirmou.','warning');
   },
   async excluir(id) {
-    if(!this.podeModificar()) return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir entregas.','error');
-    const r=this.registros.find(x=>String(x.id)===String(id)); if(!r) return;
-    if(!window.confirm(`Excluir a entrega de ${r.nome||'este registro'}?`)) return;
-    const proxima=this.registros.filter(x=>String(x.id)!==String(id)); this.registros=proxima; this._pendente=true; this.salvarLocal(); this._isSaving=true;
-    let sincronizado=false;
-    try {
-      const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(proxima); this.registros=Array.isArray(salvos)?salvos:proxima; this._pendente=false; this.salvarLocal(); sincronizado=true;
-    } catch(e) { console.error('Não foi possível sincronizar a exclusão:',e); this._pendente=true; this.salvarLocal(); }
-    finally { this._isSaving=false; }
-    if(sincronizado){
-      const refs=[r.assinatura,...(r.itens||[]).map(i=>i.imagem)].filter(Boolean);
-      for(const ref of refs){try{await window.__fb?.excluirImagemAnexoDaNuvem?.(ref);}catch(e){console.warn('A imagem removida ficou órfã no Firestore:',e);}}
-    }
-    this.renderizar(); app.mostrarAlerta(sincronizado?'Entrega excluída.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
+    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir entregas.','error');const r=this.registros.find(x=>String(x.id)===String(id));if(!r)return;if(!window.confirm(`Excluir a entrega de ${r.nome||'este registro'}?`))return;const proxima=this.registros.filter(x=>String(x.id)!==String(id));this.registros=proxima;this._pendente=true;this.salvarLocal();this._isSaving=true;let sincronizado=false;
+    try{const salvos=await window.__fb.salvarEntregasMateriaisNaNuvem(proxima);this.registros=Array.isArray(salvos)?salvos:proxima;this._pendente=false;this.salvarLocal();sincronizado=true;}catch(e){console.error('Não foi possível sincronizar a exclusão:',e);this._pendente=true;this.salvarLocal();}finally{this._isSaving=false;}
+    if(sincronizado){const refs=[r.assinatura,...(r.itens||[]).filter(i=>!i.equipamentoId).map(i=>i.imagem)].filter(Boolean);for(const ref of refs){try{await window.__fb?.excluirImagemAnexoDaNuvem?.(ref);}catch(e){console.warn('A imagem removida ficou órfã no Firestore:',e);}}}
+    this.renderizar();app.mostrarAlerta(sincronizado?'Entrega excluída.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
   },
   renderizar() {
-    const lista=document.getElementById('entregasMateriaisLista'); if(!lista) return;
-    const pode=this.podeModificar();
-    const botao=document.getElementById('btnNovaEntregaMaterial'); if(botao) botao.style.display=pode?'inline-flex':'none';
-    const info=document.getElementById('entregaPermissaoInfo'); if(info) info.style.display=pode?'none':'block';
-    this.atualizarSugestoesMateriais();
-    const q=String(document.getElementById('buscarEntregaMaterial')?.value||'').trim().toLocaleLowerCase('pt-BR');
-    const registros=[...this.registros].filter(r=>!q||[r.nome,r.empresa,...(Array.isArray(r.itens)?r.itens:[]).flatMap(i=>[i.nome,i.especificacoes])].join(' ').toLocaleLowerCase('pt-BR').includes(q));
-    registros.sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))||String(b.criadoEm||'').localeCompare(String(a.criadoEm||'')));
+    const lista=document.getElementById('entregasMateriaisLista');if(!lista)return;const pode=this.podeModificar();const botao=document.getElementById('btnNovaEntregaMaterial');if(botao)botao.style.display=pode?'inline-flex':'none';const info=document.getElementById('entregaPermissaoInfo');if(info)info.style.display=pode?'none':'block';const q=String(document.getElementById('buscarEntregaMaterial')?.value||'').trim().toLocaleLowerCase('pt-BR');const registros=[...this.registros].filter(r=>!q||[r.nome,r.empresa,...(Array.isArray(r.itens)?r.itens:[]).flatMap(i=>[i.nome,i.especificacoes,i.empresaLocacao])].join(' ').toLocaleLowerCase('pt-BR').includes(q));registros.sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))||String(b.criadoEm||'').localeCompare(String(a.criadoEm||'')));
     if(!registros.length){lista.innerHTML=`<p style="color:#64748b;text-align:center;padding:1.5rem">${this.registros.length?'Nenhuma entrega corresponde à busca.':'Nenhuma entrega cadastrada ainda.'}</p>`;return;}
-    lista.innerHTML=registros.map(r=>{
-      const id=this.escaparHTML(r.id); const itens=Array.isArray(r.itens)?r.itens:[];
-      const itensHTML=itens.map((item,i)=>`<div class="delivery-item-row"><div><strong>${this.escaparHTML(item.nome)}</strong>${item.especificacoes?`<small>Especificações: ${this.escaparHTML(item.especificacoes)}</small>`:''}<small>Alocado em: ${this.formatarData(item.dataAlocacao)}</small></div>${item.imagem?`<img class="delivery-record-photo" data-entrega-record="${id}" data-entrega-item="${this.escaparHTML(item.id)}" alt="Foto de ${this.escaparHTML(item.nome)}" />`:''}</div>`).join('');
-      const assinatura=r.assinatura?`<div class="delivery-record-signature"><span>Assinatura:</span><img data-entrega-signature="${id}" alt="Assinatura de ${this.escaparHTML(r.nome)}" /></div>`:'';
-      const acoes=pode?`<div class="delivery-record-actions"><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.editar('${id}')">✏️ Editar</button><button type="button" class="delete-btn" onclick="appEntregasMateriais.excluir('${id}')">Excluir</button></div>`:'';
-      return `<article class="delivery-record"><div class="delivery-record-head"><div><h3>${this.escaparHTML(r.nome)}</h3><p>${this.escaparHTML(r.empresa)}</p></div><strong>Data: ${this.formatarData(r.data)}</strong></div><div>${itensHTML||'<small>Sem itens cadastrados.</small>'}</div>${assinatura}${acoes}</article>`;
-    }).join('');
-    this.carregarImagensLista();
+    lista.innerHTML=registros.map(r=>{const id=this.escaparHTML(r.id);const itens=Array.isArray(r.itens)?r.itens:[];const itensHTML=itens.map(item=>`<div class="delivery-item-row"><div><strong>${this.escaparHTML(item.nome||'Equipamento')}</strong>${item.especificacoes?`<small>Especificações: ${this.escaparHTML(item.especificacoes)}</small>`:''}${item.equipamentoId?`<small>Empresa de locação: ${this.escaparHTML(item.empresaLocacao||'-')}</small><small>Data de locação: ${this.formatarData(item.dataLocacao)||'-'}</small>`:`<small>Registro anterior — data de alocação: ${this.formatarData(item.dataAlocacao)||'-'}</small>`}</div>${item.imagem?`<img class="delivery-record-photo" data-entrega-record="${id}" data-entrega-item="${this.escaparHTML(item.id)}" alt="Foto de ${this.escaparHTML(item.nome||'equipamento')}" />`:''}</div>`).join('');const assinatura=r.assinatura?`<div class="delivery-record-signature"><span>Assinatura:</span><img data-entrega-signature="${id}" alt="Assinatura de ${this.escaparHTML(r.nome)}" /></div>`:'';const podeEditar=pode&&itens.every(i=>i.equipamentoId);const acoes=pode?`<div class="delivery-record-actions">${podeEditar?`<button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.editar('${id}')">✏️ Editar</button>`:''}<button type="button" class="delete-btn" onclick="appEntregasMateriais.excluir('${id}')">Excluir</button></div>`:'';return `<article class="delivery-record"><div class="delivery-record-head"><div><h3>${this.escaparHTML(r.nome)}</h3><p>${this.escaparHTML(r.empresa)}</p></div><strong>Data do empréstimo: ${this.formatarData(r.data)}</strong></div><div>${itensHTML||'<small>Sem equipamentos cadastrados.</small>'}</div>${assinatura}${acoes}</article>`;}).join('');this.carregarImagensLista();
   },
-  async carregarImagensLista() {
-    const lista=document.getElementById('entregasMateriaisLista'); if(!lista) return;
-    for(const img of lista.querySelectorAll('[data-entrega-record]')){
-      const r=this.registros.find(x=>String(x.id)===img.dataset.entregaRecord); const item=r?.itens?.find(x=>String(x.id)===img.dataset.entregaItem); const src=await this.resolverImagem(item?.imagem); if(src) img.src=src; else img.style.display='none';
-    }
-    for(const img of lista.querySelectorAll('[data-entrega-signature]')){
-      const r=this.registros.find(x=>String(x.id)===img.dataset.entregaSignature); const src=await this.resolverImagem(r?.assinatura); if(src) img.src=src; else img.style.display='none';
-    }
+  async carregarImagensLista() { const lista=document.getElementById('entregasMateriaisLista');if(!lista)return;for(const img of lista.querySelectorAll('[data-entrega-record]')){const r=this.registros.find(x=>String(x.id)===img.dataset.entregaRecord);const item=r?.itens?.find(x=>String(x.id)===img.dataset.entregaItem);const src=await this.resolverImagem(item?.imagem);if(src)img.src=src;else img.style.display='none';}for(const img of lista.querySelectorAll('[data-entrega-signature]')){const r=this.registros.find(x=>String(x.id)===img.dataset.entregaSignature);const src=await this.resolverImagem(r?.assinatura);if(src)img.src=src;else img.style.display='none';} },
+  limparCanvasSemEstado() { const c=document.getElementById('entregaAssinaturaCanvas');if(c){const x=c.getContext('2d');x.fillStyle='#fff';x.fillRect(0,0,c.width,c.height);} },
+  atualizar() { this.renderizar();window.appEquipamentosLocacao?.atualizar();if(this._pendente)this.sincronizarPendente(); }
+};
+
+const appEquipamentosLocacao = {
+  STORAGE_KEY: 'controle_equipamentos_locacao_v1',
+  PENDING_KEY: 'controle_equipamentos_locacao_pendente_v1',
+  equipamentos: [],
+  editandoId: null,
+  imagemReferencia: null,
+  imagemDataUrl: null,
+  _unsub: null,
+  _isSaving: false,
+  _pendente: false,
+  _initialized: false,
+  _loading: false,
+  _readyPromise: null,
+  _imageCache: new Map(),
+  podeModificar() { return auth.pode('gerenciar_entregas_materiais'); },
+  gerarId(prefixo='equipamento') { const r=window.crypto?.randomUUID?window.crypto.randomUUID():Math.random().toString(36).slice(2,11);return `${prefixo}_${Date.now()}_${r}`; },
+  formatarData(valor) { const p=String(valor||'').split('T')[0].split('-');return p.length===3?`${p[2]}/${p[1]}/${p[0]}`:String(valor||''); },
+  escaparHTML(valor) { return String(valor??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); },
+  init() {
+    if(this._initialized)return this._readyPromise||Promise.resolve();
+    this._initialized=true;this._loading=true;
+    this._readyPromise=this.carregar().then(()=>{this._loading=false;this.renderizar();this.iniciarSyncAoVivo();if(this._pendente)this.sincronizarPendente();});
+    if(!this._onlineHandler){this._onlineHandler=()=>this.sincronizarPendente();window.addEventListener('online',this._onlineHandler);}
+    return this._readyPromise;
   },
-  atualizar() { this.renderizar(); if(this._pendente) this.sincronizarPendente(); }
+  carregarLocal() { try{const raw=localStorage.getItem(this.STORAGE_KEY);return raw?JSON.parse(raw):[];}catch(e){console.warn('Não foi possível ler equipamentos locais:',e);return [];} },
+  salvarLocal() { try{localStorage.setItem(this.STORAGE_KEY,JSON.stringify(this.equipamentos));localStorage.setItem(this.PENDING_KEY,this._pendente?'1':'0');return true;}catch(e){console.error('Não foi possível salvar equipamentos neste aparelho:',e);return false;} },
+  async carregar() {
+    const locais=this.carregarLocal();this._pendente=localStorage.getItem(this.PENDING_KEY)==='1';
+    try{const cloud=await window.__fb?.carregarEquipamentosLocacaoDaNuvem?.();if(Array.isArray(cloud)&&!this._pendente){this.equipamentos=cloud;this.salvarLocal();return;}this.equipamentos=Array.isArray(locais)?locais:[];if(this.equipamentos.length&&(this._pendente||!Array.isArray(cloud)))this._pendente=true;this.salvarLocal();}
+    catch(e){this.equipamentos=Array.isArray(locais)?locais:[];if(this.equipamentos.length)this._pendente=true;this.salvarLocal();console.warn('Equipamentos mantidos no aparelho; não foi possível carregar a nuvem:',e);}
+  },
+  iniciarSyncAoVivo() {
+    if(!window.__fb?.escutarMudancasEquipamentosLocacao)return;
+    try{if(this._unsub)this._unsub();this._unsub=window.__fb.escutarMudancasEquipamentosLocacao(equipamentos=>{if(this._isSaving||this._pendente||!Array.isArray(equipamentos))return;this.equipamentos=equipamentos;this.salvarLocal();this.renderizar();});}catch(e){console.warn('Sincronização ao vivo dos equipamentos indisponível:',e);}
+  },
+  async sincronizarPendente() {
+    if(!this._pendente||this._isSaving||!navigator.onLine||!window.__fb?.salvarEquipamentosLocacaoNaNuvem)return;this._isSaving=true;
+    try{const salvos=await window.__fb.salvarEquipamentosLocacaoNaNuvem(this.equipamentos);this.equipamentos=Array.isArray(salvos)?salvos:this.equipamentos;this._pendente=false;this.salvarLocal();this.renderizar();}catch(e){console.warn('Não foi possível sincronizar equipamentos pendentes:',e);}finally{this._isSaving=false;}
+  },
+  async resolverImagem(ref) { if(!ref||typeof ref!=='string')return null;if(ref.startsWith('data:image/'))return ref;if(this._imageCache.has(ref))return this._imageCache.get(ref);try{const src=await window.__fb?.resolverImagemAnexoDaNuvem?.(ref);if(src)this._imageCache.set(ref,src);return src||null;}catch(e){console.warn('Imagem de equipamento não carregou:',e);return null;} },
+  async mostrarPrevia() {
+    const img=document.getElementById('equipamentoFotoPreview');const btn=document.getElementById('btnRemoverFotoEquipamento');if(!img)return;const ref=this.imagemDataUrl||this.imagemReferencia;
+    if(!ref){img.removeAttribute('src');img.style.display='none';if(btn)btn.style.display='none';return;}if(btn)btn.style.display='inline-flex';
+    if(ref.startsWith('data:image/')){img.src=ref;img.style.display='block';return;}img.removeAttribute('src');img.style.display='none';const src=await this.resolverImagem(ref);if(src){img.src=src;img.style.display='block';}
+  },
+  abrirFormulario(id=null) {
+    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem cadastrar equipamentos.','error');const eq=id?this.equipamentos.find(x=>String(x.id)===String(id)):null;if(id&&!eq)return;
+    this.editandoId=eq?.id||null;this.imagemDataUrl=null;this.imagemReferencia=eq?.imagem||null;document.getElementById('formEquipamentoLocacao')?.reset();document.getElementById('equipamentoNome').value=eq?.nome||'';document.getElementById('equipamentoEmpresaLocacao').value=eq?.empresaLocacao||'';document.getElementById('equipamentoDataLocacao').value=eq?.dataLocacao||new Date().toISOString().slice(0,10);document.getElementById('equipamentoEspecificacoes').value=eq?.especificacoes||'';document.getElementById('equipamentoFormTitulo').textContent=eq?'Editar equipamento':'Cadastrar equipamento';document.getElementById('btnSalvarEquipamento').textContent=eq?'Salvar alterações':'Salvar equipamento';document.getElementById('equipamentoFormCard').style.display='block';this.mostrarPrevia();document.getElementById('equipamentoFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+  },
+  fecharFormulario() { const card=document.getElementById('equipamentoFormCard');if(card)card.style.display='none';this.editandoId=null;this.imagemDataUrl=null;this.imagemReferencia=null; },
+  async processarFoto(event) { const input=event.target,file=input.files?.[0];if(!file)return;if(!this.podeModificar()){input.value='';return;}try{this.imagemDataUrl=await appMateriais.comprimirImagem(file);this.imagemReferencia=null;await this.mostrarPrevia();}catch(e){console.error(e);app.mostrarAlerta('Não foi possível carregar a imagem do equipamento.','error');}input.value=''; },
+  removerFoto() { if(!this.podeModificar())return;this.imagemDataUrl=null;this.imagemReferencia=null;const a=document.getElementById('equipamentoFotoGaleria');const b=document.getElementById('equipamentoFotoCamera');if(a)a.value='';if(b)b.value='';this.mostrarPrevia(); },
+  async salvar(event) {
+    event.preventDefault();if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem cadastrar equipamentos.','error');const nome=document.getElementById('equipamentoNome').value.trim();const empresaLocacao=document.getElementById('equipamentoEmpresaLocacao').value.trim();const dataLocacao=document.getElementById('equipamentoDataLocacao').value;const especificacoes=document.getElementById('equipamentoEspecificacoes').value.trim();if(!nome||!empresaLocacao||!dataLocacao)return app.mostrarAlerta('Preencha nome, empresa de locação e data de locação.','warning');
+    const id=this.editandoId||this.gerarId();const anterior=this.equipamentos.find(x=>String(x.id)===String(id));const imagem=this.imagemDataUrl||this.imagemReferencia||null;const fotoId=this.imagemDataUrl?this.gerarId('foto_equipamento'):((this.imagemReferencia&&anterior?.fotoId)||null);const item={id,nome,empresaLocacao,dataLocacao,especificacoes,imagem,fotoId,criadoEm:anterior?.criadoEm||new Date().toISOString(),atualizadoEm:new Date().toISOString()};const proxima=[item,...this.equipamentos.filter(x=>String(x.id)!==String(id))];this.equipamentos=proxima;this._pendente=true;const localOk=this.salvarLocal();this._isSaving=true;let sincronizado=false;
+    try{if(!window.__fb?.salvarEquipamentosLocacaoNaNuvem)throw new Error('Firebase indisponível');const salvos=await window.__fb.salvarEquipamentosLocacaoNaNuvem(proxima);this.equipamentos=Array.isArray(salvos)?salvos:proxima;this._pendente=false;this.salvarLocal();sincronizado=true;}catch(e){console.error('Equipamento salvo localmente, mas não sincronizou:',e);this._pendente=true;this.salvarLocal();}finally{this._isSaving=false;}
+    this.fecharFormulario();this.renderizar();if(sincronizado)app.mostrarAlerta('Equipamento salvo e sincronizado com site e aplicativo.','success');else app.mostrarAlerta(localOk?'Equipamento salvo neste aparelho; a nuvem não confirmou. Verifique a conexão e tente atualizar.':'O equipamento ficou nesta sessão, mas o armazenamento local não confirmou.','warning');
+  },
+  editar(id) { if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem editar equipamentos.','error');this.abrirFormulario(id); },
+  async excluir(id) {
+    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir equipamentos.','error');const eq=this.equipamentos.find(x=>String(x.id)===String(id));if(!eq)return;if(!window.confirm(`Excluir o equipamento "${eq.nome}" do cadastro? Os registros de entrega já feitos serão preservados.`))return;const proxima=this.equipamentos.filter(x=>String(x.id)!==String(id));this.equipamentos=proxima;this._pendente=true;this.salvarLocal();this._isSaving=true;let sincronizado=false;
+    try{const salvos=await window.__fb.salvarEquipamentosLocacaoNaNuvem(proxima);this.equipamentos=Array.isArray(salvos)?salvos:proxima;this._pendente=false;this.salvarLocal();sincronizado=true;}catch(e){console.error('Não foi possível sincronizar a exclusão do equipamento:',e);this._pendente=true;this.salvarLocal();}finally{this._isSaving=false;}
+    this.renderizar();app.mostrarAlerta(sincronizado?'Equipamento removido do cadastro; as entregas anteriores foram mantidas.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
+  },
+  renderizar() {
+    const lista=document.getElementById('equipamentosLocacaoLista');if(!lista)return;const pode=this.podeModificar();const botao=document.getElementById('btnNovoEquipamento');if(botao)botao.style.display=pode?'inline-flex':'none';const info=document.getElementById('entregaPermissaoInfo');if(info)info.style.display=pode?'none':'block';const q=String(document.getElementById('buscarEquipamentosLocacao')?.value||'').trim().toLocaleLowerCase('pt-BR');const itens=[...this.equipamentos].filter(e=>!q||[e.nome,e.empresaLocacao,e.especificacoes].join(' ').toLocaleLowerCase('pt-BR').includes(q)).sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base'}));
+    if(!itens.length){lista.innerHTML=`<p style="color:#64748b;text-align:center;padding:1.5rem">${this._loading?'Carregando equipamentos...':this.equipamentos.length?'Nenhum equipamento corresponde à busca.':'Nenhum equipamento cadastrado ainda.'}</p>`;}
+    else{lista.innerHTML=itens.map(e=>{const id=this.escaparHTML(e.id);const img=e.imagem?`<img class="equipment-record-photo" data-equipamento-photo="${id}" alt="Foto do equipamento ${this.escaparHTML(e.nome)}" />`:`<div class="equipment-photo-placeholder" aria-label="Sem foto">Sem foto</div>`;const acoes=pode?`<div class="equipment-record-actions"><button type="button" class="btn btn-secondary" onclick="appEquipamentosLocacao.editar('${id}')">✏️ Editar</button><button type="button" class="delete-btn" onclick="appEquipamentosLocacao.excluir('${id}')">Excluir</button></div>`:'';return `<article class="equipment-record">${img}<div class="equipment-record-body"><h4>${this.escaparHTML(e.nome)}</h4><p><strong>Empresa de locação:</strong> ${this.escaparHTML(e.empresaLocacao||'-')}</p><p><strong>Data de locação:</strong> ${this.formatarData(e.dataLocacao)||'-'}</p>${e.especificacoes?`<p><strong>Especificações:</strong> ${this.escaparHTML(e.especificacoes)}</p>`:''}${acoes}</div></article>`;}).join('');this.carregarImagensLista();}
+    window.appEntregasMateriais?.renderizarItensFormulario();
+  },
+  async carregarImagensLista() { const lista=document.getElementById('equipamentosLocacaoLista');if(!lista)return;for(const img of lista.querySelectorAll('[data-equipamento-photo]')){const eq=this.equipamentos.find(x=>String(x.id)===img.dataset.equipamentoPhoto);const src=await this.resolverImagem(eq?.imagem);if(src)img.src=src;else img.style.display='none';} },
+  atualizar() { this.renderizar();if(this._pendente)this.sincronizarPendente(); }
 };
 
 const appSaldoNF = {
@@ -5056,6 +4972,7 @@ window.auth = auth;
 window.app = app;
 window.appMateriais = appMateriais;
 window.appEntregasMateriais = appEntregasMateriais;
+window.appEquipamentosLocacao = appEquipamentosLocacao;
 window.appSaldoNF = appSaldoNF;
 window.appRT = appRT;
 window.floorRooms = floorRooms;
