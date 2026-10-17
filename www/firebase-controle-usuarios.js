@@ -29,6 +29,7 @@ const REF_MOVIMENTACOES = doc(db, "controle", "movimentacoes");
 const REF_PLANEJAMENTO_RT = doc(db, "controle", "planejamento_rt");
 const REF_RT_DIA_DIA = doc(db, "controle", "rt_dia_dia");
 const REF_SALDO_NF = doc(db, "controle", "saldo_nf");
+const REF_GRUPOS_MATERIAIS = doc(db, "controle", "grupos_materiais");
 
 // ── EMPRÉSTIMOS ──
 export async function salvarNaNuvem(registros) {
@@ -195,6 +196,23 @@ export function escutarMudancasMovimentacoes(callback) {
     if (!snap.exists()) return;
     callback(snap.data().movimentacoes ?? []);
   });
+}
+
+// ── GRUPOS DE MATERIAIS ──
+export async function salvarGruposMateriaisNaNuvem(grupos) {
+  await setDoc(REF_GRUPOS_MATERIAIS, { grupos: Array.isArray(grupos) ? grupos : [], updatedAt: Date.now() }, { merge: true });
+}
+
+export async function carregarGruposMateriaisDaNuvem() {
+  const snap = await getDoc(REF_GRUPOS_MATERIAIS);
+  return snap.exists() ? (snap.data().grupos ?? null) : null;
+}
+
+export function escutarMudancasGruposMateriais(callback) {
+  return onSnapshot(REF_GRUPOS_MATERIAIS, (snap) => {
+    if (!snap.exists()) return;
+    callback(snap.data().grupos ?? []);
+  }, (error) => console.warn('Sincronização de grupos de materiais indisponível:', error));
 }
 
 
