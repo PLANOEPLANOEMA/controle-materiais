@@ -1154,7 +1154,7 @@
 </button><button type="button" class="btn btn-secondary" id="btnGerenciarGruposMateriais" onclick="appMateriais.abrirModalGrupos()">🗂️ Grupos de Materiais</button></div><div class="filter-bar"><input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" /><select id="filterGrupoMateriais" onchange="appMateriais.filtrarMateriais()" style="min-width:180px;flex:1;padding:.7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;"><option value="">Todos os grupos</option><option value="__sem_grupo__">Sem grupo</option></select><input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" /></div><div id="materiaisContainer" class="materiais-grid"></div></div></section><section id="entregas-materiais">
 <div class="card">
   <div class="delivery-heading"><div><h2>📝 Controle de Entrega de Equipamentos</h2><p style="color:#6b7a99;margin:.35rem 0 0">Cadastre equipamentos locados e selecione-os ao registrar uma entrega. Os dados sincronizam entre o site e o aplicativo.</p></div>
-    <div class="btn-group"><button id="btnNovoEquipamento" type="button" class="btn btn-primary" onclick="appEquipamentosLocacao.abrirFormulario()">➕ Cadastrar equipamento</button><button id="btnNovaEntregaMaterial" type="button" class="btn btn-success" onclick="appEntregasMateriais.abrirFormulario()">➕ Nova entrega</button><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.atualizar()">🔄 Atualizar</button></div>
+    <div class="btn-group"><button id="btnNovoEquipamento" type="button" class="btn btn-primary" onclick="appEquipamentosLocacao.abrirFormulario()">➕ Cadastrar equipamento</button><button id="btnNovaEntregaMaterial" type="button" class="btn btn-success" onclick="appEntregasMateriais.abrirFormulario()">➕ Nova entrega</button><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.atualizar()">🔄 Atualizar</button><button id="btnRelatorioEntregasEquipamentos" type="button" class="btn btn-warning" onclick="appEntregasMateriais.gerarRelatorioEntregas()">📄 Relatório de entregas</button></div>
   </div>
   <p id="entregaPermissaoInfo" style="display:none;color:#6b7a99;margin:.8rem 0 0">Acesso somente para consulta. Apenas Admin e Almoxarife podem cadastrar equipamentos e alterar entregas.</p>
 </div>
@@ -1227,7 +1227,7 @@
     escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
-  } from "./firebase-controle-usuarios.js?v=1.0.20";
+  } from "./firebase-controle-usuarios.js?v=1.0.21";
 
   window.__fb = {
     salvarNaNuvem,
@@ -3803,12 +3803,54 @@ const appEntregasMateriais = {
     if(sincronizado){const refs=[r.assinatura,...(r.itens||[]).filter(i=>!i.equipamentoId).map(i=>i.imagem)].filter(Boolean);for(const ref of refs){try{await window.__fb?.excluirImagemAnexoDaNuvem?.(ref);}catch(e){console.warn('A imagem removida ficou órfã no Firestore:',e);}}}
     this.renderizar();app.mostrarAlerta(sincronizado?'Entrega excluída.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
   },
+  obterRegistrosFiltrados() {
+    const q=String(document.getElementById('buscarEntregaMaterial')?.value||'').trim().toLocaleLowerCase('pt-BR');
+    return [...this.registros]
+      .filter(r=>!q||[r.nome,r.empresa,...(Array.isArray(r.itens)?r.itens:[]).flatMap(i=>[i.nome,i.especificacoes,i.empresaLocacao])].join(' ').toLocaleLowerCase('pt-BR').includes(q))
+      .sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))||String(b.criadoEm||'').localeCompare(String(a.criadoEm||'')));
+  },
+  async gerarRelatorioEntregas() {
+    const registros=this.obterRegistrosFiltrados();
+    if(!registros.length)return app.mostrarAlerta('Não há entregas para incluir no relatório. Confira o filtro de busca.','warning');
+    const win=window.open('','_blank');
+    if(!win)return app.mostrarAlerta('O navegador bloqueou o relatório. Libere pop-ups e tente novamente.','error');
+    win.document.open();win.document.write('<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><title>Relatório de entregas</title><body style="font:16px Arial;padding:2rem;color:#1f3864">Preparando relatório de entregas e carregando fotos e assinaturas…</body></html>');win.document.close();
+    try {
+      const preparados=await Promise.all(registros.map(async r=>({
+        ...r,
+        assinaturaRelatorio:await this.resolverImagem(r.assinatura),
+        itensRelatorio:await Promise.all((Array.isArray(r.itens)?r.itens:[]).map(async item=>({...item,imagemRelatorio:await this.resolverImagem(item.imagem)})))
+      })));
+      if(win.closed)return;
+      const escapar=v=>this.escaparHTML(v);
+      const itensTodos=preparados.flatMap(r=>r.itensRelatorio);
+      const emUso=itensTodos.filter(i=>i.status==='Em uso').length;
+      const concluidos=itensTodos.filter(i=>i.status==='Concluído').length;
+      const busca=String(document.getElementById('buscarEntregaMaterial')?.value||'').trim();
+      const geradoEm=new Date().toLocaleString('pt-BR');
+      const registrosHtml=preparados.map(r=>{
+        const itensHtml=r.itensRelatorio.map(item=>{
+          const status=['Em uso','Concluído'].includes(item.status)?item.status:'Sem status';
+          const classe=status==='Em uso'?'in-use':status==='Concluído'?'complete':'unknown';
+          const atualizado=status==='Concluído'&&item.devolvidoEm?`Devolvido em: ${escapar(this.formatarInstante(item.devolvidoEm))}`:item.statusAtualizadoEm?`Status atualizado em: ${escapar(this.formatarInstante(item.statusAtualizadoEm))}`:'';
+          const foto=item.imagemRelatorio?`<img class="equipment-photo" src="${escapar(item.imagemRelatorio)}" alt="Foto de ${escapar(item.nome||'equipamento')}">`:'<div class="photo-placeholder">Foto não disponível</div>';
+          return `<section class="equipment"><div class="equipment-title"><h3>${escapar(item.nome||'Equipamento')}</h3><span class="status ${classe}">${escapar(status)}</span></div><div class="equipment-content">${foto}<div class="equipment-info"><p><strong>Empresa de locação:</strong> ${escapar(item.empresaLocacao||'-')}</p><p><strong>Data de locação:</strong> ${escapar(this.formatarData(item.dataLocacao)||'-')}</p><p><strong>Especificações:</strong> ${escapar(item.especificacoes||'-')}</p>${atualizado?`<p><strong>${escapar(atualizado)}</strong></p>`:''}</div></div></section>`;
+        }).join('');
+        const assinatura=r.assinaturaRelatorio?`<div class="signature"><strong>Assinatura de quem recebeu</strong><img src="${escapar(r.assinaturaRelatorio)}" alt="Assinatura de ${escapar(r.nome||'recebedor')}"></div>`:'<div class="signature"><strong>Assinatura</strong><p>Não disponível neste registro.</p></div>';
+        return `<article class="record"><header class="record-head"><div><h2>${escapar(r.nome||'-')}</h2><p>${escapar(r.empresa||'-')}</p></div><div class="loan-date"><strong>Data do empréstimo</strong><span>${escapar(this.formatarData(r.data)||'-')}${r.horario?` às ${escapar(r.horario)}`:''}</span></div></header><div class="equipment-list">${itensHtml||'<p>Sem equipamentos neste registro.</p>'}</div>${assinatura}</article>`;
+      }).join('');
+      const html=`<!doctype html><html lang="pt-BR"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Relatório de Entrega de Equipamentos</title><style>*{box-sizing:border-box}body{margin:0;background:#f3f6fa;color:#1e293b;font:14px Arial,sans-serif}.page{max-width:1100px;margin:0 auto;padding:24px}.actions{margin:0 0 16px}.btn{border:0;border-radius:8px;background:#1f3864;color:#fff;padding:10px 16px;font-weight:700;cursor:pointer}.report-head{display:flex;justify-content:space-between;align-items:flex-start;gap:1rem;border-bottom:3px solid #1f3864;padding-bottom:16px;margin-bottom:18px}.report-head h1{margin:0;color:#1f3864;font-size:26px}.report-head p{margin:.4rem 0;color:#64748b}.generated{color:#64748b;text-align:right;font-size:12px}.summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin:16px 0 22px}.metric{background:#fff;border:1px solid #dbe5f1;border-radius:10px;padding:12px}.metric strong{display:block;color:#1f3864;font-size:22px}.metric span{display:block;margin-top:4px;color:#64748b;font-size:12px}.record{background:#fff;border:1px solid #dbe5f1;border-radius:12px;padding:16px;margin:0 0 16px;break-inside:avoid}.record-head{display:flex;justify-content:space-between;gap:1rem;align-items:flex-start;border-bottom:1px solid #e2e8f0;padding-bottom:10px;margin-bottom:10px}.record-head h2{margin:0 0 4px;color:#1f3864;font-size:19px}.record-head p{margin:0;color:#64748b}.loan-date{text-align:right}.loan-date strong,.loan-date span{display:block}.loan-date span{margin-top:5px}.equipment{border:1px solid #e2e8f0;border-radius:10px;padding:12px;margin:10px 0}.equipment-title{display:flex;justify-content:space-between;align-items:center;gap:10px}.equipment-title h3{margin:0;color:#334155;font-size:16px}.status{border-radius:99px;padding:4px 9px;font-weight:700;font-size:12px;white-space:nowrap}.in-use{background:#fff1c7;color:#805900}.complete{background:#dcfce7;color:#166534}.unknown{background:#eef2f7;color:#596579}.equipment-content{display:flex;align-items:flex-start;gap:12px;margin-top:10px}.equipment-photo,.photo-placeholder{width:110px;height:90px;object-fit:contain;border:1px solid #dbe5f1;border-radius:8px;background:#f8fafc;flex:0 0 auto}.photo-placeholder{display:grid;place-items:center;text-align:center;color:#64748b;font-size:11px;padding:5px}.equipment-info p{margin:4px 0;line-height:1.4}.signature{display:flex;align-items:center;gap:12px;margin-top:12px;border-top:1px dashed #cbd5e1;padding-top:10px}.signature img{width:230px;height:76px;object-fit:contain;border:1px solid #dbe5f1;border-radius:7px;background:#fff}.footer{text-align:center;color:#64748b;border-top:1px solid #dbe5f1;margin-top:22px;padding-top:12px;font-size:12px}@page{size:A4 portrait;margin:12mm}@media print{body{background:#fff}.page{max-width:none;padding:0}.actions{display:none}.record{box-shadow:none}.summary{grid-template-columns:repeat(4,1fr)}}@media(max-width:700px){.page{padding:12px}.summary{grid-template-columns:repeat(2,minmax(0,1fr))}.report-head,.record-head{flex-direction:column}.generated,.loan-date{text-align:left}.equipment-content{flex-direction:column}.signature{align-items:flex-start;flex-direction:column}}</style></head><body><main class="page"><div class="actions"><button class="btn" onclick="window.print()">🖨️ Imprimir / salvar em PDF</button></div><header class="report-head"><div><h1>Relatório de Entrega de Equipamentos</h1><p>${busca?`Busca aplicada: “${escapar(busca)}”`:'Todos os registros de entrega atualmente cadastrados'}</p></div><div class="generated">Gerado em ${escapar(geradoEm)}</div></header><section class="summary"><div class="metric"><strong>${preparados.length}</strong><span>Entregas</span></div><div class="metric"><strong>${itensTodos.length}</strong><span>Equipamentos registrados</span></div><div class="metric"><strong>${emUso}</strong><span>Em uso</span></div><div class="metric"><strong>${concluidos}</strong><span>Concluídos / devolvidos</span></div></section>${registrosHtml}<footer class="footer">Relatório gerado pelo Controle de Entregas de Equipamentos — Plano &amp; Plano</footer></main></body></html>`;
+      win.document.open();win.document.write(html);win.document.close();
+    } catch(e) {
+      console.error('Não foi possível gerar o relatório de entregas:',e);
+      if(!win.closed){win.document.open();win.document.write('<!doctype html><html lang="pt-BR"><meta charset="UTF-8"><body style="font:16px Arial;padding:2rem">Não foi possível preparar o relatório. Verifique a conexão e tente novamente.</body></html>');win.document.close();}
+      app.mostrarAlerta('Não foi possível gerar o relatório de entregas. Verifique a conexão e tente novamente.','error');
+    }
+  },
   renderizar() {
     const lista=document.getElementById('entregasMateriaisLista');if(!lista)return;const pode=this.podeModificar();
     const botao=document.getElementById('btnNovaEntregaMaterial');if(botao)botao.style.display=pode?'inline-flex':'none';const info=document.getElementById('entregaPermissaoInfo');if(info)info.style.display=pode?'none':'block';
-    const q=String(document.getElementById('buscarEntregaMaterial')?.value||'').trim().toLocaleLowerCase('pt-BR');
-    const registros=[...this.registros].filter(r=>!q||[r.nome,r.empresa,...(Array.isArray(r.itens)?r.itens:[]).flatMap(i=>[i.nome,i.especificacoes,i.empresaLocacao])].join(' ').toLocaleLowerCase('pt-BR').includes(q));
-    registros.sort((a,b)=>String(b.data||'').localeCompare(String(a.data||''))||String(b.criadoEm||'').localeCompare(String(a.criadoEm||'')));
+    const registros=this.obterRegistrosFiltrados();
     if(!registros.length){lista.innerHTML=`<p style="color:#64748b;text-align:center;padding:1.5rem">${this.registros.length?'Nenhuma entrega corresponde à busca.':'Nenhuma entrega cadastrada ainda.'}</p>`;window.appPainelMateriais?.renderizar();return;}
     lista.innerHTML=registros.map(r=>{
       const id=this.escaparHTML(r.id),itens=Array.isArray(r.itens)?r.itens:[];
