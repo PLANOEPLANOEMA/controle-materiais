@@ -1153,7 +1153,7 @@
 🔄 Atualizar
 </button><button type="button" class="btn btn-secondary" id="btnGerenciarGruposMateriais" onclick="appMateriais.abrirModalGrupos()">🗂️ Grupos de Materiais</button></div><div class="filter-bar"><input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" /><select id="filterGrupoMateriais" onchange="appMateriais.filtrarMateriais()" style="min-width:180px;flex:1;padding:.7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;"><option value="">Todos os grupos</option><option value="__sem_grupo__">Sem grupo</option></select><input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" /></div><div id="materiaisContainer" class="materiais-grid"></div></div></section><section id="entregas-materiais">
 <div class="card">
-  <div class="delivery-heading"><div><h2>📝 Controle de Entrega de Equipamentos</h2><p style="color:#6b7a99;margin:.35rem 0 0">Cadastre equipamentos locados e selecione-os ao registrar uma entrega. Os dados sincronizam entre o site e o aplicativo.</p></div>
+  <div class="delivery-heading"><div><h2>📝 Controle de Entrega de Equipamentos</h2><p id="entregaTabSubtitle" style="color:#6b7a99;margin:.35rem 0 0">Cadastre equipamentos locados e selecione-os ao registrar uma entrega. Os dados sincronizam entre o site e o aplicativo.</p></div>
     <div class="btn-group"><button id="btnNovoEquipamento" type="button" class="btn btn-primary" onclick="appEquipamentosLocacao.abrirFormulario()">➕ Cadastrar equipamento</button><button id="btnNovaEntregaMaterial" type="button" class="btn btn-success" onclick="appEntregasMateriais.abrirFormulario()">➕ Nova entrega</button><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.atualizar()">🔄 Atualizar</button><button id="btnRelatorioEntregasEquipamentos" type="button" class="btn btn-warning" onclick="appEntregasMateriais.gerarRelatorioEntregas()">📄 Relatório de entregas</button></div>
   </div>
   <p id="entregaPermissaoInfo" style="display:none;color:#6b7a99;margin:.8rem 0 0">Acesso somente para consulta. Apenas Admin e Almoxarife podem cadastrar equipamentos e alterar entregas.</p>
@@ -1180,7 +1180,7 @@
       <div class="form-group"><label for="entregaEmpresa">Empresa de quem recebeu</label><input id="entregaEmpresa" type="text" maxlength="120" required placeholder="Empresa do recebedor" /></div>
       <div class="form-group"><label for="entregaData">Data do empréstimo</label><input id="entregaData" type="date" required /></div><div class="form-group"><label for="entregaHorario">Horário do empréstimo</label><input id="entregaHorario" type="time" /></div>
     </div>
-    <div class="delivery-item-head"><h3>Equipamentos entregues</h3><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.adicionarItem()">＋ Adicionar equipamento</button></div>
+    <div class="delivery-item-head"><h3>Equipamentos entregues</h3><button id="btnAdicionarItemEntrega" type="button" class="btn btn-secondary" onclick="appEntregasMateriais.adicionarItem()">＋ Adicionar equipamento</button></div>
     <div id="entregaItensForm"></div>
     <div class="form-group"><label for="entregaAssinaturaCanvas">Assinatura de quem recebeu</label>
       <div class="delivery-signature-actions"><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.limparAssinatura()">Limpar assinatura</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('entregaAssinaturaUpload').click()">🖼️ Enviar imagem da assinatura</button><input id="entregaAssinaturaUpload" type="file" accept="image/*" style="display:none" /></div>
@@ -1227,7 +1227,7 @@
     escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
-  } from "./firebase-controle-usuarios.js?v=1.0.22";
+  } from "./firebase-controle-usuarios.js?v=1.0.23";
 
   window.__fb = {
     salvarNaNuvem,
@@ -1391,10 +1391,12 @@ const auth = {
 
     const resetBtn=document.getElementById('btnResetarRomaneios');
     if(resetBtn)resetBtn.style.display=role==='admin'?'inline-flex':'none';
+    if(role==='engenharia'){const formEntrega=document.getElementById('entregaFormCard'),formEquipamento=document.getElementById('equipamentoFormCard');if(formEntrega)formEntrega.style.display='none';if(formEquipamento)formEquipamento.style.display='none';if(window.appEntregasMateriais)window.appEntregasMateriais.editandoId=null;if(window.appEquipamentosLocacao)window.appEquipamentosLocacao.editandoId=null;}
     const firstBtn=[...document.querySelectorAll('nav button')].find(btn=>btn.dataset.section==='visao-geral'&&btn.style.display!=='none')||[...document.querySelectorAll('nav button')].find(btn=>btn.style.display!=='none');
     if (firstBtn) {
       app.showSection(firstBtn.dataset.section, firstBtn);
     }
+    window.appEntregasMateriais?.renderizar();window.appEquipamentosLocacao?.renderizar();
   },
 
   mostrarApp(sessao = this.obterSessao()) {
@@ -1421,7 +1423,7 @@ const auth = {
       admin: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
       almoxarife: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
-      engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_predio_3d']
+      engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_predio_3d','criar_entregas_materiais']
     };
     return (mapa[role] || []).includes(acao);
   }
@@ -3678,6 +3680,8 @@ const appEntregasMateriais = {
   _initialized: false,
   _imageCache: new Map(),
   podeModificar() { return auth.pode('gerenciar_entregas_materiais'); },
+  podeCriarEntrega() { return this.podeModificar() || auth.pode('criar_entregas_materiais'); },
+  isEngenharia() { return window.currentUser?.role === 'engenharia'; },
   equipamentoEmUsoPorOutroRegistro(equipamentoId,nomeEquipamento='',registroIdExcluir=null) {
     const id=String(equipamentoId||'');
     const nome=String(nomeEquipamento||'').trim().toLocaleLowerCase('pt-BR');
@@ -3750,25 +3754,25 @@ const appEntregasMateriais = {
   configurarAssinatura() {
     const canvas=document.getElementById('entregaAssinaturaCanvas');if(!canvas||canvas.dataset.bound)return;canvas.dataset.bound='1';const ctx=canvas.getContext('2d');const limparCanvas=()=>{ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);};limparCanvas();ctx.strokeStyle='#153b67';ctx.lineWidth=4;ctx.lineCap='round';ctx.lineJoin='round';
     const ponto=e=>{const r=canvas.getBoundingClientRect();return{x:(e.clientX-r.left)*canvas.width/r.width,y:(e.clientY-r.top)*canvas.height/r.height};};
-    canvas.addEventListener('pointerdown',e=>{if(!this.podeModificar())return;e.preventDefault();this.drawing=true;this.assinaturaReferencia=null;this.assinaturaDataUrl=null;this.temAssinatura=true;canvas.setPointerCapture?.(e.pointerId);const p=ponto(e);ctx.beginPath();ctx.arc(p.x,p.y,1.7,0,Math.PI*2);ctx.fillStyle='#153b67';ctx.fill();ctx.beginPath();ctx.moveTo(p.x,p.y);const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Assinatura desenhada. Você pode limpar e refazer se precisar.';});
+    canvas.addEventListener('pointerdown',e=>{if(!this.podeCriarEntrega())return;e.preventDefault();this.drawing=true;this.assinaturaReferencia=null;this.assinaturaDataUrl=null;this.temAssinatura=true;canvas.setPointerCapture?.(e.pointerId);const p=ponto(e);ctx.beginPath();ctx.arc(p.x,p.y,1.7,0,Math.PI*2);ctx.fillStyle='#153b67';ctx.fill();ctx.beginPath();ctx.moveTo(p.x,p.y);const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Assinatura desenhada. Você pode limpar e refazer se precisar.';});
     canvas.addEventListener('pointermove',e=>{if(!this.drawing)return;e.preventDefault();const p=ponto(e);ctx.lineTo(p.x,p.y);ctx.stroke();});const parar=()=>{this.drawing=false;};canvas.addEventListener('pointerup',parar);canvas.addEventListener('pointercancel',parar);canvas.addEventListener('lostpointercapture',parar);
   },
   desenharImagemAssinatura(src) { const canvas=document.getElementById('entregaAssinaturaCanvas');if(!canvas||!src)return;const img=new Image();img.onload=()=>{const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);const scale=Math.min((canvas.width-24)/img.width,(canvas.height-24)/img.height);const w=img.width*scale,h=img.height*scale;ctx.drawImage(img,(canvas.width-w)/2,(canvas.height-h)/2,w,h);};img.src=src; },
-  async processarAssinatura(event) { const input=event.target,file=input.files?.[0];if(!file)return;if(!this.podeModificar()){input.value='';return;}try{const data=await appMateriais.comprimirImagem(file);this.assinaturaReferencia=null;this.assinaturaDataUrl=data;this.temAssinatura=true;this.desenharImagemAssinatura(data);const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Imagem da assinatura carregada.';}catch(e){console.error(e);app.mostrarAlerta('Não foi possível carregar a imagem da assinatura.','error');}input.value=''; },
-  limparAssinatura(silencioso=false) { if(!silencioso&&!this.podeModificar())return;const canvas=document.getElementById('entregaAssinaturaCanvas');if(canvas){const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}this.assinaturaReferencia=null;this.assinaturaDataUrl=null;this.temAssinatura=false;const upload=document.getElementById('entregaAssinaturaUpload');if(upload)upload.value='';const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Desenhe com o dedo ou mouse, ou envie uma imagem da assinatura.'; },
+  async processarAssinatura(event) { const input=event.target,file=input.files?.[0];if(!file)return;if(!this.podeCriarEntrega()){input.value='';return;}try{const data=await appMateriais.comprimirImagem(file);this.assinaturaReferencia=null;this.assinaturaDataUrl=data;this.temAssinatura=true;this.desenharImagemAssinatura(data);const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Imagem da assinatura carregada.';}catch(e){console.error(e);app.mostrarAlerta('Não foi possível carregar a imagem da assinatura.','error');}input.value=''; },
+  limparAssinatura(silencioso=false) { if(!silencioso&&!this.podeCriarEntrega())return;const canvas=document.getElementById('entregaAssinaturaCanvas');if(canvas){const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);}this.assinaturaReferencia=null;this.assinaturaDataUrl=null;this.temAssinatura=false;const upload=document.getElementById('entregaAssinaturaUpload');if(upload)upload.value='';const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent='Desenhe com o dedo ou mouse, ou envie uma imagem da assinatura.'; },
   async carregarAssinaturaExistente(ref) { if(!ref)return;const src=await this.resolverImagem(ref);if(src)this.desenharImagemAssinatura(src); },
   async abrirFormulario() {
-    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem criar entregas.','error');
+    if(!this.podeCriarEntrega())return app.mostrarAlerta('Seu perfil não pode criar entregas.','error');
     await window.appEquipamentosLocacao?.init();
-    if(!(window.appEquipamentosLocacao?.equipamentos||[]).length){app.mostrarAlerta('Cadastre primeiro um equipamento para poder registrar a entrega.','warning');window.appEquipamentosLocacao?.abrirFormulario();return;}
-    this.editandoId=null;this.itensFormulario=[this.novoItem()];this.limparAssinatura(true);document.getElementById('formEntregaMaterial')?.reset();document.getElementById('entregaData').value=this.dataHoje();document.getElementById('entregaHorario').value=this.horaAgora();document.getElementById('entregaFormTitulo').textContent='Nova entrega de equipamento';document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar entrega';document.getElementById('entregaFormCard').style.display='block';this.renderizarItensFormulario();document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
+    if(!(window.appEquipamentosLocacao?.equipamentos||[]).length){app.mostrarAlerta('Ainda não há equipamentos disponíveis. Peça ao Administrador ou Almoxarife para cadastrar o equipamento.','warning');if(this.podeModificar())window.appEquipamentosLocacao?.abrirFormulario();return;}
+    this.editandoId=null;this.itensFormulario=[this.novoItem()];this.limparAssinatura(true);document.getElementById('formEntregaMaterial')?.reset();const engenharia=this.isEngenharia(),dataInput=document.getElementById('entregaData'),horarioInput=document.getElementById('entregaHorario');dataInput.value=this.dataHoje();horarioInput.value=this.horaAgora();const dataGrupo=dataInput.closest('.form-group'),horarioGrupo=horarioInput.closest('.form-group'),botaoAdicionar=document.getElementById('btnAdicionarItemEntrega');if(dataGrupo)dataGrupo.style.display=engenharia?'none':'';if(horarioGrupo)horarioGrupo.style.display=engenharia?'none':'';if(botaoAdicionar)botaoAdicionar.style.display=engenharia?'none':'';document.getElementById('entregaFormTitulo').textContent='Nova entrega de equipamento';document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar entrega';document.getElementById('entregaFormCard').style.display='block';this.renderizarItensFormulario();document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
   },
   fecharFormulario() { const card=document.getElementById('entregaFormCard');if(card)card.style.display='none';this.editandoId=null; },
   async adicionarItem() { if(!this.podeModificar())return;await window.appEquipamentosLocacao?.init();if(!(window.appEquipamentosLocacao?.equipamentos||[]).length){app.mostrarAlerta('Cadastre primeiro um equipamento para poder registrar a entrega.','warning');window.appEquipamentosLocacao?.abrirFormulario();return;}this.itensFormulario.push(this.novoItem());this.renderizarItensFormulario(); },
   removerItem(indice) { if(!this.podeModificar())return;if(this.itensFormulario.length<=1)return app.mostrarAlerta('A entrega precisa ter pelo menos um equipamento.','warning');this.itensFormulario.splice(indice,1);this.renderizarItensFormulario(); },
   atualizarItem(indice,campo,valor) { if(!this.podeModificar())return;if(this.itensFormulario[indice])this.itensFormulario[indice][campo]=valor; },
   selecionarEquipamento(indice,id) {
-    if(!this.podeModificar())return;
+    if(!this.podeCriarEntrega())return;
     const eq=(window.appEquipamentosLocacao?.equipamentos||[]).find(x=>String(x.id)===String(id));if(!eq)return;
     const item=this.itensFormulario[indice];if(!item)return;
     const emUso=item.status!=='Concluído'&&this.equipamentoEmUsoPorOutroRegistro(eq.id,eq.nome,this.editandoId);
@@ -3790,12 +3794,13 @@ const appEntregasMateriais = {
       if(item.equipamentoId&&!atual)options+=`<option value="${this.escaparHTML(item.equipamentoId)}" selected>${this.escaparHTML(item.nome||'Equipamento')} (não consta mais no cadastro)</option>`;
       const nome=atual?.nome||item.nome;const empresaLocacao=atual?.empresaLocacao||item.empresaLocacao;const dataLocacao=atual?.dataLocacao||item.dataLocacao;const especificacoes=atual?.especificacoes||item.especificacoes;const imagem=atual?.imagem||item.imagem;const direto=String(imagem||'').startsWith('data:image/');
       const detalhes=nome?`<div class="equipment-selection-details"><strong>${this.escaparHTML(nome)}</strong><span>Empresa de locação: ${this.escaparHTML(empresaLocacao||'-')}</span><span>Data de locação: ${this.formatarData(dataLocacao)||'-'}</span>${especificacoes?`<span>Especificações: ${this.escaparHTML(especificacoes)}</span>`:''}</div>`:'<small style="color:#64748b">Selecione um equipamento cadastrado. A foto e as especificações virão do cadastro.</small>';
-      return `<div class="delivery-item-card"><div class="delivery-item-head"><strong>Equipamento ${i+1}</strong><button type="button" class="delete-btn" onclick="appEntregasMateriais.removerItem(${i})">Remover</button></div><div class="form-group"><label for="entregaEquipamento_${i}">Equipamento</label><select id="entregaEquipamento_${i}" required onchange="appEntregasMateriais.selecionarEquipamento(${i},this.value)">${options}</select></div>${detalhes}${imagem?`<img class="delivery-photo-preview" data-entrega-editor-img="${i}" alt="Foto de ${this.escaparHTML(nome||'equipamento')}" src="${direto?imagem:''}" />`:''}</div>`;
+      const remover=this.podeModificar()?`<button type="button" class="delete-btn" onclick="appEntregasMateriais.removerItem(${i})">Remover</button>`:'';
+      return `<div class="delivery-item-card"><div class="delivery-item-head"><strong>Equipamento ${i+1}</strong>${remover}</div><div class="form-group"><label for="entregaEquipamento_${i}">Equipamento</label><select id="entregaEquipamento_${i}" required onchange="appEntregasMateriais.selecionarEquipamento(${i},this.value)">${options}</select></div>${detalhes}${imagem?`<img class="delivery-photo-preview" data-entrega-editor-img="${i}" alt="Foto de ${this.escaparHTML(nome||'equipamento')}" src="${direto?imagem:''}" />`:''}</div>`;
     }).join('');this.carregarImagensEditor();
   },
   async carregarImagensEditor() { const cont=document.getElementById('entregaItensForm');if(!cont)return;for(const img of cont.querySelectorAll('[data-entrega-editor-img]')){const i=Number(img.dataset.entregaEditorImg);const eq=(window.appEquipamentosLocacao?.equipamentos||[]).find(x=>String(x.id)===String(this.itensFormulario[i]?.equipamentoId));const ref=eq?.imagem||this.itensFormulario[i]?.imagem;if(!ref)continue;const src=await this.resolverImagem(ref);if(src){img.src=src;img.style.display='block';}} },
   async editar(id) {
-    if(!this.podeModificar())return app.mostrarAlerta('Apenas Admin e Almoxarife podem editar entregas.','error');const r=this.registros.find(x=>String(x.id)===String(id));if(!r)return;
+    if(!this.podeModificar())return app.mostrarAlerta('Apenas Admin e Almoxarife podem editar entregas.','error');const dg=document.getElementById('entregaData')?.closest('.form-group'),hg=document.getElementById('entregaHorario')?.closest('.form-group'),ba=document.getElementById('btnAdicionarItemEntrega');if(dg)dg.style.display='';if(hg)hg.style.display='';if(ba)ba.style.display='';const r=this.registros.find(x=>String(x.id)===String(id));if(!r)return;
     const cadastrados=window.appEquipamentosLocacao?.equipamentos||[];const itens=(Array.isArray(r.itens)?r.itens:[]).map(x=>{const match=cadastrados.find(eq=>String(eq.id)===String(x.equipamentoId))||cadastrados.find(eq=>String(eq.nome||'').trim().toLocaleLowerCase('pt-BR')===String(x.nome||'').trim().toLocaleLowerCase('pt-BR'));return {...x,equipamentoId:x.equipamentoId||match?.id||''};});
     if(itens.some(x=>!x.equipamentoId)){app.mostrarAlerta('Este registro antigo não está vinculado a um equipamento cadastrado. Ele foi preservado para consulta; cadastre equipamentos para as próximas entregas.','warning');return;}
     this.editandoId=r.id;this.itensFormulario=itens.length?itens.map(x=>({...x})): [this.novoItem()];this.assinaturaReferencia=r.assinatura||null;this.assinaturaDataUrl=null;this.temAssinatura=Boolean(r.assinatura);this.limparCanvasSemEstado();document.getElementById('formEntregaMaterial').reset();document.getElementById('entregaNome').value=r.nome||'';document.getElementById('entregaEmpresa').value=r.empresa||'';document.getElementById('entregaData').value=r.data||this.dataHoje();document.getElementById('entregaHorario').value=r.horario||'';document.getElementById('entregaFormTitulo').textContent='Editar entrega de equipamento';document.getElementById('btnSalvarEntregaMaterial').textContent='Salvar alterações';document.getElementById('entregaFormCard').style.display='block';this.renderizarItensFormulario();const ajuda=document.getElementById('entregaAssinaturaAjuda');if(ajuda)ajuda.textContent=r.assinatura?'Assinatura atual carregada; desenhe sobre ela, envie outra ou limpe para substituir.':'Desenhe ou envie a assinatura.';await this.carregarAssinaturaExistente(r.assinatura);document.getElementById('entregaFormCard').scrollIntoView({behavior:'smooth',block:'start'});
@@ -3804,9 +3809,10 @@ const appEntregasMateriais = {
   assinaturaAtual() { if(this.assinaturaDataUrl)return this.assinaturaDataUrl;if(this.assinaturaReferencia)return this.assinaturaReferencia;if(!this.temAssinatura)return null;const c=document.getElementById('entregaAssinaturaCanvas');return c?c.toDataURL('image/jpeg',0.86):null; },
   async salvar(event) {
     event.preventDefault();
-    if(!this.podeModificar())return app.mostrarAlerta('Somente Admin e Almoxarife podem alterar entregas.','error');
-    const nome=document.getElementById('entregaNome').value.trim(),empresa=document.getElementById('entregaEmpresa').value.trim(),data=document.getElementById('entregaData').value,horarioInput=document.getElementById('entregaHorario').value;
-    const anterior=this.editandoId?this.registros.find(x=>String(x.id)===String(this.editandoId)):null,horario=horarioInput||anterior?.horario||'';
+    if(!this.podeCriarEntrega())return app.mostrarAlerta('Seu perfil não pode criar entregas.','error');
+    if(this.editandoId&&!this.podeModificar())return app.mostrarAlerta('Engenharia pode apenas criar novas entregas, não editar registros.','error');
+    const engenharia=this.isEngenharia(),nome=document.getElementById('entregaNome').value.trim(),empresa=document.getElementById('entregaEmpresa').value.trim(),data=engenharia?this.dataHoje():document.getElementById('entregaData').value,horarioInput=document.getElementById('entregaHorario').value;
+    const anterior=this.editandoId?this.registros.find(x=>String(x.id)===String(this.editandoId)):null,horario=engenharia?this.horaAgora():horarioInput||anterior?.horario||'';
     const itens=this.itensFormulario.map(item=>({...item,nome:String(item.nome||'').trim(),especificacoes:String(item.especificacoes||'').trim(),empresaLocacao:String(item.empresaLocacao||'').trim()}));
     if(!nome||!empresa||!data)return app.mostrarAlerta('Preencha Nome, Empresa e Data do empréstimo.','warning');
     if(!itens.length||itens.some(item=>!item.equipamentoId||!item.nome))return app.mostrarAlerta('Selecione um equipamento cadastrado para cada item da entrega.','warning');
@@ -3894,8 +3900,10 @@ const appEntregasMateriais = {
     }
   },
   renderizar() {
-    const lista=document.getElementById('entregasMateriaisLista');if(!lista)return;const pode=this.podeModificar();
-    const botao=document.getElementById('btnNovaEntregaMaterial');if(botao)botao.style.display=pode?'inline-flex':'none';const info=document.getElementById('entregaPermissaoInfo');if(info)info.style.display=pode?'none':'block';
+    const lista=document.getElementById('entregasMateriaisLista');if(!lista)return;const pode=this.podeModificar(),podeCriar=this.podeCriarEntrega(),engenharia=this.isEngenharia();
+    const catalogo=document.getElementById('equipamentoListaCard');if(catalogo)catalogo.style.display=engenharia?'none':'';
+    const botao=document.getElementById('btnNovaEntregaMaterial');if(botao)botao.style.display=podeCriar?'inline-flex':'none';const info=document.getElementById('entregaPermissaoInfo');if(info){info.style.display=pode?'none':'block';info.textContent=engenharia?'Engenharia pode criar novas entregas escolhendo um equipamento cadastrado e preenchendo nome, empresa e assinatura. Data e horário são automáticos. Apenas Admin e Almoxarife podem editar, excluir ou alterar status.':'Acesso somente para consulta. Apenas Admin e Almoxarife podem cadastrar equipamentos, criar/editar entregas e alterar status.';}
+    const subtitulo=document.getElementById('entregaTabSubtitle');if(subtitulo)subtitulo.textContent=engenharia?'Selecione um equipamento já cadastrado, informe quem recebeu e registre a assinatura. Os dados sincronizam com o site e o aplicativo.':'Cadastre equipamentos locados e selecione-os ao registrar uma entrega. Os dados sincronizam entre o site e o aplicativo.';
     const registros=this.obterRegistrosFiltrados();
     if(!registros.length){lista.innerHTML=`<p style="color:#64748b;text-align:center;padding:1.5rem">${this.registros.length?'Nenhuma entrega corresponde à busca.':'Nenhuma entrega cadastrada ainda.'}</p>`;window.appPainelMateriais?.renderizar();return;}
     lista.innerHTML=registros.map(r=>{
@@ -3984,7 +3992,7 @@ const appEquipamentosLocacao = {
     this.renderizar();app.mostrarAlerta(sincronizado?'Equipamento removido do cadastro; as entregas anteriores foram mantidas.':'Exclusão guardada neste aparelho; será sincronizada quando houver conexão.',sincronizado?'success':'warning');
   },
   renderizar() {
-    const lista=document.getElementById('equipamentosLocacaoLista');if(!lista)return;const pode=this.podeModificar();const botao=document.getElementById('btnNovoEquipamento');if(botao)botao.style.display=pode?'inline-flex':'none';const info=document.getElementById('entregaPermissaoInfo');if(info)info.style.display=pode?'none':'block';const q=String(document.getElementById('buscarEquipamentosLocacao')?.value||'').trim().toLocaleLowerCase('pt-BR');const itens=[...this.equipamentos].filter(e=>!q||[e.nome,e.empresaLocacao,e.especificacoes].join(' ').toLocaleLowerCase('pt-BR').includes(q)).sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base'}));
+    const lista=document.getElementById('equipamentosLocacaoLista');if(!lista)return;const pode=this.podeModificar(),engenharia=window.currentUser?.role==='engenharia',catalogo=document.getElementById('equipamentoListaCard'),form=document.getElementById('equipamentoFormCard');if(catalogo)catalogo.style.display=engenharia?'none':'';if(form&&engenharia)form.style.display='none';const botao=document.getElementById('btnNovoEquipamento');if(botao)botao.style.display=pode?'inline-flex':'none';const info=document.getElementById('entregaPermissaoInfo');if(info)info.style.display=pode?'none':'block';const q=String(document.getElementById('buscarEquipamentosLocacao')?.value||'').trim().toLocaleLowerCase('pt-BR');const itens=[...this.equipamentos].filter(e=>!q||[e.nome,e.empresaLocacao,e.especificacoes].join(' ').toLocaleLowerCase('pt-BR').includes(q)).sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base'}));
     if(!itens.length){lista.innerHTML=`<p style="color:#64748b;text-align:center;padding:1.5rem">${this._loading?'Carregando equipamentos...':this.equipamentos.length?'Nenhum equipamento corresponde à busca.':'Nenhum equipamento cadastrado ainda.'}</p>`;}
     else{lista.innerHTML=itens.map(e=>{const id=this.escaparHTML(e.id);const img=e.imagem?`<img class="equipment-record-photo" data-equipamento-photo="${id}" alt="Foto do equipamento ${this.escaparHTML(e.nome)}" />`:`<div class="equipment-photo-placeholder" aria-label="Sem foto">Sem foto</div>`;const acoes=pode?`<div class="equipment-record-actions"><button type="button" class="btn btn-secondary" onclick="appEquipamentosLocacao.editar('${id}')">✏️ Editar</button><button type="button" class="delete-btn" onclick="appEquipamentosLocacao.excluir('${id}')">Excluir</button></div>`:'';return `<article class="equipment-record">${img}<div class="equipment-record-body"><h4>${this.escaparHTML(e.nome)}</h4><p><strong>Empresa de locação:</strong> ${this.escaparHTML(e.empresaLocacao||'-')}</p><p><strong>Data de locação:</strong> ${this.formatarData(e.dataLocacao)||'-'}</p>${e.especificacoes?`<p><strong>Especificações:</strong> ${this.escaparHTML(e.especificacoes)}</p>`:''}${acoes}</div></article>`;}).join('');this.carregarImagensLista();}
     window.appEntregasMateriais?.renderizarItensFormulario();
