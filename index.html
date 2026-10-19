@@ -1151,7 +1151,7 @@
 📊 Relatório Completo
 </button><button class="btn btn-secondary" onclick="appMateriais.buscarMateriais()">
 🔄 Atualizar
-</button><button type="button" class="btn btn-secondary" id="btnGerenciarGruposMateriais" onclick="appMateriais.abrirModalGrupos()">🗂️ Grupos de Materiais</button></div><div class="filter-bar"><input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" /><select id="filterGrupoMateriais" onchange="appMateriais.filtrarMateriais()" style="min-width:180px;flex:1;padding:.7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;"><option value="">Todos os grupos</option><option value="__sem_grupo__">Sem grupo</option></select><input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" /></div><div id="materiaisContainer" class="materiais-grid"></div></div></section><section id="entregas-materiais">
+</button><button type="button" class="btn btn-secondary" id="btnGerenciarGruposMateriais" onclick="appMateriais.abrirModalGrupos()">🗂️ Grupos de Materiais</button><button type="button" class="btn btn-secondary" id="btnGerenciarKitsMateriais" onclick="appMateriais.abrirModalKits()">🧰 Kits</button><button type="button" class="btn btn-warning" id="btnRegistrarBaixaKit" onclick="appMateriais.abrirModalBaixaKit()">📦 Baixar kit</button></div><div class="filter-bar"><input type="text" id="searchMateriais" placeholder="🔍 Buscar material..." oninput="appMateriais.filtrarMateriais()" /><select id="filterGrupoMateriais" onchange="appMateriais.filtrarMateriais()" style="min-width:180px;flex:1;padding:.7rem;border:1px solid #cbd5e1;border-radius:8px;background:#fff;"><option value="">Todos os grupos</option><option value="__sem_grupo__">Sem grupo</option></select><input type="date" id="filterDataMateriais" onchange="appMateriais.filtrarMateriais()" /></div><div id="materiaisContainer" class="materiais-grid"></div></div></section><section id="entregas-materiais">
 <div class="card">
   <div class="delivery-heading"><div><h2>📝 Controle de Entrega de Equipamentos</h2><p id="entregaTabSubtitle" style="color:#6b7a99;margin:.35rem 0 0">Cadastre equipamentos locados e selecione-os ao registrar uma entrega. Os dados sincronizam entre o site e o aplicativo.</p></div>
     <div class="btn-group"><button id="btnNovoEquipamento" type="button" class="btn btn-primary" onclick="appEquipamentosLocacao.abrirFormulario()">➕ Cadastrar equipamento</button><button id="btnNovaEntregaMaterial" type="button" class="btn btn-success" onclick="appEntregasMateriais.abrirFormulario()">➕ Nova entrega</button><button type="button" class="btn btn-secondary" onclick="appEntregasMateriais.atualizar()">🔄 Atualizar</button><button id="btnRelatorioEntregasEquipamentos" type="button" class="btn btn-warning" onclick="appEntregasMateriais.gerarRelatorioEntregas()">📄 Relatório de entregas</button></div>
@@ -1195,7 +1195,10 @@
 📥 Baixar Relatório PDF
 </button><button class="btn btn-secondary" onclick="window.print()">
 🖨️ Imprimir
-</button></div><div id="pdf-container" class="pdf-report"><!-- Relatório será gerado aqui --></div></div></section></main><!-- ── MODAIS CONTROLE DE SALDO POR NF ── --><div id="modalSaldoMaterial" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Saldo por NF</span></div><h3 id="saldoMaterialTitle">Cadastrar Material / Contrato</h3><form id="formSaldoMaterial" onsubmit="appSaldoNF.salvarMaterial(event)"><div class="form-group"><label for="saldoMaterialNome">Material *</label><input type="text" id="saldoMaterialNome" required placeholder="Ex: Concreto FCK 30, Areia média, Brita 1..." /></div><div class="form-group"><label for="saldoMaterialUnidade">Unidade *</label><input type="text" id="saldoMaterialUnidade" required placeholder="Ex: m³, un, kg, ton, mês" /></div><div class="form-group"><label for="saldoMaterialContrato">Saldo contratado *</label><input type="number" step="0.001" min="0" id="saldoMaterialContrato" required placeholder="Ex: 500" /></div><div class="form-group"><label for="saldoMaterialMargem">Margem de segurança (%) *</label><input type="number" step="0.01" min="0" max="100" id="saldoMaterialMargem" required value="20" /></div><div class="form-group"><label for="saldoMaterialObs">Observação</label><textarea id="saldoMaterialObs" rows="3" placeholder="Ex: Alinhar nova RT quando chegar em 20% de saldo."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><div id="modalSaldoNF" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Lançamento de NF</span></div><h3 id="saldoNFTitle">Lançar NF</h3><form id="formSaldoNF" onsubmit="appSaldoNF.salvarNF(event)"><div class="form-group"><label for="saldoNFData">Data *</label><input type="date" id="saldoNFData" required /></div><div class="form-group"><label for="saldoNFNumero">Número da NF *</label><input type="text" id="saldoNFNumero" required placeholder="Ex: 109765" /></div><div class="form-group"><label for="saldoNFFornecedor">Fornecedor</label><input type="text" id="saldoNFFornecedor" placeholder="Ex: Concremix, Pedreira, Blocos..." /></div><div class="form-group"><label for="saldoNFMaterial">Material *</label><select id="saldoNFMaterial" required></select></div><div class="form-group"><label for="saldoNFValor">Valor da NF</label><input type="number" step="0.01" min="0" id="saldoNFValor" placeholder="Ex: 12500,00" /></div><div class="form-group"><label for="saldoNFObs">Observação</label><textarea id="saldoNFObs" rows="3" placeholder="Ex: referente ao pedido/contrato..."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">Cancelar</button><button type="submit" class="btn btn-success">Salvar NF</button></div></form></div></div><!-- ── MODAL EMPRÉSTIMOS ── --><div id="modal" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Empréstimos</span></div><h3 id="modalTitle">Novo Registro</h3><form id="formRegistro" onsubmit="app.salvarRegistro(event)"><div class="form-group"><label for="empresa">Empresa *</label><input type="text" id="empresa" required placeholder="Ex: Felipe Agosti" /></div><div class="form-group"><label for="material">Material *</label><input type="text" id="material" required placeholder="Ex: Pontalete" /></div><div class="form-group"><label for="data">Data do Empréstimo *</label><input type="date" id="data" required /></div><div class="form-group"><label for="horario">Horário do empréstimo</label><input type="time" id="horario" /></div><div class="form-group"><label for="quantidade">Quantidade *</label><input type="number" id="quantidade" required min="1" placeholder="Ex: 20" /></div><div class="form-group" style="grid-column:1/-1"><label>Foto do romaneio (opcional)</label><div class="delivery-photo-actions"><input id="fotoRomaneioGaleria" type="file" accept="image/*" style="display:none" onchange="app.selecionarFotoRomaneio(event)" /><input id="fotoRomaneioCamera" type="file" accept="image/*" capture="environment" style="display:none" onchange="app.selecionarFotoRomaneio(event)" /><button type="button" class="btn btn-secondary" onclick="document.getElementById('fotoRomaneioGaleria').click()">🖼️ Escolher foto</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('fotoRomaneioCamera').click()">📷 Tirar foto</button></div><img id="fotoRomaneioPreview" class="romaneio-photo-preview" alt="Prévia da foto do romaneio" style="display:none" /></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><div id="modalFotoRomaneio" class="modal" onclick="if(event.target===this)app.fecharVisualizacaoFotoRomaneio()"><div class="modal-content"><div class="modal-topbar"><strong style="color:var(--blue-dark)">Foto do romaneio</strong><button type="button" class="btn btn-secondary" onclick="app.fecharVisualizacaoFotoRomaneio()">✕ Fechar</button></div><img id="fotoRomaneioCompleta" class="romaneio-photo-full" alt="Foto completa do romaneio" /></div></div><!-- ── MODAL MATERIAIS DA OBRA ── --><div id="modalMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3 id="modalMateriaisTitle">Novo Material</h3><form id="formMateriais" onsubmit="appMateriais.salvarMaterial(event)"><div class="form-group"><label for="nomeMaterial">Nome do Material *</label><input type="text" id="nomeMaterial" required placeholder="Ex: Cimento, Areia, Tijolos..." /></div><div class="form-group"><label for="quantidadeMaterial">Quantidade *</label><input type="number" id="quantidadeMaterial" required min="1" placeholder="Ex: 50" /></div><div class="form-group"><label for="especificacoes">Especificações / Descrição</label><textarea id="especificacoes" placeholder="Ex: Cimento Portland 50kg, Areia média, etc..." rows="3"></textarea></div><div class="form-group"><label>Grupos do material</label><small style="display:block;color:#6b7a99;margin:.25rem 0 .5rem;">Selecione um ou mais grupos para filtrar este material depois.</small><div id="materialGruposChecklist" class="material-group-checklist"></div></div><div class="form-group"><label for="fotoMaterial">Foto do Material</label><small class="camera-helper">A imagem será comprimida automaticamente. No celular, use <strong>Galeria</strong> para escolher uma imagem salva ou <strong>Câmera</strong> para tirar a foto na hora.</small><input type="file" id="fotoMaterial" accept="image/*" style="display:none;" /><input type="file" id="fotoMaterialCamera" accept="image/*" capture="environment" style="display:none;" /><div class="camera-actions"><button type="button" class="btn gallery-btn" onclick="document.getElementById('fotoMaterial').click()"><span class="camera-btn-icon">🖼️</span><span>Escolher da Galeria</span></button><button type="button" class="btn capture-btn" onclick="document.getElementById('fotoMaterialCamera').click()"><span class="camera-btn-icon">📷</span><span>Tirar Foto</span></button></div><div id="imagemPreview" class="image-preview image-preview-app" style="display: none;"><img id="imagemPreviewImg" src="" alt="Preview" /></div></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Material</button></div></form></div></div><!-- ── MODAL GRUPOS DE MATERIAIS ── --><div id="modalGruposMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalGrupos()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3>Grupos de Materiais</h3><p style="color:#6b7a99;">Crie grupos para organizar os materiais. Excluir um grupo remove apenas a classificação, não os materiais.</p><form id="formNovoGrupoMaterial" onsubmit="appMateriais.criarGrupoMaterial(event)"><div class="form-group"><label for="novoGrupoMaterial">Nome do grupo</label><input type="text" id="novoGrupoMaterial" maxlength="40" required placeholder="Ex.: Limpeza, Finalização, Segurança" /></div><div class="modal-buttons"><button type="submit" class="btn btn-success">Criar grupo</button></div></form><div id="listaGruposMateriais"></div></div></div><!-- ── MODAL RETIRADA DE MATERIAL ── --><div id="modalRetirada" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Rastreabilidade</span></div><h3>Registrar Retirada</h3><form id="formRetirada" onsubmit="appMateriais.salvarRetirada(event)"><input type="hidden" id="retiradaMaterialId" /><div class="form-group"><label for="retiradaMaterialNome">Material</label><input type="text" id="retiradaMaterialNome" readonly /></div><div class="form-group"><label for="retiradaQuantidade">Quantidade retirada *</label><input type="number" id="retiradaQuantidade" min="1" required /></div><div class="form-group"><label for="retiradaResponsavel">Quem retirou *</label><input type="text" id="retiradaResponsavel" required placeholder="Nome de quem retirou" /></div><div class="form-group"><label for="retiradaFuncao">Função</label><input type="text" id="retiradaFuncao" placeholder="Ex: Pedreiro, Encarregado" /></div><div class="form-group"><label for="retiradaSetor">Setor</label><input type="text" id="retiradaSetor" placeholder="Ex: Engenharia, Produção" /></div><div class="form-group"><label for="retiradaMotivo">Motivo da retirada *</label><textarea id="retiradaMotivo" rows="3" required placeholder="Descreva o motivo da retirada"></textarea></div><div class="form-group"><label for="retiradaObservacoes">Observações</label><textarea id="retiradaObservacoes" rows="2" placeholder="Opcional"></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Retirada</button></div></form></div></div><div id="room3dModal" class="room3d-modal"><div class="room3d-shell"><div class="room3d-topbar"><div><h3 id="room3dTitle">Apartamento virtual do pavimento</h3><p id="room3dSubtitle">Clique nas superfícies do ambiente para abrir o serviço correto.</p></div><button type="button" class="btn btn-secondary" onclick="floorRooms.close()">✕ Fechar</button></div><div class="room3d-content"><div class="room3d-stage"><div class="room3d-legend-bar"><span class="room3d-legend-pill">🏠 Apartamento visual</span><span class="room3d-legend-pill">🖱️ Parede, teto, chão e porta clicáveis</span></div><div class="room3d-scene"><div class="room3d-apartment"><div class="room3d-floor-base"></div><div class="room3d-floor-finish"></div><div class="room3d-floor-lines"></div><div class="room3d-wall-back"></div><div class="room3d-wall-left"></div><div class="room3d-wall-right"></div><div class="room3d-ceiling-panel"></div><div class="room3d-ceiling-detail"></div><div class="room3d-window w1"></div><div class="room3d-window w2"></div><div class="room3d-door-frame"><div class="room3d-door-leaf"></div></div><div class="room3d-rug"></div><div class="room3d-sofa"></div><div class="room3d-table"></div><div class="room3d-tv"></div><div class="room3d-plant"></div><div class="room3d-hotspots" id="room3dHotspots"></div></div></div></div><div class="room3d-side"><div class="room3d-summary"><div style="display:flex;justify-content:space-between;gap:.8rem;align-items:flex-start;"><div><strong style="display:block;color:var(--blue-dark);font-size:1rem;">Controle interno do apartamento</strong><div class="room3d-pav-note">Parede esquerda = gesso liso, parede direita = pintura, teto = forro, chão = contra piso e porta = instalação de porta.</div></div><span class="predio3d-badge" id="room3dOverallStatus">Sem dados</span></div><div class="room3d-summary-grid"><div class="room3d-summary-card"><div class="num" id="room3dSummaryDone">0</div><div>Concluídos</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryProgress">0</div><div>Em andamento</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryPhotos">0</div><div>Fotos</div></div></div></div><div id="room3dServices" class="room3d-services"></div></div></div></div></div><footer><div class="footer-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><em>Gestão com propósito e excelência</em></div></footer><!-- Firebase bridge -->
+</button></div><div id="pdf-container" class="pdf-report"><!-- Relatório será gerado aqui --></div></div></section></main><!-- ── MODAIS CONTROLE DE SALDO POR NF ── --><div id="modalSaldoMaterial" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Saldo por NF</span></div><h3 id="saldoMaterialTitle">Cadastrar Material / Contrato</h3><form id="formSaldoMaterial" onsubmit="appSaldoNF.salvarMaterial(event)"><div class="form-group"><label for="saldoMaterialNome">Material *</label><input type="text" id="saldoMaterialNome" required placeholder="Ex: Concreto FCK 30, Areia média, Brita 1..." /></div><div class="form-group"><label for="saldoMaterialUnidade">Unidade *</label><input type="text" id="saldoMaterialUnidade" required placeholder="Ex: m³, un, kg, ton, mês" /></div><div class="form-group"><label for="saldoMaterialContrato">Saldo contratado *</label><input type="number" step="0.001" min="0" id="saldoMaterialContrato" required placeholder="Ex: 500" /></div><div class="form-group"><label for="saldoMaterialMargem">Margem de segurança (%) *</label><input type="number" step="0.01" min="0" max="100" id="saldoMaterialMargem" required value="20" /></div><div class="form-group"><label for="saldoMaterialObs">Observação</label><textarea id="saldoMaterialObs" rows="3" placeholder="Ex: Alinhar nova RT quando chegar em 20% de saldo."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalMaterial()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><div id="modalSaldoNF" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Lançamento de NF</span></div><h3 id="saldoNFTitle">Lançar NF</h3><form id="formSaldoNF" onsubmit="appSaldoNF.salvarNF(event)"><div class="form-group"><label for="saldoNFData">Data *</label><input type="date" id="saldoNFData" required /></div><div class="form-group"><label for="saldoNFNumero">Número da NF *</label><input type="text" id="saldoNFNumero" required placeholder="Ex: 109765" /></div><div class="form-group"><label for="saldoNFFornecedor">Fornecedor</label><input type="text" id="saldoNFFornecedor" placeholder="Ex: Concremix, Pedreira, Blocos..." /></div><div class="form-group"><label for="saldoNFMaterial">Material *</label><select id="saldoNFMaterial" required></select></div><div class="form-group"><label for="saldoNFValor">Valor da NF</label><input type="number" step="0.01" min="0" id="saldoNFValor" placeholder="Ex: 12500,00" /></div><div class="form-group"><label for="saldoNFObs">Observação</label><textarea id="saldoNFObs" rows="3" placeholder="Ex: referente ao pedido/contrato..."></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appSaldoNF.fecharModalNF()">Cancelar</button><button type="submit" class="btn btn-success">Salvar NF</button></div></form></div></div><!-- ── MODAL EMPRÉSTIMOS ── --><div id="modal" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Empréstimos</span></div><h3 id="modalTitle">Novo Registro</h3><form id="formRegistro" onsubmit="app.salvarRegistro(event)"><div class="form-group"><label for="empresa">Empresa *</label><input type="text" id="empresa" required placeholder="Ex: Felipe Agosti" /></div><div class="form-group"><label for="material">Material *</label><input type="text" id="material" required placeholder="Ex: Pontalete" /></div><div class="form-group"><label for="data">Data do Empréstimo *</label><input type="date" id="data" required /></div><div class="form-group"><label for="horario">Horário do empréstimo</label><input type="time" id="horario" /></div><div class="form-group"><label for="quantidade">Quantidade *</label><input type="number" id="quantidade" required min="1" placeholder="Ex: 20" /></div><div class="form-group" style="grid-column:1/-1"><label>Foto do romaneio (opcional)</label><div class="delivery-photo-actions"><input id="fotoRomaneioGaleria" type="file" accept="image/*" style="display:none" onchange="app.selecionarFotoRomaneio(event)" /><input id="fotoRomaneioCamera" type="file" accept="image/*" capture="environment" style="display:none" onchange="app.selecionarFotoRomaneio(event)" /><button type="button" class="btn btn-secondary" onclick="document.getElementById('fotoRomaneioGaleria').click()">🖼️ Escolher foto</button><button type="button" class="btn btn-secondary" onclick="document.getElementById('fotoRomaneioCamera').click()">📷 Tirar foto</button></div><img id="fotoRomaneioPreview" class="romaneio-photo-preview" alt="Prévia da foto do romaneio" style="display:none" /></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="app.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar</button></div></form></div></div><div id="modalFotoRomaneio" class="modal" onclick="if(event.target===this)app.fecharVisualizacaoFotoRomaneio()"><div class="modal-content"><div class="modal-topbar"><strong style="color:var(--blue-dark)">Foto do romaneio</strong><button type="button" class="btn btn-secondary" onclick="app.fecharVisualizacaoFotoRomaneio()">✕ Fechar</button></div><img id="fotoRomaneioCompleta" class="romaneio-photo-full" alt="Foto completa do romaneio" /></div></div><!-- ── MODAL MATERIAIS DA OBRA ── --><div id="modalMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3 id="modalMateriaisTitle">Novo Material</h3><form id="formMateriais" onsubmit="appMateriais.salvarMaterial(event)"><div class="form-group"><label for="nomeMaterial">Nome do Material *</label><input type="text" id="nomeMaterial" required placeholder="Ex: Cimento, Areia, Tijolos..." /></div><div class="form-group"><label for="quantidadeMaterial">Quantidade *</label><input type="number" id="quantidadeMaterial" required min="1" placeholder="Ex: 50" /></div><div class="form-group"><label for="especificacoes">Especificações / Descrição</label><textarea id="especificacoes" placeholder="Ex: Cimento Portland 50kg, Areia média, etc..." rows="3"></textarea></div><div class="form-group"><label>Grupos do material</label><small style="display:block;color:#6b7a99;margin:.25rem 0 .5rem;">Selecione um ou mais grupos para filtrar este material depois.</small><div id="materialGruposChecklist" class="material-group-checklist"></div></div><div class="form-group"><label for="fotoMaterial">Foto do Material</label><small class="camera-helper">A imagem será comprimida automaticamente. No celular, use <strong>Galeria</strong> para escolher uma imagem salva ou <strong>Câmera</strong> para tirar a foto na hora.</small><input type="file" id="fotoMaterial" accept="image/*" style="display:none;" /><input type="file" id="fotoMaterialCamera" accept="image/*" capture="environment" style="display:none;" /><div class="camera-actions"><button type="button" class="btn gallery-btn" onclick="document.getElementById('fotoMaterial').click()"><span class="camera-btn-icon">🖼️</span><span>Escolher da Galeria</span></button><button type="button" class="btn capture-btn" onclick="document.getElementById('fotoMaterialCamera').click()"><span class="camera-btn-icon">📷</span><span>Tirar Foto</span></button></div><div id="imagemPreview" class="image-preview image-preview-app" style="display: none;"><img id="imagemPreviewImg" src="" alt="Preview" /></div></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModal()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Material</button></div></form></div></div><!-- ── MODAL GRUPOS DE MATERIAIS ── --><div id="modalGruposMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalGrupos()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Controle de Materiais</span></div><h3>Grupos de Materiais</h3><p style="color:#6b7a99;">Crie grupos para organizar os materiais. Excluir um grupo remove apenas a classificação, não os materiais.</p><form id="formNovoGrupoMaterial" onsubmit="appMateriais.criarGrupoMaterial(event)"><div class="form-group"><label for="novoGrupoMaterial">Nome do grupo</label><input type="text" id="novoGrupoMaterial" maxlength="40" required placeholder="Ex.: Limpeza, Finalização, Segurança" /></div><div class="modal-buttons"><button type="submit" class="btn btn-success">Criar grupo</button></div></form><div id="listaGruposMateriais"></div></div></div><!-- ── MODAL RETIRADA DE MATERIAL ── --><div id="modalRetirada" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Rastreabilidade</span></div><h3>Registrar Retirada</h3><form id="formRetirada" onsubmit="appMateriais.salvarRetirada(event)"><input type="hidden" id="retiradaMaterialId" /><div class="form-group"><label for="retiradaMaterialNome">Material</label><input type="text" id="retiradaMaterialNome" readonly /></div><div class="form-group"><label for="retiradaQuantidade">Quantidade retirada *</label><input type="number" id="retiradaQuantidade" min="1" required /></div><div class="form-group"><label for="retiradaResponsavel">Quem retirou *</label><input type="text" id="retiradaResponsavel" required placeholder="Nome de quem retirou" /></div><div class="form-group"><label for="retiradaFuncao">Função</label><input type="text" id="retiradaFuncao" placeholder="Ex: Pedreiro, Encarregado" /></div><div class="form-group"><label for="retiradaSetor">Setor</label><input type="text" id="retiradaSetor" placeholder="Ex: Engenharia, Produção" /></div><div class="form-group"><label for="retiradaMotivo">Motivo da retirada *</label><textarea id="retiradaMotivo" rows="3" required placeholder="Descreva o motivo da retirada"></textarea></div><div class="form-group"><label for="retiradaObservacoes">Observações</label><textarea id="retiradaObservacoes" rows="2" placeholder="Opcional"></textarea></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalRetirada()">Cancelar</button><button type="submit" class="btn btn-success">Salvar Retirada</button></div></form></div></div><div id="room3dModal" class="room3d-modal"><div class="room3d-shell"><div class="room3d-topbar"><div><h3 id="room3dTitle">Apartamento virtual do pavimento</h3><p id="room3dSubtitle">Clique nas superfícies do ambiente para abrir o serviço correto.</p></div><button type="button" class="btn btn-secondary" onclick="floorRooms.close()">✕ Fechar</button></div><div class="room3d-content"><div class="room3d-stage"><div class="room3d-legend-bar"><span class="room3d-legend-pill">🏠 Apartamento visual</span><span class="room3d-legend-pill">🖱️ Parede, teto, chão e porta clicáveis</span></div><div class="room3d-scene"><div class="room3d-apartment"><div class="room3d-floor-base"></div><div class="room3d-floor-finish"></div><div class="room3d-floor-lines"></div><div class="room3d-wall-back"></div><div class="room3d-wall-left"></div><div class="room3d-wall-right"></div><div class="room3d-ceiling-panel"></div><div class="room3d-ceiling-detail"></div><div class="room3d-window w1"></div><div class="room3d-window w2"></div><div class="room3d-door-frame"><div class="room3d-door-leaf"></div></div><div class="room3d-rug"></div><div class="room3d-sofa"></div><div class="room3d-table"></div><div class="room3d-tv"></div><div class="room3d-plant"></div><div class="room3d-hotspots" id="room3dHotspots"></div></div></div></div><div class="room3d-side"><div class="room3d-summary"><div style="display:flex;justify-content:space-between;gap:.8rem;align-items:flex-start;"><div><strong style="display:block;color:var(--blue-dark);font-size:1rem;">Controle interno do apartamento</strong><div class="room3d-pav-note">Parede esquerda = gesso liso, parede direita = pintura, teto = forro, chão = contra piso e porta = instalação de porta.</div></div><span class="predio3d-badge" id="room3dOverallStatus">Sem dados</span></div><div class="room3d-summary-grid"><div class="room3d-summary-card"><div class="num" id="room3dSummaryDone">0</div><div>Concluídos</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryProgress">0</div><div>Em andamento</div></div><div class="room3d-summary-card"><div class="num" id="room3dSummaryPhotos">0</div><div>Fotos</div></div></div></div><div id="room3dServices" class="room3d-services"></div></div></div></div></div><footer><div class="footer-signature"><span>Criação e desenvolvimento</span><strong>ADM Gustavo Mingas</strong><em>Gestão com propósito e excelência</em></div></footer><!-- ── KITS DE MATERIAIS ── -->
+<div id="modalKitsMateriais" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalKits()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Composição de kits</span></div><h3>🧰 Kits de materiais</h3><p style="color:#6b7a99;">Defina quais materiais compõem cada kit e a quantidade de cada item por kit. A baixa atualizará o saldo e a rastreabilidade de todos os componentes juntos.</p><div class="btn-group" style="margin-bottom:1rem;"><button type="button" class="btn btn-primary" onclick="appMateriais.abrirEditorKit()">＋ Novo kit</button><button type="button" class="btn btn-secondary" onclick="appMateriais.carregarExemploKitLoucas()">📄 Usar composição do PDF de louças</button></div><div id="listaKitsMateriais"></div><div id="kitEditorCard" class="card" style="display:none;margin-top:1rem;"><h3 id="kitEditorTitulo">Novo kit</h3><form id="formKitMaterial" onsubmit="appMateriais.salvarKit(event)"><div class="form-group"><label for="kitNome">Nome do kit *</label><input type="text" id="kitNome" maxlength="100" required placeholder="Ex.: Kit Louças por Pavimento – Torre B" /></div><div class="form-group"><label for="kitObservacoes">Observações</label><textarea id="kitObservacoes" rows="2" placeholder="Observações da composição"></textarea></div><h4>Materiais e quantidades por kit</h4><div id="kitItensEditor"></div><div class="btn-group" style="margin:.75rem 0 1rem;"><button type="button" class="btn btn-secondary" onclick="appMateriais.adicionarLinhaKit()">＋ Adicionar material</button></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.cancelarEditorKit()">Cancelar</button><button type="submit" class="btn btn-success">Salvar composição</button></div></form></div></div></div>
+<div id="modalBaixaKit" class="modal"><div class="modal-content"><div class="modal-topbar"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalBaixaKit()">← Voltar</button><span style="font-weight:700;color:var(--blue-dark);">Rastreabilidade de kits</span></div><h3>📦 Dar baixa em kit</h3><p style="color:#6b7a99;">Informe quantos kits foram consumidos. O sistema confere todos os saldos e só conclui se houver estoque suficiente para todos os componentes.</p><form id="formBaixaKit" onsubmit="appMateriais.salvarBaixaKit(event)"><div class="form-group"><label for="baixaKitSelecionado">Kit *</label><select id="baixaKitSelecionado" required onchange="appMateriais.renderizarPreviaBaixaKit()"><option value="">Selecione um kit</option></select></div><div class="form-group"><label for="baixaKitQuantidade">Quantidade de kits *</label><input type="number" id="baixaKitQuantidade" min="1" step="1" value="1" required oninput="appMateriais.renderizarPreviaBaixaKit()" /></div><div class="form-group"><label for="baixaKitResponsavel">Quem recebeu/retirou *</label><input type="text" id="baixaKitResponsavel" required placeholder="Nome do responsável" /></div><div class="form-row"><div class="form-group"><label for="baixaKitFuncao">Função</label><input type="text" id="baixaKitFuncao" placeholder="Ex.: Encanador" /></div><div class="form-group"><label for="baixaKitSetor">Setor / pavimento</label><input type="text" id="baixaKitSetor" placeholder="Ex.: Torre B / 1º Pavto" /></div></div><div class="form-group"><label for="baixaKitMotivo">Motivo *</label><input type="text" id="baixaKitMotivo" required value="Baixa de kit de materiais" /></div><div class="form-group"><label for="baixaKitObservacoes">Observações</label><textarea id="baixaKitObservacoes" rows="2" placeholder="Observações adicionais"></textarea></div><div id="previsaoBaixaKit" class="card" style="margin:1rem 0;"></div><div class="modal-buttons"><button type="button" class="btn btn-secondary" onclick="appMateriais.fecharModalBaixaKit()">Cancelar</button><button id="btnConfirmarBaixaKit" type="submit" class="btn btn-warning">Confirmar baixa dos materiais</button></div></form></div></div>
+<!-- Firebase bridge -->
 <script type="module">
   import {
     salvarNaNuvem,
@@ -1207,6 +1210,11 @@
     salvarGruposMateriaisNaNuvem,
     carregarGruposMateriaisDaNuvem,
     escutarMudancasGruposMateriais,
+    salvarKitMateriaisNaNuvem,
+    excluirKitMateriaisNaNuvem,
+    carregarKitsMateriaisDaNuvem,
+    escutarMudancasKitsMateriais,
+    registrarBaixaKitNaNuvem,
     salvarMovimentacoesNaNuvem,
     carregarMovimentacoesDaNuvem,
     escutarMudancasMovimentacoes,
@@ -1227,7 +1235,7 @@
     escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
-  } from "./firebase-controle-usuarios.js?v=1.0.23";
+  } from "./firebase-controle-usuarios.js?v=1.0.24";
 
   window.__fb = {
     salvarNaNuvem,
@@ -1239,6 +1247,11 @@
     salvarGruposMateriaisNaNuvem,
     carregarGruposMateriaisDaNuvem,
     escutarMudancasGruposMateriais,
+    salvarKitMateriaisNaNuvem,
+    excluirKitMateriaisNaNuvem,
+    carregarKitsMateriaisDaNuvem,
+    escutarMudancasKitsMateriais,
+    registrarBaixaKitNaNuvem,
     salvarMovimentacoesNaNuvem,
     carregarMovimentacoesDaNuvem,
     escutarMudancasMovimentacoes,
@@ -1420,8 +1433,8 @@ const auth = {
   pode(acao) {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
-      admin: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
-      almoxarife: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
+      admin: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','gerenciar_kits_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
+      almoxarife: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','gerenciar_kits_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_predio_3d','criar_entregas_materiais']
     };
@@ -2526,6 +2539,15 @@ const appMateriais = {
   _gruposMateriaisWritePending: false,
   STORAGE_KEY_GRUPOS_MATERIAIS: 'controle_materiais_obra_grupos',
   gruposMateriais: [],
+  STORAGE_KEY_KITS_MATERIAIS: 'controle_kits_materiais',
+  kitsMateriais: [],
+  _unsubKits: null,
+  _kitsWritePending: false,
+  editandoKitId: null,
+  kitDraftItems: [],
+  baixaKitOperationId: null,
+  baixaKitPendingPayload: null,
+  STORAGE_KEY_KIT_PENDENTE: 'controle_baixa_kit_pendente',
 
   normalizarChaveGrupo(nome) {
     return String(nome || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').trim().toLocaleLowerCase('pt-BR');
@@ -2705,7 +2727,7 @@ const appMateriais = {
 
   init() {
     console.log('Inicializando aplicação de materiais da obra...');
-    Promise.all([this.carregarMateriais(), this.carregarMovimentacoes(), this.carregarGruposMateriais()]).then(() => {
+    Promise.all([this.carregarMateriais(), this.carregarMovimentacoes(), this.carregarGruposMateriais(), this.carregarKitsMateriais()]).then(() => {
       this.setupEventListeners();
       this.renderizarFiltroGruposMateriais();
       this.buscarMateriais();
@@ -2753,6 +2775,15 @@ const appMateriais = {
           this.renderizarRastreabilidadeCompleta();
         });
       }
+      if (window.__fb && window.__fb.escutarMudancasKitsMateriais) {
+        if (this._unsubKits) this._unsubKits();
+        this._unsubKits = window.__fb.escutarMudancasKitsMateriais(kits => {
+          if (this._kitsWritePending) return;
+          this.kitsMateriais = this.normalizarKitsMateriais(kits);
+          try { localStorage.setItem(this.STORAGE_KEY_KITS_MATERIAIS, JSON.stringify(this.kitsMateriais)); } catch(e) {}
+          this.renderizarListaKits();this.preencherSelectKits();this.renderizarPreviaBaixaKit();
+        });
+      }
     } catch (e) {
       console.warn('Sync ao vivo de materiais indisponível:', e);
     }
@@ -2776,6 +2807,10 @@ const appMateriais = {
         if (e.target.id === 'modalGruposMateriais') this.fecharModalGrupos();
       });
     }
+    const modalKits = document.getElementById('modalKitsMateriais');
+    if (modalKits) modalKits.addEventListener('click', e => { if (e.target.id === 'modalKitsMateriais') this.fecharModalKits(); });
+    const modalBaixaKit = document.getElementById('modalBaixaKit');
+    if (modalBaixaKit) modalBaixaKit.addEventListener('click', e => { if (e.target.id === 'modalBaixaKit') this.fecharModalBaixaKit(); });
 
     const fotoInput = document.getElementById('fotoMaterial');
     const fotoInputCamera = document.getElementById('fotoMaterialCamera');
@@ -2937,6 +2972,9 @@ const appMateriais = {
     if (btnRelDia) btnRelDia.style.display = auth.pode('ver_relatorio_dia') ? 'inline-flex' : 'none';
     if (btnRelCompleto) btnRelCompleto.style.display = auth.pode('ver_relatorio_completo') ? 'inline-flex' : 'none';
     if (btnGrupos) btnGrupos.style.display = auth.pode('gerenciar_grupos_materiais') ? 'inline-flex' : 'none';
+    const btnKits=document.getElementById('btnGerenciarKitsMateriais'),btnBaixarKit=document.getElementById('btnRegistrarBaixaKit');
+    if(btnKits)btnKits.style.display=auth.pode('gerenciar_kits_materiais')?'inline-flex':'none';
+    if(btnBaixarKit)btnBaixarKit.style.display=auth.pode('registrar_retirada')?'inline-flex':'none';
     const search = document.getElementById('searchMateriais');
     const filterData = document.getElementById('filterDataMateriais');
     const filterGrupo = document.getElementById('filterGrupoMateriais');
@@ -3342,6 +3380,195 @@ const appMateriais = {
     );
   },
 
+  gerarKitId() { return `kit_${window.crypto?.randomUUID ? window.crypto.randomUUID() : `${Date.now()}_${Math.random().toString(36).slice(2,10)}`}`; },
+
+  normalizarKitsMateriais(kits) {
+    return (Array.isArray(kits) ? kits : []).filter(k => k && k.id && String(k.nome || '').trim()).map(k => ({
+      ...k, id:String(k.id), nome:String(k.nome).trim(), observacoes:String(k.observacoes || ''),
+      itens:(Array.isArray(k.itens) ? k.itens : []).map(item => ({
+        ...item, materialId:item.materialId, materialNome:String(item.materialNome || this.materiais.find(m => String(m.id) === String(item.materialId))?.nome || ''),
+        quantidade:Number(item.quantidade), referencia:String(item.referencia || '')
+      })).filter(item => item.materialId !== '' && item.materialId != null && Number.isInteger(item.quantidade) && item.quantidade > 0),
+      createdAt:k.createdAt || k.updatedAt || new Date().toISOString(), updatedAt:k.updatedAt || ''
+    })).sort((a,b)=>a.nome.localeCompare(b.nome,'pt-BR',{sensitivity:'base'}));
+  },
+
+  async carregarKitsMateriais() {
+    try {
+      if(window.__fb?.carregarKitsMateriaisDaNuvem){
+        const cloud=await window.__fb.carregarKitsMateriaisDaNuvem();
+        if(Array.isArray(cloud)){this.kitsMateriais=this.normalizarKitsMateriais(cloud);try{localStorage.setItem(this.STORAGE_KEY_KITS_MATERIAIS,JSON.stringify(this.kitsMateriais));}catch(e){};this.renderizarListaKits();this.preencherSelectKits();return;}
+      }
+      const saved=localStorage.getItem(this.STORAGE_KEY_KITS_MATERIAIS);this.kitsMateriais=this.normalizarKitsMateriais(saved?JSON.parse(saved):[]);
+    }catch(e){console.error('Erro ao carregar kits de materiais:',e);this.kitsMateriais=[];}
+    this.renderizarListaKits();this.preencherSelectKits();
+  },
+
+  abrirModalKits() {
+    if(!auth.pode('gerenciar_kits_materiais'))return app.mostrarAlerta('Somente Admin e Almoxarife podem cadastrar ou alterar kits.','error');
+    this.renderizarListaKits();const editor=document.getElementById('kitEditorCard');if(editor)editor.style.display='none';
+    document.getElementById('modalKitsMateriais').classList.add('active');atualizarBotaoMobile();
+  },
+  fecharModalKits() { document.getElementById('modalKitsMateriais')?.classList.remove('active');this.cancelarEditorKit();atualizarBotaoMobile(); },
+
+  renderizarListaKits() {
+    const box=document.getElementById('listaKitsMateriais');if(!box)return;
+    if(!this.kitsMateriais.length){box.innerHTML='<p style="color:#6b7a99;padding:.75rem 0;">Nenhum kit cadastrado. Crie uma composição ou use o modelo do PDF anexado.</p>';return;}
+    box.innerHTML=this.kitsMateriais.map(kit=>{
+      const linhas=kit.itens.map(i=>{const m=this.materiais.find(x=>String(x.id)===String(i.materialId));return `<li>${this.escaparHTML(i.materialNome||m?.nome||'Material indisponível')}: <strong>${i.quantidade}</strong> ${m?.unidade||''} por kit${i.referencia?` <small>(${this.escaparHTML(i.referencia)})</small>`:''}</li>`;}).join('');
+      const id=JSON.stringify(String(kit.id));
+      return `<article class="card" style="margin:.75rem 0;padding:1rem;"><div style="display:flex;justify-content:space-between;gap:.8rem;flex-wrap:wrap;align-items:center;"><strong>${this.escaparHTML(kit.nome)}</strong><span style="color:#6b7a99;">${kit.itens.length} materiais por kit</span></div>${kit.observacoes?`<p style="color:#6b7a99;margin:.5rem 0;">${this.escaparHTML(kit.observacoes)}</p>`:''}<ul style="margin:.6rem 0 .8rem;padding-left:1.25rem;">${linhas}</ul><div class="btn-group"><button type="button" class="btn btn-warning" onclick='appMateriais.abrirModalBaixaKit(${id})'>📦 Dar baixa</button><button type="button" class="btn btn-secondary" onclick='appMateriais.abrirEditorKit(${id})'>✏️ Editar</button><button type="button" class="btn btn-danger" onclick='appMateriais.excluirKit(${id})'>🗑️ Excluir</button></div></article>`;
+    }).join('');
+  },
+
+  abrirEditorKit(id=null) {
+    if(!auth.pode('gerenciar_kits_materiais'))return app.mostrarAlerta('Somente Admin e Almoxarife podem editar kits.','error');
+    const kit=id?this.kitsMateriais.find(k=>String(k.id)===String(id)):null;if(id&&!kit)return;
+    this.editandoKitId=kit?.id||null;
+    const form=document.getElementById('formKitMaterial');form?.reset();
+    document.getElementById('kitNome').value=kit?.nome||'';document.getElementById('kitObservacoes').value=kit?.observacoes||'';
+    this.kitDraftItems=kit?kit.itens.map(i=>({...i})): [{materialId:'',quantidade:1,referencia:''}];
+    document.getElementById('kitEditorTitulo').textContent=kit?'Editar kit':'Novo kit';document.getElementById('kitEditorCard').style.display='block';
+    this.renderizarEditorKit();document.getElementById('kitEditorCard').scrollIntoView?.({behavior:'smooth',block:'nearest'});
+  },
+  cancelarEditorKit() { this.editandoKitId=null;this.kitDraftItems=[];const form=document.getElementById('formKitMaterial');form?.reset();const card=document.getElementById('kitEditorCard');if(card)card.style.display='none'; },
+
+  carregarExemploKitLoucas() {
+    if(!auth.pode('gerenciar_kits_materiais'))return app.mostrarAlerta('Somente Admin e Almoxarife podem cadastrar kits.','error');
+    if(this.editandoKitId)return app.mostrarAlerta('Salve ou cancele a edição atual antes de carregar o modelo.','warning');
+    const modelo=[
+      ['30 flexíveis de 40 cm',30],['7 flexíveis de 60 cm',7],['12 flexíveis de 30 cm',12],['12 anéis de vedação',12],
+      ['12 válvulas para cozinha',12],['12 válvulas para lavatório',12],['12 válvulas para tanque',12],['12 sifões cromados (cozinha)',12],
+      ['24 sifões brancos (tanque e lavatório)',24],['24 coifas de 100 mm',24],['12 coifas de 75 mm',12],
+      ['24 pares de parafusos de 10 mm (vaso e coluna)',24],['12 pares de parafusos de 8 mm (lavatório)',12],
+      ['24 acabamentos de registro',24],['12 torneiras de tanque',12],['12 torneiras de lavatório',12],['12 torneiras de cozinha',12]
+    ];
+    this.editandoKitId=null;this.kitDraftItems=modelo.map(([referencia,quantidade])=>({materialId:'',quantidade,referencia}));
+    document.getElementById('formKitMaterial')?.reset();document.getElementById('kitNome').value='KIT Louças por Pavimento – Torre B';
+    document.getElementById('kitObservacoes').value='Considerado apenas 12 unidades, porque apartamento cremalheira não instala agora.';
+    document.getElementById('kitEditorTitulo').textContent='Novo kit — composição do PDF';document.getElementById('kitEditorCard').style.display='block';this.renderizarEditorKit();
+  },
+
+  renderizarEditorKit() {
+    const box=document.getElementById('kitItensEditor');if(!box)return;
+    const materiais=this.materiais.slice().sort((a,b)=>String(a.nome||'').localeCompare(String(b.nome||''),'pt-BR',{sensitivity:'base'}));
+    box.innerHTML=this.kitDraftItems.map((item,i)=>{
+      const options='<option value="">Selecione um material do estoque</option>'+materiais.map(m=>`<option value="${this.escaparHTML(m.id)}" ${String(m.id)===String(item.materialId)?'selected':''}>${this.escaparHTML(m.nome)} — saldo: ${Number(m.quantidade)||0}${m.unidade?` ${this.escaparHTML(m.unidade)}`:''}</option>`).join('');
+      return `<div class="card" style="margin:.6rem 0;padding:.8rem;"><div style="display:flex;justify-content:space-between;gap:.5rem;align-items:center;"><strong>Componente ${i+1}</strong><button type="button" class="btn btn-danger" onclick="appMateriais.removerLinhaKit(${i})">Remover</button></div>${item.referencia?`<small style="display:block;color:#6b7a99;margin:.35rem 0;">Referência do PDF: ${this.escaparHTML(item.referencia)}</small>`:''}<div class="form-row" style="margin-top:.35rem;"><div class="form-group"><label>Material do estoque *</label><select required onchange="appMateriais.atualizarLinhaKit(${i},'materialId',this.value)">${options}</select></div><div class="form-group" style="max-width:180px;"><label>Quantidade por kit *</label><input type="number" min="1" step="1" required value="${Number(item.quantidade)||1}" oninput="appMateriais.atualizarLinhaKit(${i},'quantidade',this.value)" /></div></div></div>`;
+    }).join('');
+  },
+  atualizarLinhaKit(indice,campo,valor) { const item=this.kitDraftItems[indice];if(!item)return;item[campo]=campo==='quantidade'?Number(valor):valor; },
+  adicionarLinhaKit() { if(!auth.pode('gerenciar_kits_materiais'))return;this.kitDraftItems.push({materialId:'',quantidade:1,referencia:''});this.renderizarEditorKit(); },
+  removerLinhaKit(indice) { if(!auth.pode('gerenciar_kits_materiais'))return;this.kitDraftItems.splice(indice,1);if(!this.kitDraftItems.length)this.kitDraftItems.push({materialId:'',quantidade:1,referencia:''});this.renderizarEditorKit(); },
+
+  async salvarKit(event) {
+    event.preventDefault();if(!auth.pode('gerenciar_kits_materiais'))return app.mostrarAlerta('Somente Admin e Almoxarife podem salvar kits.','error');
+    const nome=document.getElementById('kitNome').value.trim(),observacoes=document.getElementById('kitObservacoes').value.trim();
+    if(!nome||!this.kitDraftItems.length)return app.mostrarAlerta('Informe o nome e pelo menos um material para o kit.','error');
+    const consolidados=new Map();
+    for(const linha of this.kitDraftItems){const material=this.materiais.find(m=>String(m.id)===String(linha.materialId));const quantidade=Number(linha.quantidade);if(!material||!Number.isInteger(quantidade)||quantidade<1)return app.mostrarAlerta('Selecione um material cadastrado e informe uma quantidade inteira maior que zero em cada linha.','error');const key=String(material.id),anterior=consolidados.get(key);consolidados.set(key,{materialId:material.id,materialNome:material.nome,quantidade:(anterior?.quantidade||0)+quantidade,referencia:[anterior?.referencia,linha.referencia].filter(Boolean).join('; ')});}
+    const atual=this.editandoKitId?this.kitsMateriais.find(k=>String(k.id)===String(this.editandoKitId)):null,agora=new Date().toISOString();
+    const kit={id:atual?.id||this.gerarKitId(),nome,observacoes,itens:[...consolidados.values()],createdAt:atual?.createdAt||agora,updatedAt:agora,updatedBy:window.currentUser?.username||'sistema'};
+    if(!window.__fb?.salvarKitMateriaisNaNuvem)return app.mostrarAlerta('A sincronização de kits não está disponível. Nenhum kit foi salvo.','error');
+    this._kitsWritePending=true;
+    try{const cloud=await window.__fb.salvarKitMateriaisNaNuvem(kit);this.kitsMateriais=this.normalizarKitsMateriais(cloud);localStorage.setItem(this.STORAGE_KEY_KITS_MATERIAIS,JSON.stringify(this.kitsMateriais));this.cancelarEditorKit();this.renderizarListaKits();this.preencherSelectKits();app.mostrarAlerta('Kit salvo e sincronizado com o site e o aplicativo.','success');}
+    catch(e){console.error('Falha ao salvar definição do kit:',e);app.mostrarAlerta(`Não foi possível sincronizar o kit; ele não foi salvo. ${e.message||''}`,'error');}
+    finally{this._kitsWritePending=false;}
+  },
+
+  async excluirKit(id) {
+    if(!auth.pode('gerenciar_kits_materiais'))return app.mostrarAlerta('Somente Admin e Almoxarife podem excluir kits.','error');
+    const kit=this.kitsMateriais.find(k=>String(k.id)===String(id));if(!kit)return;
+    if(!confirm(`Excluir o kit "${kit.nome}"? Os materiais e as baixas já registradas serão mantidos.`))return;
+    if(!window.__fb?.excluirKitMateriaisNaNuvem)return app.mostrarAlerta('A sincronização de kits não está disponível; nada foi excluído.','error');
+    this._kitsWritePending=true;
+    try{const cloud=await window.__fb.excluirKitMateriaisNaNuvem(id);this.kitsMateriais=this.normalizarKitsMateriais(cloud);localStorage.setItem(this.STORAGE_KEY_KITS_MATERIAIS,JSON.stringify(this.kitsMateriais));this.renderizarListaKits();this.preencherSelectKits();this.renderizarPreviaBaixaKit();app.mostrarAlerta('Kit excluído da nuvem; histórico de baixas e materiais foram preservados.','success');}
+    catch(e){console.error('Falha ao excluir kit:',e);app.mostrarAlerta(`Não foi possível excluir o kit: ${e.message||''}`,'error');}
+    finally{this._kitsWritePending=false;}
+  },
+
+  preencherSelectKits() {
+    const sel=document.getElementById('baixaKitSelecionado');if(!sel)return;const atual=sel.value;
+    sel.innerHTML='<option value="">Selecione um kit</option>'+this.kitsMateriais.map(k=>`<option value="${this.escaparHTML(k.id)}">${this.escaparHTML(k.nome)} (${k.itens.length} materiais)</option>`).join('');
+    sel.value=this.kitsMateriais.some(k=>String(k.id)===String(atual))?atual:'';
+  },
+  lerBaixaKitPendente() {
+    try { const salvo=localStorage.getItem(this.STORAGE_KEY_KIT_PENDENTE);const item=salvo?JSON.parse(salvo):null;return item&&item.id&&item.payload?item:null; } catch(e) { return null; }
+  },
+  bloquearCamposBaixaKit(bloqueado) {
+    const form=document.getElementById('formBaixaKit');if(form?.querySelectorAll)form.querySelectorAll('input,select,textarea').forEach(el=>{el.disabled=!!bloqueado;});
+    const btn=document.getElementById('btnConfirmarBaixaKit');if(btn)btn.disabled=false;
+  },
+  abrirModalBaixaKit(kitId=null) {
+    if(!auth.pode('registrar_retirada'))return app.mostrarAlerta('Seu perfil não pode registrar baixas de kits.','error');
+    const pendente=this.lerBaixaKitPendente();
+    if(!this.kitsMateriais.length&&!pendente){app.mostrarAlerta('Cadastre primeiro a composição de um kit.','warning');if(auth.pode('gerenciar_kits_materiais'))this.abrirModalKits();return;}
+    const form=document.getElementById('formBaixaKit');form?.reset();this.preencherSelectKits();
+    this.baixaKitPendingPayload=pendente?.payload||null;this.baixaKitOperationId=pendente?.id||null;
+    if(pendente){
+      const payload=pendente.payload,sel=document.getElementById('baixaKitSelecionado');
+      if(sel&&!this.kitsMateriais.some(k=>String(k.id)===String(payload.kitId))){const opt=document.createElement('option');opt.value=String(payload.kitId);opt.textContent=payload.kitNome||'Kit da tentativa pendente';sel.appendChild(opt);}
+      if(sel)sel.value=String(payload.kitId||'');
+      document.getElementById('baixaKitQuantidade').value=String(payload.quantidadeKits||1);
+      document.getElementById('baixaKitResponsavel').value=payload.responsavel||'';document.getElementById('baixaKitFuncao').value=payload.funcao||'';
+      document.getElementById('baixaKitSetor').value=payload.setor||'';document.getElementById('baixaKitMotivo').value=payload.motivo||'';document.getElementById('baixaKitObservacoes').value=payload.observacoes||'';
+      this.bloquearCamposBaixaKit(true);
+    }else{
+      if(kitId)document.getElementById('baixaKitSelecionado').value=String(kitId);
+      document.getElementById('baixaKitQuantidade').value='1';document.getElementById('baixaKitMotivo').value='Baixa de kit de materiais';this.bloquearCamposBaixaKit(false);
+    }
+    document.getElementById('modalBaixaKit').classList.add('active');this.renderizarPreviaBaixaKit();atualizarBotaoMobile();
+  },
+  fecharModalBaixaKit() { document.getElementById('modalBaixaKit')?.classList.remove('active');atualizarBotaoMobile(); },
+  renderizarPreviaBaixaKit() {
+    const box=document.getElementById('previsaoBaixaKit');if(!box)return;
+    const btn=document.getElementById('btnConfirmarBaixaKit');
+    if(this.baixaKitPendingPayload){box.innerHTML='<p style="color:#8a4b08;font-weight:700;">Há uma tentativa de baixa sem confirmação de rede. Os dados estão bloqueados para impedir alteração do pedido. Clique em “Reenviar/confirmar tentativa” para consultar a mesma chave; o sistema não descontará duas vezes.</p>';if(btn){btn.disabled=false;btn.textContent='Reenviar/confirmar tentativa';}return;}
+    if(btn)btn.textContent='Confirmar baixa dos materiais';
+    const kit=this.kitsMateriais.find(k=>String(k.id)===String(document.getElementById('baixaKitSelecionado')?.value||''));const n=Number(document.getElementById('baixaKitQuantidade')?.value||0);
+    if(!kit){box.innerHTML='<p style="color:#6b7a99;">Selecione um kit para conferir os materiais e os saldos necessários.</p>';if(btn)btn.disabled=true;return;}
+    const rows=kit.itens.map(item=>{const material=this.materiais.find(m=>String(m.id)===String(item.materialId));const total=(Number(item.quantidade)||0)*n,saldo=Number(material?.quantidade)||0,ok=!!material&&Number.isInteger(n)&&n>0&&saldo>=total;return {item,material,total,saldo,ok};});
+    box.innerHTML=`<h4>Conferência da baixa: ${this.escaparHTML(kit.nome)}</h4><p>${Number.isInteger(n)&&n>0?n:0} kit(s) selecionado(s). A baixa será lançada como ${rows.length} movimento(s), um por material.</p><div class="table-wrap"><table><thead><tr><th>Material</th><th>Por kit</th><th>Necessário</th><th>Saldo atual</th><th>Saldo após baixa</th></tr></thead><tbody>${rows.map(r=>`<tr><td>${this.escaparHTML(r.item.materialNome||r.material?.nome||'Material indisponível')}</td><td>${r.item.quantidade}</td><td>${r.total}</td><td>${r.saldo}</td><td style="font-weight:800;color:${r.ok?'#1f7a42':'#b42318'}">${r.ok?r.saldo-r.total:'SALDO INSUFICIENTE'}</td></tr>`).join('')}</tbody></table></div>${rows.every(r=>r.ok)?'<p style="color:#1f7a42;font-weight:700;">Estoque suficiente para todos os componentes.</p>':'<p style="color:#b42318;font-weight:700;">A baixa fica bloqueada: ajuste a quantidade ou reponha os materiais em falta.</p>'}`;
+    if(btn)btn.disabled=!rows.length||!rows.every(r=>r.ok);
+  },
+  async salvarBaixaKit(event) {
+    event.preventDefault();if(!auth.pode('registrar_retirada'))return app.mostrarAlerta('Seu perfil não pode registrar baixas de kits.','error');
+    let tentativa=this.baixaKitPendingPayload?{id:this.baixaKitOperationId,payload:this.baixaKitPendingPayload}:this.lerBaixaKitPendente();let payload=tentativa?.payload||null;
+    if(!payload){
+      const kit=this.kitsMateriais.find(k=>String(k.id)===String(document.getElementById('baixaKitSelecionado').value)),quantidadeKits=Number(document.getElementById('baixaKitQuantidade').value),responsavel=document.getElementById('baixaKitResponsavel').value.trim(),motivo=document.getElementById('baixaKitMotivo').value.trim();
+      if(!kit||!Number.isInteger(quantidadeKits)||quantidadeKits<1||!responsavel||!motivo)return app.mostrarAlerta('Preencha o kit, a quantidade, quem retirou e o motivo.','error');
+      const insuficiente=kit.itens.find(i=>{const m=this.materiais.find(x=>String(x.id)===String(i.materialId));return !m||(Number(m.quantidade)||0)<Number(i.quantidade)*quantidadeKits;});
+      if(insuficiente){this.renderizarPreviaBaixaKit();return app.mostrarAlerta('Saldo insuficiente em pelo menos um componente. Nenhum material foi baixado.','error');}
+      payload={kitId:kit.id,kitNome:kit.nome,kitUpdatedAt:kit.updatedAt,quantidadeKits,responsavel,funcao:document.getElementById('baixaKitFuncao').value.trim(),setor:document.getElementById('baixaKitSetor').value.trim(),motivo,observacoes:document.getElementById('baixaKitObservacoes').value.trim(),lancadoPor:window.currentUser?.username||'sistema',dataHora:new Date().toISOString()};
+      tentativa={id:this.gerarKitId().replace(/^kit_/,'baixa_'),payload};
+      try{localStorage.setItem(this.STORAGE_KEY_KIT_PENDENTE,JSON.stringify(tentativa));}catch(e){return app.mostrarAlerta('Não foi possível salvar a chave de proteção contra baixa duplicada neste aparelho. Nenhum desconto foi enviado.','error');}
+      this.baixaKitOperationId=tentativa.id;this.baixaKitPendingPayload=payload;this.bloquearCamposBaixaKit(true);this.renderizarPreviaBaixaKit();
+    }
+    payload={...payload,id:tentativa.id};
+    if(!window.__fb?.registrarBaixaKitNaNuvem)return app.mostrarAlerta('A baixa sincronizada não está disponível. A tentativa foi preservada sem alterar o saldo.','error');
+    const btn=document.getElementById('btnConfirmarBaixaKit');if(btn)btn.disabled=true;
+    try{
+      const result=await window.__fb.registrarBaixaKitNaNuvem(payload);
+      if(!result||!Array.isArray(result.materiais)||!Array.isArray(result.movimentacoes))throw new Error('O Firebase não retornou a confirmação da baixa.');
+      this.materiais=result.materiais;this.movimentacoes=result.movimentacoes;
+      try{localStorage.setItem(this.STORAGE_KEY,JSON.stringify(this.materiais));localStorage.setItem(this.STORAGE_KEY_MOV,JSON.stringify(this.movimentacoes));localStorage.removeItem(this.STORAGE_KEY_KIT_PENDENTE);}catch(e){console.warn('Baixa sincronizada; cache local indisponível:',e);}
+      this.baixaKitPendingPayload=null;this.baixaKitOperationId=null;this.bloquearCamposBaixaKit(false);
+      this.fecharModalBaixaKit();this.buscarMateriais();this.renderizarMovimentacoes();this.renderizarRelatorioDia();this.renderizarRastreabilidadeCompleta();window.appPainelMateriais?.renderizar();
+      const nomeKit=this.kitsMateriais.find(k=>String(k.id)===String(payload.kitId))?.nome||payload.kitNome||'kit';
+      app.mostrarAlerta(result.duplicada?'Esta baixa já havia sido confirmada. O sistema sincronizou os dados sem repetir o desconto.':`Baixa de ${payload.quantidadeKits} kit(s) (${nomeKit}) confirmada: ${result.recibo?.itens?.length||1} materiais registrados na rastreabilidade.`,result.duplicada?'warning':'success');
+    }catch(e){
+      console.error('Baixa de kit não confirmada:',e);
+      if(e?.code==='kit/validation'){
+        try{localStorage.removeItem(this.STORAGE_KEY_KIT_PENDENTE);}catch(_e){}
+        this.baixaKitPendingPayload=null;this.baixaKitOperationId=null;this.bloquearCamposBaixaKit(false);this.renderizarPreviaBaixaKit();
+        app.mostrarAlerta(`A baixa foi recusada sem alterar o estoque. ${e.message||'Revise os dados e tente novamente.'}`,'error');
+      }else{
+        this.baixaKitPendingPayload=payload;this.baixaKitOperationId=tentativa.id;this.bloquearCamposBaixaKit(true);this.renderizarPreviaBaixaKit();
+        app.mostrarAlerta('Sem confirmação do servidor. A tentativa foi guardada e os campos bloqueados; reenvie a mesma tentativa após conferir a conexão para evitar baixa duplicada.','warning');
+      }
+    }finally{if(btn)btn.disabled=false;}
+  },
+
   renderizarMovimentacoes() {
     const section = document.getElementById('materiais-obra');
     if (!section) return;
@@ -3364,7 +3591,7 @@ const appMateriais = {
         ${auth.pode('ver_rastreabilidade') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button>` : ''}
         <button class="btn btn-secondary" onclick="app.showSection('rastreabilidade', document.querySelector('nav button[data-section=&quot;rastreabilidade&quot;]'))">📋 Ver Rastreabilidade Completa</button>
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${[m.funcao,m.setor].filter(Boolean).join(' / ') || '-'}</td><td>${m.motivo}${m.observacoes ? `<br><small>${m.observacoes}</small>` : ''}</td><td>${m.lancadoPor}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${this.escaparHTML(m.materialNome || '-')}</td><td>${m.quantidade}</td><td>${this.escaparHTML(m.responsavel || '-')}</td><td>${this.escaparHTML([m.funcao,m.setor].filter(Boolean).join(' / ') || '-')}</td><td>${this.escaparHTML(m.motivo || '-')}${m.observacoes ? `<br><small>${this.escaparHTML(m.observacoes || '-')}</small>` : ''}</td><td>${this.escaparHTML(m.lancadoPor || '-')}</td><td>${m.origem==='baixa_kit' ? `<span style="color:#6b7a99;">Baixa de kit protegida</span>` : auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick='appMateriais.excluirMovimentacao("${this.escaparHTML(String(m.id))}")'>Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
     window.appPainelMateriais?.renderizar();
   },
 
@@ -3466,7 +3693,7 @@ const appMateriais = {
         <span class="btn btn-primary" style="cursor:default;">🧾 ${itens.length} registros</span>
         ${auth.pode('ver_rastreabilidade') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button>` : ''}
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${m.materialNome}</td><td>${m.quantidade}</td><td>${m.responsavel}</td><td>${m.funcao || '-'}</td><td>${m.setor || '-'}</td><td>${m.motivo || '-'}</td><td>${m.observacoes || '-'}</td><td>${m.lancadoPor || '-'}</td><td>${auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick="appMateriais.excluirMovimentacao(${m.id})">Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${this.escaparHTML(m.materialNome || '-')}</td><td>${m.quantidade}</td><td>${this.escaparHTML(m.responsavel || '-')}</td><td>${this.escaparHTML(m.funcao || '-')}</td><td>${this.escaparHTML(m.setor || '-')}</td><td>${this.escaparHTML(m.motivo || '-')}</td><td>${this.escaparHTML(m.observacoes || '-')}</td><td>${this.escaparHTML(m.lancadoPor || '-') }</td><td>${m.origem==='baixa_kit' ? `<span style="color:#6b7a99;">Baixa de kit protegida</span>` : auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick='appMateriais.excluirMovimentacao("${this.escaparHTML(String(m.id))}")'>Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
   },
 
   async excluirMovimentacao(id) {
@@ -3474,8 +3701,13 @@ const appMateriais = {
       app.mostrarAlerta('Somente o administrador pode excluir rastreabilidade.', 'error');
       return;
     }
+    const movimento = this.movimentacoes.find(m => String(m.id) === String(id));
+    if (movimento?.origem === 'baixa_kit') {
+      app.mostrarAlerta('Os componentes de uma baixa de kit não podem ser excluídos isoladamente. O histórico e o saldo precisam permanecer íntegros.', 'error');
+      return;
+    }
     if (!confirm('Deseja realmente excluir este registro de rastreabilidade?')) return;
-    this.movimentacoes = this.movimentacoes.filter(m => m.id !== id);
+    this.movimentacoes = this.movimentacoes.filter(m => String(m.id) !== String(id));
     await this.salvarMovimentacoes();
     this.renderizarMovimentacoes();
     this.renderizarRastreabilidadeCompleta();
