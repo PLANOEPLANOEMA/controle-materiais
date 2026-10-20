@@ -1215,6 +1215,7 @@
     carregarKitsMateriaisDaNuvem,
     escutarMudancasKitsMateriais,
     registrarBaixaKitNaNuvem,
+    estornarBaixaKitNaNuvem,
     salvarMovimentacoesNaNuvem,
     carregarMovimentacoesDaNuvem,
     escutarMudancasMovimentacoes,
@@ -1235,7 +1236,7 @@
     escutarMudancasEquipamentosLocacao,
     resolverImagemAnexoDaNuvem,
     excluirImagemAnexoDaNuvem
-  } from "./firebase-controle-usuarios.js?v=1.0.24";
+  } from "./firebase-controle-usuarios.js?v=1.0.25";
 
   window.__fb = {
     salvarNaNuvem,
@@ -1252,6 +1253,7 @@
     carregarKitsMateriaisDaNuvem,
     escutarMudancasKitsMateriais,
     registrarBaixaKitNaNuvem,
+    estornarBaixaKitNaNuvem,
     salvarMovimentacoesNaNuvem,
     carregarMovimentacoesDaNuvem,
     escutarMudancasMovimentacoes,
@@ -1433,8 +1435,8 @@ const auth = {
   pode(acao) {
     const role = window.currentUser?.role || 'admin';
     const mapa = {
-      admin: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','gerenciar_kits_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
-      almoxarife: ['ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','gerenciar_kits_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
+      admin: ['excluir_baixa_kit','ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','gerenciar_kits_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','excluir_rastreabilidade','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
+      almoxarife: ['excluir_baixa_kit','ver_romaneios','editar_emprestimos','editar_materiais','deletar_materiais','gerenciar_kits_materiais','registrar_retirada','ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','ver_rt_dia_dia','gerenciar_grupos_materiais','gerenciar_entregas_materiais'],
       go: ['ver_rastreabilidade','ver_relatorio_dia','ver_relatorio_completo','ver_planejamento_rt','editar_planejamento_rt','ver_predio_3d','ver_rt_dia_dia','editar_rt_dia_dia'],
       engenharia: ['ver_relatorio_dia','ver_relatorio_completo','ver_predio_3d','criar_entregas_materiais']
     };
@@ -3591,7 +3593,7 @@ const appMateriais = {
         ${auth.pode('ver_rastreabilidade') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button>` : ''}
         <button class="btn btn-secondary" onclick="app.showSection('rastreabilidade', document.querySelector('nav button[data-section=&quot;rastreabilidade&quot;]'))">📋 Ver Rastreabilidade Completa</button>
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${this.escaparHTML(m.materialNome || '-')}</td><td>${m.quantidade}</td><td>${this.escaparHTML(m.responsavel || '-')}</td><td>${this.escaparHTML([m.funcao,m.setor].filter(Boolean).join(' / ') || '-')}</td><td>${this.escaparHTML(m.motivo || '-')}${m.observacoes ? `<br><small>${this.escaparHTML(m.observacoes || '-')}</small>` : ''}</td><td>${this.escaparHTML(m.lancadoPor || '-')}</td><td>${m.origem==='baixa_kit' ? `<span style="color:#6b7a99;">Baixa de kit protegida</span>` : auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick='appMateriais.excluirMovimentacao("${this.escaparHTML(String(m.id))}")'>Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função/Setor</th><th>Motivo</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map((m, i) => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${this.escaparHTML(m.materialNome || '-')}</td><td>${m.quantidade}</td><td>${this.escaparHTML(m.responsavel || '-')}</td><td>${this.escaparHTML([m.funcao,m.setor].filter(Boolean).join(' / ') || '-')}</td><td>${this.escaparHTML(m.motivo || '-')}${m.observacoes ? `<br><small>${this.escaparHTML(m.observacoes || '-')}</small>` : ''}</td><td>${this.escaparHTML(m.lancadoPor || '-')}</td><td>${m.origem==='baixa_kit' ? (auth.pode('excluir_baixa_kit') && itens.findIndex(x => x.origem==='baixa_kit' && String(x.idBaixaKit)===String(m.idBaixaKit))===i ? `<button class="btn btn-danger" onclick='appMateriais.excluirBaixaKit("${this.escaparHTML(String(m.idBaixaKit))}")'>Excluir baixa do kit e estornar saldo</button>` : `<span style="color:#6b7a99;">Baixa de kit agrupada</span>`) : auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick='appMateriais.excluirMovimentacao("${this.escaparHTML(String(m.id))}")'>Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma retirada registrada ainda.</p>`}`;
     window.appPainelMateriais?.renderizar();
   },
 
@@ -3693,7 +3695,41 @@ const appMateriais = {
         <span class="btn btn-primary" style="cursor:default;">🧾 ${itens.length} registros</span>
         ${auth.pode('ver_rastreabilidade') ? `<button class="btn btn-warning" onclick="appMateriais.gerarRelatorioRastreabilidadeCompleta()">🧾 Relatório de Rastreabilidade</button>` : ''}
       </div>
-      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map(m => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${this.escaparHTML(m.materialNome || '-')}</td><td>${m.quantidade}</td><td>${this.escaparHTML(m.responsavel || '-')}</td><td>${this.escaparHTML(m.funcao || '-')}</td><td>${this.escaparHTML(m.setor || '-')}</td><td>${this.escaparHTML(m.motivo || '-')}</td><td>${this.escaparHTML(m.observacoes || '-')}</td><td>${this.escaparHTML(m.lancadoPor || '-') }</td><td>${m.origem==='baixa_kit' ? `<span style="color:#6b7a99;">Baixa de kit protegida</span>` : auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick='appMateriais.excluirMovimentacao("${this.escaparHTML(String(m.id))}")'>Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
+      ${itens.length ? `<div class="table-wrap"><table><thead><tr><th>Data/Hora</th><th>Material</th><th>Qtd.</th><th>Quem retirou</th><th>Função</th><th>Setor</th><th>Motivo</th><th>Observações</th><th>Lançado por</th><th>Ações</th></tr></thead><tbody>${itens.map((m, i) => `<tr><td>${new Date(m.dataHora).toLocaleString('pt-BR')}</td><td>${this.escaparHTML(m.materialNome || '-')}</td><td>${m.quantidade}</td><td>${this.escaparHTML(m.responsavel || '-')}</td><td>${this.escaparHTML(m.funcao || '-')}</td><td>${this.escaparHTML(m.setor || '-')}</td><td>${this.escaparHTML(m.motivo || '-')}</td><td>${this.escaparHTML(m.observacoes || '-')}</td><td>${this.escaparHTML(m.lancadoPor || '-') }</td><td>${m.origem==='baixa_kit' ? (auth.pode('excluir_baixa_kit') && itens.findIndex(x => x.origem==='baixa_kit' && String(x.idBaixaKit)===String(m.idBaixaKit))===i ? `<button class="btn btn-danger" onclick='appMateriais.excluirBaixaKit("${this.escaparHTML(String(m.idBaixaKit))}")'>Excluir baixa do kit e estornar saldo</button>` : `<span style="color:#6b7a99;">Baixa de kit agrupada</span>`) : auth.pode('excluir_rastreabilidade') ? `<button class="btn btn-danger" onclick='appMateriais.excluirMovimentacao("${this.escaparHTML(String(m.id))}")'>Excluir</button>` : `<span style="color:#6b7a99;">Somente admin</span>`}</td></tr>`).join('')}</tbody></table></div>` : `<p style="color:#6b7a99;">Nenhuma movimentação encontrada com os filtros informados.</p>`}`;
+  },
+
+
+  async excluirBaixaKit(idBaixaKit) {
+    if (!auth.pode('excluir_baixa_kit')) {
+      app.mostrarAlerta('Somente Admin ou Almoxarife podem iniciar o estorno de uma baixa de kit.', 'error');
+      return;
+    }
+    const id = String(idBaixaKit || '');
+    const movimento = this.movimentacoes.find(m => m?.origem === 'baixa_kit' && String(m.idBaixaKit) === id);
+    if (!id || !movimento) return app.mostrarAlerta('A baixa de kit selecionada não foi encontrada. Atualize os dados e tente novamente.', 'error');
+    if (!confirm(`Excluir a baixa completa de “${movimento.kitNome || 'kit'}” e devolver automaticamente os materiais ao estoque? Esta ação não pode ser desfeita.`)) return;
+    const senha = prompt('Digite a senha de administrador para autorizar o estorno:');
+    if (senha === null) return;
+    if (senha !== 'Admin@123') return app.mostrarAlerta('Senha incorreta. Nenhum dado foi alterado.', 'error');
+    if (!window.__fb?.estornarBaixaKitNaNuvem) return app.mostrarAlerta('A função de estorno não está disponível. Atualize o site/app e tente novamente.', 'error');
+    try {
+      const result = await window.__fb.estornarBaixaKitNaNuvem(id);
+      this.materiais = result.materiais;
+      this.movimentacoes = result.movimentacoes;
+      try {
+        localStorage.setItem(this.STORAGE_KEY, JSON.stringify(this.materiais));
+        localStorage.setItem(this.STORAGE_KEY_MOV, JSON.stringify(this.movimentacoes));
+      } catch (e) { console.warn('Estorno sincronizado; cache local indisponível:', e); }
+      this.buscarMateriais();
+      this.renderizarMovimentacoes();
+      this.renderizarRastreabilidadeCompleta();
+      this.renderizarRelatorioDia();
+      window.appPainelMateriais?.renderizar();
+      app.mostrarAlerta(`Baixa do ${result.kitNome} excluída. ${result.movimentosRemovidos} movimentos removidos e materiais devolvidos ao estoque.`, 'success');
+    } catch (e) {
+      console.error('Falha ao estornar baixa de kit:', e);
+      app.mostrarAlerta(`Não foi possível excluir a baixa. Nenhuma alteração parcial foi realizada. ${e?.message || 'Verifique a conexão e tente novamente.'}`, 'error');
+    }
   },
 
   async excluirMovimentacao(id) {

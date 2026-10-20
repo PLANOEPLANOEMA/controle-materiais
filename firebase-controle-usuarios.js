@@ -363,6 +363,53 @@ export async function registrarBaixaKitNaNuvem(payload) {
   });
 }
 
+
+export async function estornarBaixaKitNaNuvem(idBaixaKit) {
+  const id = String(idBaixaKit || '').replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 80);
+  if (!id) throw erroValidacaoKit('Identificador da baixa de kit inválido.');
+  const reciboRef = doc(db, 'controle', `baixa_kit_${id}`);
+  return await runTransaction(db, async tx => {
+    const [reciboSnap, materiaisSnap, movimentacoesSnap] = await Promise.all([
+      tx.get(reciboRef), tx.get(REF_MATERIAIS), tx.get(REF_MOVIMENTACOES)
+    ]);
+    if (!reciboSnap.exists()) throw erroValidacaoKit('O comprovante desta baixa não foi encontrado. Nenhuma alteração foi feita.');
+    const recibo = reciboSnap.data() || {};
+    const dadosMateriais = materiaisSnap.exists() ? (materiaisSnap.data() || {}) : {};
+    const dadosCompat = movimentacoesSnap.exists() ? (movimentacoesSnap.data() || {}) : {};
+    const principal = Array.isArray(dadosMateriais.materiais) ? dadosMateriais.materiais : null;
+    const compat = Array.isArray(dadosCompat.materiais) ? dadosCompat.materiais : null;
+    const materiais = compat && (!principal || (Number(dadosCompat.materiaisUpdatedAt) || 0) > (Number(dadosMateriais.updatedAt) || 0))
+      ? compat : (principal || compat || []);
+    const movimentos = Array.isArray(dadosCompat.movimentacoes) ? dadosCompat.movimentacoes : [];
+    const kitMovs = movimentos.filter(m => m?.origem === 'baixa_kit' && String(m.idBaixaKit) === id);
+    if (!kitMovs.length) throw erroValidacaoKit('Os movimentos desta baixa não foram encontrados. Nenhuma alteração foi feita.');
+    if (kitMovs.some(m => m.tipo !== 'saida' || !m.materialId || !Number.isInteger(Number(m.quantidade)) || Number(m.quantidade) < 1))
+      throw erroValidacaoKit('A baixa contém movimentos inconsistentes. O estorno foi bloqueado para proteger o estoque.');
+    const estornos = new Map();
+    for (const m of kitMovs) {
+      const key = String(m.materialId);
+      const anterior = estornos.get(key) || { materialId: m.materialId, quantidade: 0, nome: m.materialNome || key };
+      anterior.quantidade += Number(m.quantidade);
+      estornos.set(key, anterior);
+    }
+    const atualizados = new Map();
+    const agoraIso = new Date().toISOString();
+    for (const [key, item] of estornos) {
+      const indice = materiais.findIndex(m => String(m.id) === key);
+      if (indice < 0) throw erroValidacaoKit(`O material ${item.nome} não existe mais no estoque. Recrie o material antes de estornar; nenhum dado foi alterado.`);
+      const material = materiais[indice];
+      atualizados.set(key, { ...material, quantidade: (Number(material.quantidade) || 0) + item.quantidade, dataAtualizacao: agoraIso });
+    }
+    const materiaisNovos = materiais.map(m => atualizados.get(String(m.id)) || m);
+    const movimentacoesNovas = movimentos.filter(m => !(m?.origem === 'baixa_kit' && String(m.idBaixaKit) === id));
+    const atualizadoEm = Date.now();
+    tx.set(REF_MATERIAIS, { materiais: materiaisNovos, updatedAt: atualizadoEm }, { merge: true });
+    tx.set(REF_MOVIMENTACOES, { materiais: materiaisNovos, materiaisUpdatedAt: atualizadoEm, movimentacoes: movimentacoesNovas, updatedAt: atualizadoEm }, { merge: true });
+    tx.delete(reciboRef);
+    return { materiais: materiaisNovos, movimentacoes: movimentacoesNovas, quantidadeMateriaisEstornados: estornos.size, movimentosRemovidos: kitMovs.length, kitNome: recibo.kitNome || kitMovs[0].kitNome || 'kit' };
+  });
+}
+
 // ── ENTREGAS / EMPRÉSTIMOS DE MATERIAIS ──
 export async function salvarEntregasMateriaisNaNuvem(registros) {
   const lista = Array.isArray(registros) ? registros : [];
