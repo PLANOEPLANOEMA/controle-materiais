@@ -284,7 +284,11 @@ export async function registrarBaixaKitNaNuvem(payload) {
   if (!id || !kitId || !Number.isInteger(quantidadeKits) || quantidadeKits < 1) throw erroValidacaoKit('Dados inválidos para a baixa do kit.');
   const reciboRef = doc(db, 'controle', `baixa_kit_${id}`);
   const dataHora = String(payload?.dataHora || new Date().toISOString());
-  const fingerprint = JSON.stringify([kitId, String(payload?.kitUpdatedAt || ''), quantidadeKits, String(payload?.responsavel || '').trim(), String(payload?.funcao || '').trim(), String(payload?.setor || '').trim(), String(payload?.motivo || '').trim(), String(payload?.observacoes || '').trim(), String(payload?.lancadoPor || 'sistema'), dataHora]);
+  const data = String(payload?.data || dataHora.slice(0, 10));
+  const dataTeste = new Date(`${data}T00:00:00.000Z`);
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(data) || Number.isNaN(dataTeste.getTime()) || dataTeste.toISOString().slice(0, 10) !== data) throw erroValidacaoKit('Informe uma data válida para a baixa.');
+  const fingerprintBase = [kitId, String(payload?.kitUpdatedAt || ''), quantidadeKits, String(payload?.responsavel || '').trim(), String(payload?.funcao || '').trim(), String(payload?.setor || '').trim(), String(payload?.motivo || '').trim(), String(payload?.observacoes || '').trim(), String(payload?.lancadoPor || 'sistema')];
+  const fingerprint = JSON.stringify(payload?.data ? [...fingerprintBase, data, dataHora] : [...fingerprintBase, dataHora]);
   return await runTransaction(db, async tx => {
     const [reciboSnap, kitsSnap, materiaisSnap, movimentacoesSnap] = await Promise.all([
       tx.get(reciboRef), tx.get(REF_KITS_MATERIAIS), tx.get(REF_MATERIAIS), tx.get(REF_MOVIMENTACOES)
@@ -345,6 +349,7 @@ export async function registrarBaixaKitNaNuvem(payload) {
       materialId: linha.material.id,
       materialNome: linha.material.nome,
       quantidade: linha.quantidadeTotal,
+      data,
       responsavel,
       funcao: String(payload?.funcao || '').trim(),
       setor: String(payload?.setor || '').trim(),
@@ -355,7 +360,7 @@ export async function registrarBaixaKitNaNuvem(payload) {
     }));
     const movimentacoesNovas = [...novasMovimentacoes, ...movimentacoesAtuais];
     const atualizadoEm = Date.now();
-    const recibo = { id, kitId, kitNome, quantidadeKits, responsavel, dataHora, fingerprint, itens: novasMovimentacoes.map(m => ({ materialId: m.materialId, materialNome: m.materialNome, quantidade: m.quantidade })) };
+    const recibo = { id, kitId, kitNome, quantidadeKits, responsavel, data, dataHora, fingerprint, itens: novasMovimentacoes.map(m => ({ materialId: m.materialId, materialNome: m.materialNome, quantidade: m.quantidade })) };
     tx.set(REF_MATERIAIS, { materiais: materiaisNovos, updatedAt: atualizadoEm }, { merge: true });
     tx.set(REF_MOVIMENTACOES, { materiais: materiaisNovos, materiaisUpdatedAt: atualizadoEm, movimentacoes: movimentacoesNovas, updatedAt: atualizadoEm }, { merge: true });
     tx.set(reciboRef, recibo);
